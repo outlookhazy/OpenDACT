@@ -39,7 +39,7 @@ namespace OpenDACT.Class_Files
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
                     UserVariables.diagonalRodLength = EEPROM.diagonalRod.Value;
-                    UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
+                    UserInterface.consoleLog.Log("Using default diagonal rod length from EEPROM");
                 }
             }
 
@@ -68,7 +68,7 @@ namespace OpenDACT.Class_Files
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
                     UserVariables.diagonalRodLength = EEPROM.diagonalRod.Value;
-                    UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
+                    UserInterface.consoleLog.Log("Using default diagonal rod length from EEPROM");
                 }
             }
 
@@ -117,7 +117,7 @@ namespace OpenDACT.Class_Files
                              Heights.ZOpp < Heights.XOpp + UserVariables.accuracy && Heights.ZOpp > Heights.XOpp - UserVariables.accuracy &&
                              Heights.ZOpp < Heights.YOpp + UserVariables.accuracy && Heights.ZOpp > Heights.YOpp - UserVariables.accuracy;
 
-                UserInterface.LogConsole("Tower:" + tower + " SPM:" + spm + " Alpha:" + alpha + " HRad:" + hrad);
+                UserInterface.consoleLog.Log("Tower:" + tower + " SPM:" + spm + " Alpha:" + alpha + " HRad:" + hrad);
 
                 if (tower)
                 {
@@ -153,7 +153,7 @@ namespace OpenDACT.Class_Files
                 if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                 {
                     EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
-                    UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
+                    UserInterface.consoleLog.Log("Setting Z Max Length with adjustment for FSR");
                 }
 
                 calibrationState = false;
@@ -161,7 +161,7 @@ namespace OpenDACT.Class_Files
             else
             {
                 GCode.checkHeights = true;
-                UserInterface.LogConsole("Continuing Calibration");
+                UserInterface.consoleLog.Log("Continuing Calibration");
             }
         }
 
@@ -179,7 +179,7 @@ namespace OpenDACT.Class_Files
             YOpp -= HRadSA;
             ZOpp -= HRadSA;
 
-            UserInterface.LogConsole("HRad:" + EEPROM.HRadius.ToString());
+            UserInterface.consoleLog.Log("HRad:" + EEPROM.HRadius.ToString());
         }
 
         
@@ -190,7 +190,7 @@ namespace OpenDACT.Class_Files
             int analyzeCount = 0;
 
 
-            UserInterface.logConsole("Expect a slight inaccuracy in the geometry analysis; basic calibration.");
+            UserInterface.consoleLog.Log("Expect a slight inaccuracy in the geometry analysis; basic calibration.");
         }
         */
 
@@ -254,9 +254,9 @@ namespace OpenDACT.Class_Files
 
                     if (Math.Abs(tempX2) <= UserVariables.accuracy && Math.Abs(tempY2) <= UserVariables.accuracy && Math.Abs(tempZ2) <= UserVariables.accuracy)
                     {
-                        UserInterface.LogConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
-                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
-                        UserInterface.LogConsole("No Hrad correction");
+                        UserInterface.consoleLog.Log("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
+                        UserInterface.consoleLog.Log("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.consoleLog.Log("No Hrad correction");
 
                         float smallest = Math.Min(offsetX, Math.Min(offsetY, offsetZ));
 
@@ -264,7 +264,7 @@ namespace OpenDACT.Class_Files
                         offsetY -= smallest;
                         offsetZ -= smallest;
 
-                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.consoleLog.Log("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
 
                         X = tempX2;
                         XOpp = tempXOpp2;
@@ -282,8 +282,8 @@ namespace OpenDACT.Class_Files
                     }
                     else if (j == 99)
                     {
-                        UserInterface.LogConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
-                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.consoleLog.Log("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
+                        UserInterface.consoleLog.Log("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
                         float dradCorr = tempX2 * -1.25F;
                         float HRadRatio = UserVariables.HRadRatio;
 
@@ -304,8 +304,8 @@ namespace OpenDACT.Class_Files
                         tempYOpp2 -= HRadOffset;
                         tempZOpp2 -= HRadOffset;
 
-                        UserInterface.LogConsole("Hrad correction: " + dradCorr);
-                        UserInterface.LogConsole("HRad: " + EEPROM.HRadius.ToString());
+                        UserInterface.consoleLog.Log("Hrad correction: " + dradCorr);
+                        UserInterface.consoleLog.Log("HRad: " + EEPROM.HRadius.ToString());
 
                         j = 0;
                     }
@@ -314,21 +314,21 @@ namespace OpenDACT.Class_Files
                         j++;
                     }
 
-                    //UserInterface.logConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
-                    //UserInterface.logConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
+                    //UserInterface.consoleLog.Log("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                    //UserInterface.consoleLog.Log("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
                 }
                 else
                 {
                     j = 100;
 
-                    UserInterface.LogConsole("Tower Offsets and Delta Radii Calibrated");
+                    UserInterface.consoleLog.Log("Tower Offsets and Delta Radii Calibrated");
                 }
             }
 
             if (EEPROM.offsetX.Value > 1000 || EEPROM.offsetY.Value > 1000 || EEPROM.offsetZ.Value > 1000)
             {
-                UserInterface.LogConsole("Tower offset calibration error, setting default values.");
-                UserInterface.LogConsole("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
+                UserInterface.consoleLog.Log("Tower offset calibration error, setting default values.");
+                UserInterface.consoleLog.Log("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
                 offsetX = 0;
                 offsetY = 0;
                 offsetZ = 0;
@@ -408,7 +408,7 @@ namespace OpenDACT.Class_Files
                     k = 100;
 
                     //log
-                    UserInterface.LogConsole("ABC:" + EEPROM.A + " " + EEPROM.B + " " + EEPROM.C);
+                    UserInterface.consoleLog.Log("ABC:" + EEPROM.A + " " + EEPROM.B + " " + EEPROM.C);
                 }
                 else
                 {
@@ -448,9 +448,9 @@ namespace OpenDACT.Class_Files
             XOpp += (XYZ - XYZOpp) * towChange * 0.75f;
             YOpp += (XYZ - XYZOpp) * towChange * 0.75f;
             ZOpp += (XYZ - XYZOpp) * towChange * 0.75f;
-            
 
-            UserInterface.LogConsole("Steps per Millimeter: " + EEPROM.stepsPerMM.ToString());
+
+            UserInterface.consoleLog.Log("Steps per Millimeter: " + EEPROM.stepsPerMM.ToString());
         }
 
         /*

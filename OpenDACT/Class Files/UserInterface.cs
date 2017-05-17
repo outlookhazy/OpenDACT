@@ -99,27 +99,17 @@ namespace OpenDACT.Class_Files
     }
 
 
-    static class UserInterface
+    public static class UserInterface
     {
-        
-        public static void LogConsole(string value)
-        {
-            if (UserVariables.isInitiated == true)
-            {
-                Program.mainFormTest.AppendMainConsole(value);
-            }
+        public static LogConsole consoleLog;
+        public static LogConsole printerLog;
+
+        public static void Init() {
+            UserInterface.consoleLog = new LogConsole(Program.mainFormTest.consoleMain);
+            UserInterface.printerLog = new LogConsole(Program.mainFormTest.consolePrinter);
         }
 
-
-        public static void LogPrinter(string value)
-        {
-            if (UserVariables.isInitiated == true)
-            {
-                Program.mainFormTest.AppendPrinterConsole(value);
-            }
-        }
-
-        /*
+        /* 
             BUTTONS:
             connect
             disconnect
@@ -132,10 +122,10 @@ namespace OpenDACT.Class_Files
         */
 
         //
-        public static void SetAdvancedCalVars()
+        /*public static void SetAdvancedCalVars()
         {
 
-            /*
+            
             Invoke((MethodInvoker)delegate { mainForm.textDeltaTower.Text = Math.Round(deltaTower, 3).ToString(); });
             Invoke((MethodInvoker)delegate { this.textDeltaOpp.Text = Math.Round(deltaOpp, 3).ToString(); });
             Invoke((MethodInvoker)delegate { this.textHRadRatio.Text = Math.Round(HRadRatio, 3).ToString(); });
@@ -160,14 +150,14 @@ namespace OpenDACT.Class_Files
             Invoke((MethodInvoker)delegate { this.textzxOppPerc.Text = Math.Round(zxOppPerc, 3).ToString(); });
             Invoke((MethodInvoker)delegate { this.textzyPerc.Text = Math.Round(zyPerc, 3).ToString(); });
             Invoke((MethodInvoker)delegate { this.textzyOppPerc.Text = Math.Round(zyOppPerc, 3).ToString(); });
-            */
+            
         }
+        */
 
-        public static void GraphAccuracy()
+        /* public static void GraphAccuracy()
         {
             //create graph of accuracy over iterations
-
-
         }
+        */
     }
 }

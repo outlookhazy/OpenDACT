@@ -156,7 +156,7 @@ namespace OpenDACT.Class_Files
 
         public static void PrintHeights()
         {
-            UserInterface.LogConsole("Center:" + Heights.center + " X:" + Heights.X + " XOpp:" + Heights.XOpp + " Y:" + Heights.Y + " YOpp:" + Heights.YOpp + " Z:" + Heights.Z + " ZOpp:" + Heights.ZOpp);
+            UserInterface.consoleLog.Log("Center:" + Heights.center + " X:" + Heights.X + " XOpp:" + Heights.XOpp + " Y:" + Heights.Y + " YOpp:" + Heights.YOpp + " Z:" + Heights.Z + " ZOpp:" + Heights.ZOpp);
         }
     }
 }

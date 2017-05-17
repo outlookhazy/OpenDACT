@@ -19,7 +19,7 @@ namespace OpenDACT.Class_Files
         }
 
         //uses long string instead of scientific notation
-        public static string ToLongString(double input)
+        /*public static string ToLongString(double input)
         {
             string str = input.ToString().ToUpper();
 
@@ -71,9 +71,10 @@ namespace OpenDACT.Class_Files
 
             return result;
         }
+        */
 
         //keeps input from being in scientific notation, and if the value is near zero then it will be set to zero
-        public static string GetZeros(int zeroCount)
+        /*public static string GetZeros(int zeroCount)
         {
             if (zeroCount < 0)
             {
@@ -89,5 +90,6 @@ namespace OpenDACT.Class_Files
 
             return sb.ToString();
         }
+        */
     }
 }

@@ -22,7 +22,7 @@ namespace OpenDACT.Class_Files
             
             Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            InitializeComponent();
+            InitializeComponent();            
 
             consoleMain.Text = "";
             consoleMain.ScrollBars = RichTextBoxScrollBars.Vertical;
@@ -66,10 +66,11 @@ namespace OpenDACT.Class_Files
                 portsCombo.DisplayMember = "Key";
                 portsCombo.ValueMember = "Value";
             }
-            else
+            /* else
             {
-                UserInterface.LogConsole("No ports available");
+                UserInterface.consoleLog.Log("No ports available");
             }
+            */
 
             //accuracyTime.Series["Accuracy"].Points.AddXY(0, 0);
             UserVariables.isInitiated = true;
@@ -77,12 +78,12 @@ namespace OpenDACT.Class_Files
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            Connection.connect();
+            Connection.Connect();
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            Connection.disconnect();
+            Connection.Disconnect();
         }
 
         private void CalibrateButton_Click(object sender, EventArgs e)
@@ -100,7 +101,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.LogConsole("Not connected");
+                UserInterface.consoleLog.Log("Not connected");
             }
         }
         
@@ -119,7 +120,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.LogConsole("Not connected");
+                UserInterface.consoleLog.Log("Not connected");
             }
         }
 
@@ -137,7 +138,7 @@ namespace OpenDACT.Class_Files
         {
             Invoke((MethodInvoker)delegate { consolePrinter.AppendText(value + "\n"); });
             Invoke((MethodInvoker)delegate { consolePrinter.ScrollToCaret(); });
-        }
+        }        
 
         private void OpenAdvanced_Click(object sender, EventArgs e)
         {
@@ -166,7 +167,7 @@ namespace OpenDACT.Class_Files
         private void SendGCodeText() 
             {
             if (GCode.TrySend(GCodeBox.Text.ToString().ToUpper())) {                
-                UserInterface.LogConsole("Sent: " + GCodeBox.Text.ToString().ToUpper());
+                UserInterface.consoleLog.Log("Sent: " + GCodeBox.Text.ToString().ToUpper());
             }            
         }
 
@@ -304,7 +305,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.LogConsole("Not Connected");
+                UserInterface.consoleLog.Log("Not Connected");
             }
         }
 
@@ -414,9 +415,9 @@ namespace OpenDACT.Class_Files
             {
                 Connection._serialPort.DiscardOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);
-                Connection.disconnect();
+                Connection.Disconnect();
                 Threading.isCalibrating = false;
-                Connection.connect();
+                Connection.Connect();
             }
             catch
             {
@@ -489,8 +490,12 @@ namespace OpenDACT.Class_Files
             }
             catch (Exception ex)
             {
-                UserInterface.LogConsole(ex.ToString());
+                UserInterface.consoleLog.Log(ex.ToString());
             }
-        }        
+        }
+
+        private void MainForm_Load(object sender, EventArgs e) {
+            UserInterface.Init();
+        }
     }
 }

@@ -7,8 +7,7 @@ using System.Threading;
 
 namespace OpenDACT.Class_Files
 {
-
-    class Heightsbackup
+    /* class Heightsbackup
     {
         //store every set of heights
         public static float center;
@@ -20,75 +19,75 @@ namespace OpenDACT.Class_Files
         public static float ZOpp;
 
         //set
-        public static void setCenter(float value)
+        public static void SetCenter(float value)
         {
             value = Validation.CheckZero(value);
             center = value;
         }
-        public static void setX(float value)
+        public static void SetX(float value)
         {
             value = Validation.CheckZero(value);
             X = value;
         }
-        public static void setXOpp(float value)
+        public static void SetXOpp(float value)
         {
             value = Validation.CheckZero(value);
             XOpp = value;
         }
-        public static void setY(float value)
+        public static void SetY(float value)
         {
             value = Validation.CheckZero(value);
             Y = value;
         }
-        public static void setYOpp(float value)
+        public static void SetYOpp(float value)
         {
             value = Validation.CheckZero(value);
             YOpp = value;
         }
-        public static void setZ(float value)
+        public static void SetZ(float value)
         {
             value = Validation.CheckZero(value);
             Z = value;
         }
-        public static void setZOpp(float value)
+        public static void SetZOpp(float value)
         {
             value = Validation.CheckZero(value);
             ZOpp = value;
         }
 
         //return
-        public static float returnCenter()
+        public static float ReturnCenter()
         {
             return center;
         }
-        public static float returnX()
+        public static float ReturnX()
         {
             return X;
         }
-        public static float returnXOpp()
+        public static float ReturnXOpp()
         {
             return XOpp;
         }
-        public static float returnY()
+        public static float ReturnY()
         {
             return Y;
         }
-        public static float returnYOpp()
+        public static float ReturnYOpp()
         {
             return YOpp;
         }
-        public static float returnZ()
+        public static float ReturnZ()
         {
             return Z;
         }
-        public static float returnZOpp()
+        public static float ReturnZOpp()
         {
             return ZOpp;
         }
     }
+    */
 
-
-    class EEPROMbackup
+    /* class EEPROMbackup
     {
         public static float stepsPerMM;
         public static float tempSPM;
@@ -235,9 +234,9 @@ namespace OpenDACT.Class_Files
             return DC;
         }
     }
+    */
 
-
-    class UserVariablesbackup
+    /* class UserVariablesbackup
     {
         //misc vars, alpha offsets, tower offsets, spm offsets, hrad offsets, drad offsets
         public static float HRadRatio;
@@ -380,6 +379,5 @@ namespace OpenDACT.Class_Files
             ialphaRotPercZ = alphaRotationPercentageZ;
         }
     }
+    */
 }
-
-

@@ -122,7 +122,7 @@ namespace OpenDACT.Class_Files
             switch (settingPosition)
             {
                 case EEPROM_Position.StepsPerMM:
-                    UserInterface.LogConsole("EEPROM capture initiated");
+                    UserInterface.consoleLog.Log("EEPROM capture initiated");
 
                     EEPROM.stepsPerMM.Value = value;
                     EEPROM.tempSPM = value;
@@ -179,7 +179,7 @@ namespace OpenDACT.Class_Files
         public static void SendEEPROM()
         {
             //manually set all eeprom values
-            UserInterface.LogConsole("Setting EEPROM.");
+            UserInterface.consoleLog.Log("Setting EEPROM.");
             Thread.Sleep(50);
             GCode.SendEEPROMVariable(EEPROM.stepsPerMM);
             Thread.Sleep(50);

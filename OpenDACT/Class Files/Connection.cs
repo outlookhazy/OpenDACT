@@ -16,16 +16,12 @@ namespace OpenDACT.Class_Files
         public static Thread readThread;
         public static Thread calcThread;
 
-        public static void connect()
+        public static void Connect()
         {
-            if (_serialPort.IsOpen)
-            {
-                UserInterface.LogConsole("Already Connected");
-            }
-            else
-            {
-                try
-                {
+            if (_serialPort.IsOpen) {
+                UserInterface.consoleLog.Log("Already Connected");
+            } else {
+                try {
                     // Opens a new thread if there has been a previous thread that has closed.
                     if (readThread.IsAlive == false)
                     {
@@ -44,7 +40,7 @@ namespace OpenDACT.Class_Files
                     // Open the serial port and start reading on a reader thread.
                     // _continue is a flag used to terminate the app.
 
-                    UserInterface.LogConsole(Program.mainFormTest.portsCombo.Text);
+                    UserInterface.consoleLog.Log(Program.mainFormTest.portsCombo.Text);
 
                     if (Program.mainFormTest.portsCombo.Text != "" && Program.mainFormTest.baudRateCombo.Text != "")
                     {
@@ -53,16 +49,16 @@ namespace OpenDACT.Class_Files
 
                         readThread.Start();
                         calcThread.Start();
-                        UserInterface.LogConsole("Connected");
+                        UserInterface.consoleLog.Log("Connected");
                     }
                     else
                     {
-                        UserInterface.LogConsole("Please fill all text boxes above");
+                        UserInterface.consoleLog.Log("Please fill all text boxes above");
                     }
                 }
                 catch (Exception e1)
                 {
-                    UserInterface.LogConsole(e1.Message);
+                    UserInterface.consoleLog.Log(e1.Message);
                     Threading._continue = false;
 
                     //check if connection is open
@@ -81,7 +77,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static void disconnect()
+        public static void Disconnect()
         {
             if (_serialPort.IsOpen && readThread.IsAlive)
             {
@@ -91,16 +87,16 @@ namespace OpenDACT.Class_Files
                     readThread.Join();
                     calcThread.Join();
                     _serialPort.Close();
-                    UserInterface.LogConsole("Disconnected");
+                    UserInterface.consoleLog.Log("Disconnected");
                 }
                 catch (Exception e1)
                 {
-                    UserInterface.LogConsole(e1.Message);
+                    UserInterface.consoleLog.Log(e1.Message);
                 }
             }
             else
             {
-                UserInterface.LogConsole("Not Connected");
+                UserInterface.consoleLog.Log("Not Connected");
             }
         }
     }

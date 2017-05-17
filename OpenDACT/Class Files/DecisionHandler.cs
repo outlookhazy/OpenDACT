@@ -8,8 +8,10 @@ namespace OpenDACT.Class_Files
 {
     static class DecisionHandler
     {
-        public static void HandleInput(string message, bool canMove)
+        public static void HandleInput(string message)
         {
+            bool canMove = message.Contains("wait");
+
             Program.mainFormTest.SetUserVariables();
 
             if (EEPROMFunctions.tempEEPROMSet == false)
@@ -37,7 +39,7 @@ namespace OpenDACT.Class_Files
                 }
                 else if (canMove == true)
                 {
-                    //UserInterface.logConsole("position flow");
+                    //UserInterface.consoleLog.Log("position flow");
                     GCode.PositionFlow();
                 }
                 else if (HeightFunctions.ParseZProbe(message) != 1000 && HeightFunctions.heightsSet == false)
@@ -63,7 +65,7 @@ namespace OpenDACT.Class_Files
 
                     if (UserVariables.advancedCalibration == false || GCode.isHeuristicComplete == true)
                     {
-                        UserInterface.LogConsole("Calibration Iteration Number: " + Calibration.iterationNum);
+                        UserInterface.consoleLog.Log("Calibration Iteration Number: " + Calibration.iterationNum);
                         Calibration.Calibrate();
 
                         Program.mainFormTest.SetEEPROMGUIList();
@@ -73,19 +75,18 @@ namespace OpenDACT.Class_Files
                         {
                             GCode.TrySend(GCode.Command.HOME);
                             Calibration.calibrationComplete = true;
-                            UserInterface.LogConsole("Calibration Complete");
+                            UserInterface.consoleLog.Log("Calibration Complete");
                             //end calibration
                         }
                     }
                     else
                     {
-                        UserInterface.LogConsole("Heuristic Step: " + UserVariables.advancedCalCount);
+                        UserInterface.consoleLog.Log("Heuristic Step: " + UserVariables.advancedCalCount);
                         GCode.HeuristicLearning();
 
                         Program.mainFormTest.SetEEPROMGUIList();
                         EEPROMFunctions.SendEEPROM();
                     }
-
 
                     Calibration.calibrateInProgress = false;
                 }
@@ -94,12 +95,12 @@ namespace OpenDACT.Class_Files
                     if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                     {
                         EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
-                        UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
+                        UserInterface.consoleLog.Log("Setting Z Max Length with adjustment for FSR");
                     }
 
                     GCode.TrySend(GCode.Command.HOME);
 
-                    UserInterface.LogConsole("Heights checked");
+                    UserInterface.consoleLog.Log("Heights checked");
                 }
 
                 HeightFunctions.heightsSet = false;
@@ -107,7 +108,7 @@ namespace OpenDACT.Class_Files
             /*
             else
             {
-                UserInterface.logConsole("0: " + Calibration.calibrateInProgress + GCode.checkHeights + EEPROMFunctions.tempEEPROMSet + EEPROMFunctions.EEPROMReadOnly);
+                UserInterface.consoleLog.Log("0: " + Calibration.calibrateInProgress + GCode.checkHeights + EEPROMFunctions.tempEEPROMSet + EEPROMFunctions.EEPROMReadOnly);
             }
             */
 

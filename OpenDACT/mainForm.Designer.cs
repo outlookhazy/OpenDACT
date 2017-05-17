@@ -2036,12 +2036,14 @@ namespace OpenDACT.Class_Files
             // 
             // comboBoxZMin
             // 
+            this.comboBoxZMin.DataSource = new OpenDACT.Class_Files.Printer.ProbeType[] {
+        OpenDACT.Class_Files.Printer.ProbeType.FSR,
+        OpenDACT.Class_Files.Printer.ProbeType.ZProbe};
             this.comboBoxZMin.FormattingEnabled = true;
-            this.comboBoxZMin.DataSource = Enum.GetValues(typeof(Printer.ProbeType));            
             this.comboBoxZMin.Location = new System.Drawing.Point(343, 5);
             this.comboBoxZMin.Name = "comboBoxZMin";
             this.comboBoxZMin.Size = new System.Drawing.Size(100, 21);
-            this.comboBoxZMin.TabIndex = 203;            
+            this.comboBoxZMin.TabIndex = 203;
             // 
             // stopBut
             // 
@@ -2100,6 +2102,7 @@ namespace OpenDACT.Class_Files
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "mainForm";
             this.Text = "OpenDACT";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.printerLogPanel.ResumeLayout(false);
             this.printerLogPanel.PerformLayout();
             this.advancedPanel.ResumeLayout(false);

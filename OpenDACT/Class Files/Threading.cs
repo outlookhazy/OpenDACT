@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace OpenDACT.Class_Files
 {
@@ -13,7 +14,7 @@ namespace OpenDACT.Class_Files
         public static bool _continue = true;
         public static bool isCalibrating = true;
 
-        static List<string> readLineData = new List<string>();
+        static ConcurrentQueue<string> readLineData = new ConcurrentQueue<string>();
 
         public static void Read()
         {
@@ -25,10 +26,10 @@ namespace OpenDACT.Class_Files
                 {
                     string message = Connection._serialPort.ReadLine();
 
-                    UserInterface.LogPrinter(message);
+                    UserInterface.printerLog.Log(message);
 
                     //DecisionHandler.handleInput(message);
-                    readLineData.Add(message);
+                    readLineData.Enqueue(message);
                 }
                 catch (TimeoutException) { }
             }//end while
@@ -41,30 +42,15 @@ namespace OpenDACT.Class_Files
             while (_continue)
             {
                 try
-                {
-                    bool hasData;
-                    lock (readLineData)
-                    {
-                        hasData = readLineData.Any();
-                    }
-
-                    while (isCalibrating && hasData)
+                {                   
+                    while (isCalibrating && readLineData.Any())
                     {
                         //wait for ok to perform calculation?
                         UserVariables.isInitiated = true;
-                        bool canMove;
+                        string line;
+                        while (!readLineData.TryDequeue(out line)) { /* spin */ }        
 
-                        if (readLineData.First().Contains("wait"))
-                        {
-                            canMove = true;
-                        }
-                        else
-                        {
-                            canMove = false;
-                        }
-
-                        DecisionHandler.HandleInput(readLineData.First(), canMove);
-                        readLineData.RemoveAt(0);
+                        DecisionHandler.HandleInput(line);                        
                     }//end while
                 }
                 catch (Exception) { }

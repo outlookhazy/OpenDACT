@@ -16,18 +16,16 @@ namespace OpenDACT.Class_Files
         public static bool wasZProbeHeightSet = false;
         public static bool isHeuristicComplete = false;
 
-        public static void MoveToPosition(float X, float Y, float Z)
-        {
-            TrySend("G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        public static bool MoveToPosition(float X, float Y, float Z) {
+            return TrySend("G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
         }
 
-        public static void RapidToPosition(float X, float Y, float Z) 
-        {
-            TrySend("G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        public static bool RapidToPosition(float X, float Y, float Z) {
+            return TrySend("G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
         }
 
-        public static void SendEEPROMVariable(EEPROM_Variable variable) {
-            TrySend(String.Format("M206 T{0} P{1} S{2}", variable.Type, variable.Position, variable.Value.ToString("F3")));
+        public static bool SendEEPROMVariable(EEPROM_Variable variable) {
+            return TrySend(String.Format("M206 T{0} P{1} S{2}", variable.Type, variable.Position, variable.Value.ToString("F3")));
         }
 
         public static bool TrySend(String serialCommand) {
@@ -36,30 +34,28 @@ namespace OpenDACT.Class_Files
                 return true;
             }
             else {
-                UserInterface.LogConsole("Not Connected");
+                UserInterface.consoleLog.Log("Not Connected");
                 return false;
             }
         }
 
-        public static void PauseTimeRadius()
-        {
+        /*
+        public static void PauseTimeRadius() {
             Thread.Sleep(Convert.ToInt32(((UserVariables.plateDiameter / 2) / UserVariables.xySpeed) * 1000));//1000 s to ms x 1.25 for multiplier
         }
 
-        public static void PauseTimeProbe()
-        {
+        public static void PauseTimeProbe() {
             Thread.Sleep(Convert.ToInt32(((UserVariables.probingHeight * 2) / EEPROM.zProbeSpeed.Value) * 1125));
         }
 
-        public static void PauseTimeZMax()
-        {
+        public static void PauseTimeZMax() {
             Thread.Sleep(Convert.ToInt32((EEPROM.zMaxLength.Value / UserVariables.xySpeed) * 1025));
         }
 
-        public static void PauseTimeZMaxThird()
-        {
+        public static void PauseTimeZMaxThird() {
             Thread.Sleep(Convert.ToInt32(((EEPROM.zMaxLength.Value / 3) / UserVariables.xySpeed) * 1000));
         }
+        */
 
 
         public static void PositionFlow()
@@ -311,8 +307,6 @@ namespace OpenDACT.Class_Files
             }//end else
         }
 
-
-
         public static void HeuristicLearning()
         {
             //find base heights
@@ -323,7 +317,7 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     EEPROM.stepsPerMM.Value += 1;
-                    UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
+                    UserInterface.consoleLog.Log("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
                 }
 
                 //check heights
@@ -339,11 +333,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     EEPROM.stepsPerMM.Value -= 1;
-                    UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
+                    UserInterface.consoleLog.Log("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
 
                     //set Hrad +1
                     EEPROM.HRadius.Value += 1;
-                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius.Value).ToString());
+                    UserInterface.consoleLog.Log("Setting horizontal radius to: " + (EEPROM.HRadius.Value).ToString());
                 }
 
                 //check heights
@@ -358,11 +352,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset horizontal radius
                     EEPROM.HRadius.Value -= 1;
-                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
+                    UserInterface.consoleLog.Log("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
 
                     //set X offset
                     EEPROM.offsetX.Value += 80;
-                    UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
+                    UserInterface.consoleLog.Log("Setting offset X to: " + (EEPROM.offsetX).ToString());
                 }
 
                 //check heights
@@ -381,11 +375,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset X offset
                     EEPROM.offsetX.Value -= 80;
-                    UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
+                    UserInterface.consoleLog.Log("Setting offset X to: " + (EEPROM.offsetX).ToString());
 
                     //set Y offset
                     EEPROM.offsetY.Value += 80;
-                    UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
+                    UserInterface.consoleLog.Log("Setting offset Y to: " + (EEPROM.offsetY).ToString());
                 }
 
                 //check heights
@@ -404,11 +398,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset Y offset
                     EEPROM.offsetY.Value -= 80;
-                    UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
+                    UserInterface.consoleLog.Log("Setting offset Y to: " + (EEPROM.offsetY).ToString());
 
                     //set Z offset
                     EEPROM.offsetZ.Value += 80;
-                    UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
+                    UserInterface.consoleLog.Log("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
                 }
 
                 //check heights
@@ -427,11 +421,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set Z offset
                     EEPROM.offsetZ.Value -= 80;
-                    UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
+                    UserInterface.consoleLog.Log("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
 
                     //set alpha rotation offset perc X
                     EEPROM.A.Value += 1;
-                    UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha A to: " + (EEPROM.A).ToString());
                 }
 
                 //check heights
@@ -449,11 +443,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc X
                     EEPROM.A.Value -= 1;
-                    UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha A to: " + (EEPROM.A).ToString());
 
                     //set alpha rotation offset perc Y
                     EEPROM.B.Value += 1;
-                    UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha B to: " + (EEPROM.B).ToString());
                 }
 
                 //check heights
@@ -469,11 +463,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc Y
                     EEPROM.B.Value -= 1;
-                    UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha B to: " + (EEPROM.B).ToString());
 
                     //set alpha rotation offset perc Z
                     EEPROM.C.Value += 1;
-                    UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha C to: " + (EEPROM.C).ToString());
                 }
 
                 //check heights
@@ -490,11 +484,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc Z
                     EEPROM.C.Value -= 1;
-                    UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
+                    UserInterface.consoleLog.Log("Setting Alpha C to: " + (EEPROM.C).ToString());
 
                 }
 
-                UserInterface.LogConsole("Alpha offset percentage: " + UserVariables.alphaRotationPercentage);
+                UserInterface.consoleLog.Log("Alpha offset percentage: " + UserVariables.alphaRotationPercentage);
 
                 UserVariables.advancedCalibration = false;
                 Program.mainFormTest.SetButtonValues();
