@@ -22,37 +22,37 @@ namespace OpenDACT.Class_Files
         //set
         public static void setCenter(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             center = value;
         }
         public static void setX(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             X = value;
         }
         public static void setXOpp(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             XOpp = value;
         }
         public static void setY(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             Y = value;
         }
         public static void setYOpp(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             YOpp = value;
         }
         public static void setZ(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             Z = value;
         }
         public static void setZOpp(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             ZOpp = value;
         }
 
@@ -108,72 +108,72 @@ namespace OpenDACT.Class_Files
         //set
         public static void setSPM(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             stepsPerMM = value;
         }
         public static void setTempSPM(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             tempSPM = value;
         }
         public static void setZMaxLength(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             zMaxLength = value;
         }
         public static void setZProbe(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             zProbe = value;
         }
         public static void setHRadius(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             HRadius = value;
         }
         public static void setOffsetX(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             offsetX = value;
         }
         public static void setOffsetY(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             offsetY = value;
         }
         public static void setOffsetZ(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             offsetZ = value;
         }
         public static void setA(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             A = value;
         }
         public static void setB(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             B = value;
         }
         public static void setC(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             C = value;
         }
         public static void setDA(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             DA = value;
         }
         public static void setDB(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             DB = value;
         }
         public static void setDC(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             DC = value;
         }
 
@@ -270,17 +270,17 @@ namespace OpenDACT.Class_Files
 
         public static void setHRadRatio(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             HRadRatio = value;
         }
         public static void setDRadRatio(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             DRadRatio = value;
         }
         public static void setAccuracy(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             accuracy = value;
         }
         public static void setOffsetXCorrection(float ioffsetXCorrection, float ixxOppPerc, float ixyPerc, float ixyOppPerc, float ixzPerc, float ixzOppPerc)
@@ -313,17 +313,17 @@ namespace OpenDACT.Class_Files
         }
         public static void setAlphaRotationPercentageX(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             alphaRotationPercentageX = value;
         }
         public static void setAlphaRotationPercentageY(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             alphaRotationPercentageY = value;
         }
         public static void setAlphaRotationPercentageZ(float value)
         {
-            value = Validation.checkZero(value);
+            value = Validation.CheckZero(value);
             alphaRotationPercentageZ = value;
         }
 
