@@ -68,29 +68,29 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.logConsole("No ports available");
+                UserInterface.LogConsole("No ports available");
             }
 
             //accuracyTime.Series["Accuracy"].Points.AddXY(0, 0);
             UserVariables.isInitiated = true;
         }
 
-        private void connectButton_Click(object sender, EventArgs e)
+        private void ConnectButton_Click(object sender, EventArgs e)
         {
             Connection.connect();
         }
 
-        private void disconnectButton_Click(object sender, EventArgs e)
+        private void DisconnectButton_Click(object sender, EventArgs e)
         {
             Connection.disconnect();
         }
 
-        private void calibrateButton_Click(object sender, EventArgs e)
+        private void CalibrateButton_Click(object sender, EventArgs e)
         {
             if (Connection._serialPort.IsOpen)
             {
                 GCode.checkHeights = true;
-                EEPROMFunctions.readEEPROM();
+                EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
@@ -100,16 +100,16 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.logConsole("Not connected");
+                UserInterface.LogConsole("Not connected");
             }
         }
         
-        private void quickCalibrate_Click(object sender, EventArgs e)
+        private void QuickCalibrate_Click(object sender, EventArgs e)
         {
             if (Connection._serialPort.IsOpen)
             {
                 GCode.checkHeights = true;
-                EEPROMFunctions.readEEPROM();
+                EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
@@ -119,34 +119,27 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                UserInterface.logConsole("Not connected");
+                UserInterface.LogConsole("Not connected");
             }
         }
 
-        private void resetPrinter_Click(object sender, EventArgs e)
+        private void ResetPrinter_Click(object sender, EventArgs e)
         {
-            if (Connection._serialPort.IsOpen)
-            {
-                GCode.emergencyReset();
-            }
-            else
-            {
-                UserInterface.logConsole("Not connected");
-            }
+                GCode.TrySend(GCode.Command.RESET);
         }
-        public void appendMainConsole(string value)
+        public void AppendMainConsole(string value)
         {
             Invoke((MethodInvoker)delegate { consoleMain.AppendText(value + "\n"); });
             Invoke((MethodInvoker)delegate { consoleMain.ScrollToCaret(); });
         }
 
-        public void appendPrinterConsole(string value)
+        public void AppendPrinterConsole(string value)
         {
             Invoke((MethodInvoker)delegate { consolePrinter.AppendText(value + "\n"); });
             Invoke((MethodInvoker)delegate { consolePrinter.ScrollToCaret(); });
         }
 
-        private void openAdvanced_Click(object sender, EventArgs e)
+        private void OpenAdvanced_Click(object sender, EventArgs e)
         {
             if (advancedPanel.Visible == false)
             {
@@ -160,28 +153,24 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        private void sendGCode_Click(object sender, EventArgs e)
+        private void SendGCode_Click(object sender, EventArgs e)
         {
-            sendGCodeText();
+            SendGCodeText();
         }
 
         private void GCodeBox_KeyUp(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
-                sendGCodeText();
+                SendGCodeText();
         }
 
-        private void sendGCodeText() 
+        private void SendGCodeText() 
             {
-            if (Connection._serialPort.IsOpen) {
-                Connection._serialPort.WriteLine(GCodeBox.Text.ToString().ToUpper());
-                UserInterface.logConsole("Sent: " + GCodeBox.Text.ToString().ToUpper());
-            }
-            else {
-                UserInterface.logConsole("Not Connected");
-            }
+            if (GCode.TrySend(GCodeBox.Text.ToString().ToUpper())) {                
+                UserInterface.LogConsole("Sent: " + GCodeBox.Text.ToString().ToUpper());
+            }            
         }
 
-        public void setAccuracyPoint(float x, float y)
+        public void SetAccuracyPoint(float x, float y)
         {
             Invoke((MethodInvoker)delegate
             {
@@ -190,18 +179,18 @@ namespace OpenDACT.Class_Files
             });
         }
 
-        private void aboutButton_Click(object sender, EventArgs e)
+        private void AboutButton_Click(object sender, EventArgs e)
         {
             System.Windows.Forms.MessageBox.Show("Version: 3.1.0A\n\nCreated by Steven T. Rowland\n\nWith help from Gene Buckle and Michael Hackney\n");
         }
-        private void contactButton_Click_1(object sender, EventArgs e)
+        private void ContactButton_Click_1(object sender, EventArgs e)
         {
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = "mailto:steventrowland@gmail.com";
             proc.Start();
         }
 
-        private void donateButton_Click_1(object sender, EventArgs e)
+        private void DonateButton_Click_1(object sender, EventArgs e)
         {
             string url = "";
 
@@ -221,7 +210,7 @@ namespace OpenDACT.Class_Files
             System.Diagnostics.Process.Start(url);
         }
 
-        public void setHeightsInvoke()
+        public void SetHeightsInvoke()
         {
             float X = Heights.X;
             float XOpp = Heights.XOpp;
@@ -260,7 +249,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public void setEEPROMGUIList()
+        public void SetEEPROMGUIList()
         {
             Invoke((MethodInvoker)delegate
             {
@@ -282,44 +271,44 @@ namespace OpenDACT.Class_Files
             });
         }
 
-        private void sendEEPROMButton_Click(object sender, EventArgs e)
+        private void SendEEPROMButton_Click(object sender, EventArgs e)
         {
-            EEPROM.stepsPerMM = Convert.ToInt32(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.stepsPerMMText.Text, out value); return value; }));
-            EEPROM.zMaxLength = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.zMaxLengthText.Text, out value); return value; }));
-            EEPROM.zProbeHeight = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.zProbeText.Text, out value); return value; }));
-            EEPROM.zProbeSpeed = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.zProbeSpeedText.Text, out value); return value; }));
-            EEPROM.diagonalRod = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.diagonalRod.Text, out value); return value; }));
-            EEPROM.HRadius = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.HRadiusText.Text, out value); return value; }));
-            EEPROM.offsetX = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.offsetXText.Text, out value); return value; }));
-            EEPROM.offsetY = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.offsetYText.Text, out value); return value; }));
-            EEPROM.offsetZ = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.offsetZText.Text, out value); return value; }));
-            EEPROM.A = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.AText.Text, out value); return value; }));
-            EEPROM.B = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.BText.Text, out value); return value; }));
-            EEPROM.C = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.CText.Text, out value); return value; }));
-            EEPROM.DA = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.DAText.Text, out value); return value; }));
-            EEPROM.DB = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.DBText.Text, out value); return value; }));
-            EEPROM.DC = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(this.DCText.Text, out value); return value; }));
+            EEPROM.stepsPerMM = Convert.ToInt32(this.Invoke((Func<double>)delegate { Double.TryParse(this.stepsPerMMText.Text, out double value); return value; }));
+            EEPROM.zMaxLength = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zMaxLengthText.Text, out double value); return value; }));
+            EEPROM.zProbeHeight = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeText.Text, out double value); return value; }));
+            EEPROM.zProbeSpeed = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeSpeedText.Text, out double value); return value; }));
+            EEPROM.diagonalRod = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.diagonalRod.Text, out double value); return value; }));
+            EEPROM.HRadius = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.HRadiusText.Text, out double value); return value; }));
+            EEPROM.offsetX = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetXText.Text, out double value); return value; }));
+            EEPROM.offsetY = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetYText.Text, out double value); return value; }));
+            EEPROM.offsetZ = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetZText.Text, out double value); return value; }));
+            EEPROM.A = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.AText.Text, out double value); return value; }));
+            EEPROM.B = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.BText.Text, out double value); return value; }));
+            EEPROM.C = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.CText.Text, out double value); return value; }));
+            EEPROM.DA = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DAText.Text, out double value); return value; }));
+            EEPROM.DB = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DBText.Text, out double value); return value; }));
+            EEPROM.DC = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DCText.Text, out double value); return value; }));
 
-            EEPROMFunctions.sendEEPROM();
+            EEPROMFunctions.SendEEPROM();
         }
 
-        private void readEEPROM_Click(object sender, EventArgs e)
+        private void ReadEEPROM_Click(object sender, EventArgs e)
         {
             if (Connection._serialPort.IsOpen)
             {
                 EEPROMFunctions.tempEEPROMSet = false;
-                EEPROMFunctions.readEEPROM();
+                EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = true;
                 HeightFunctions.checkHeightsOnly = false;
                 EEPROMFunctions.EEPROMReadCount = 0;
             }
             else
             {
-                UserInterface.logConsole("Not Connected");
+                UserInterface.LogConsole("Not Connected");
             }
         }
 
-        public void setButtonValues()
+        public void SetButtonValues()
         {
             Invoke((MethodInvoker)delegate
             {
@@ -348,23 +337,24 @@ namespace OpenDACT.Class_Files
                 this.textOppPerc.Text = UserVariables.oppPerc.ToString();
             });
         }
-        private string getZMin()
+        private Printer.ProbeType GetZMin()
         {
             if (comboBoxZMin.InvokeRequired)
             {
-                return (string)comboBoxZMin.Invoke(new Func<string>(getZMin));
+                
+                return (Printer.ProbeType)comboBoxZMin.Invoke(new Func<Printer.ProbeType>(GetZMin));
             }
             else
             {
-                return comboBoxZMin.Text;
+                return (Printer.ProbeType)Enum.Parse(typeof(Printer.ProbeType), comboBoxZMin.SelectedItem.ToString());
             }
         }
 
-        private string getHeuristic()
+        private string GetHeuristic()
         {
             if (heuristicComboBox.InvokeRequired)
             {
-                return (string)heuristicComboBox.Invoke(new Func<string>(getHeuristic));
+                return (string)heuristicComboBox.Invoke(new Func<string>(GetHeuristic));
             }
             else
             {
@@ -372,15 +362,15 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public void setUserVariables()
+        public void SetUserVariables()
         {
             UserVariables.calculationAccuracy = Convert.ToSingle(this.textAccuracy.Text);
             UserVariables.accuracy = Convert.ToSingle(this.textAccuracy2.Text);
             UserVariables.HRadRatio = Convert.ToSingle(this.textHRadRatio.Text);
             UserVariables.DRadRatio = Convert.ToSingle(this.textDRadRatio.Text);
 
-            UserVariables.probeChoice = getZMin();
-            UserVariables.advancedCalibration = Convert.ToBoolean(getHeuristic());
+            UserVariables.probeChoice = GetZMin();
+            UserVariables.advancedCalibration = Convert.ToBoolean(GetHeuristic());
 
             UserVariables.pauseTimeSet = Convert.ToInt32(this.textPauseTimeSet.Text);
             UserVariables.maxIterations = Convert.ToInt32(this.textMaxIterations.Text);
@@ -394,19 +384,19 @@ namespace OpenDACT.Class_Files
             UserVariables.probingHeight = Convert.ToSingle(this.textProbingHeight.Text);
 
             //XYZ Offset percs
-            UserVariables.offsetCorrection = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(textOffsetPerc.Text, out value); return value; }));
-            UserVariables.mainOppPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(textMainOppPerc.Text, out value); return value; }));
-            UserVariables.towPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(textTowPerc.Text, out value); return value; }));
-            UserVariables.oppPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(textOppPerc.Text, out value); return value; }));
+            UserVariables.offsetCorrection = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(textOffsetPerc.Text, out double value); return value; }));
+            UserVariables.mainOppPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(textMainOppPerc.Text, out double value); return value; }));
+            UserVariables.towPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(textTowPerc.Text, out double value); return value; }));
+            UserVariables.oppPerc = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(textOppPerc.Text, out double value); return value; }));
 
-            UserVariables.xySpeed = Convert.ToSingle(this.Invoke((Func<double>)delegate { double value; Double.TryParse(xySpeedTxt.Text, out value); return value; }));
+            UserVariables.xySpeed = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(xySpeedTxt.Text, out double value); return value; }));
         }
 
-        private void checkHeights_Click(object sender, EventArgs e)
+        private void CheckHeights_Click(object sender, EventArgs e)
         {
             if (EEPROMFunctions.tempEEPROMSet == false)
             {
-                EEPROMFunctions.readEEPROM();
+                EEPROMFunctions.ReadEEPROM();
             }
 
             GCode.checkHeights = true;
@@ -418,12 +408,12 @@ namespace OpenDACT.Class_Files
             Calibration.calibrationComplete = false;
         }
 
-        private void stopBut_Click(object sender, EventArgs e)
+        private void StopBut_Click(object sender, EventArgs e)
         {
             try
             {
                 Connection._serialPort.DiscardOutBuffer();
-                GCode.emergencyReset();
+                GCode.TrySend(GCode.Command.RESET);
                 Connection.disconnect();
                 Threading.isCalibrating = false;
                 Connection.connect();
@@ -435,13 +425,13 @@ namespace OpenDACT.Class_Files
 
         }
 
-        private void manualCalibrateBut_Click(object sender, EventArgs e)
+        private void ManualCalibrateBut_Click(object sender, EventArgs e)
         {
             try
             {
                 Calibration.calibrationState = true;
 
-                Program.mainFormTest.setUserVariables();
+                Program.mainFormTest.SetUserVariables();
 
                 Heights.X = Convert.ToSingle(xManual.Text);
                 Heights.XOpp = Convert.ToSingle(xOppManual.Text);
@@ -467,7 +457,7 @@ namespace OpenDACT.Class_Files
                 EEPROM.DB = Convert.ToSingle(delRadBMan.Text);
                 EEPROM.DC = Convert.ToSingle(delRadCMan.Text);
 
-                Calibration.basicCalibration();
+                Calibration.BasicCalibration();
 
                 //set eeprom vals in manual calibration
                 this.spmMan.Text = EEPROM.stepsPerMM.ToString();
@@ -499,7 +489,7 @@ namespace OpenDACT.Class_Files
             }
             catch (Exception ex)
             {
-                UserInterface.logConsole(ex.ToString());
+                UserInterface.LogConsole(ex.ToString());
             }
         }        
     }

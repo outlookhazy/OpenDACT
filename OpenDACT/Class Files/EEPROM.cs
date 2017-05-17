@@ -35,12 +35,12 @@ namespace OpenDACT.Class_Files
         public static bool EEPROMReadOnly = false;
         public static int EEPROMReadCount = 0;
 
-        public static void readEEPROM()
+        public static void ReadEEPROM()
         {
-            GCode.sendReadEEPROMCommand();
+            GCode.TrySend(GCode.Command.READ_EEPROM);
         }
 
-        public static void parseEEPROM(string value, out int intParse, out float floatParse2)
+        public static void ParseEEPROM(string value, out int intParse, out float floatParse2)
         {
             //parse EEProm
             if (value.Contains("EPR"))
@@ -84,12 +84,12 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static void setEEPROM(int intParse, float floatParse2)
+        public static void SetEEPROM(int intParse, float floatParse2)
         {
             switch (intParse)
             {
                 case 11:
-                    UserInterface.logConsole("EEPROM capture initiated");
+                    UserInterface.LogConsole("EEPROM capture initiated");
 
                     EEPROM.stepsPerMM = floatParse2;
                     EEPROM.tempSPM = floatParse2;
@@ -105,7 +105,7 @@ namespace OpenDACT.Class_Files
                     tempEEPROMSet = true;
                     GCode.checkHeights = true;
                     EEPROMReadCount++;
-                    Program.mainFormTest.setEEPROMGUIList();
+                    Program.mainFormTest.SetEEPROMGUIList();
 
                     break;
                 case 881:
@@ -144,40 +144,40 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static void sendEEPROM()
+        public static void SendEEPROM()
         {
             //manually set all eeprom values
-            UserInterface.logConsole("Setting EEPROM.");
+            UserInterface.LogConsole("Setting EEPROM.");
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 11, EEPROM.stepsPerMM);
+            GCode.SendEEPROMVariable(3, 11, EEPROM.stepsPerMM);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 153, EEPROM.zMaxLength);
+            GCode.SendEEPROMVariable(3, 153, EEPROM.zMaxLength);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 808, EEPROM.zProbeHeight);
+            GCode.SendEEPROMVariable(3, 808, EEPROM.zProbeHeight);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 812, EEPROM.zProbeSpeed);
+            GCode.SendEEPROMVariable(3, 812, EEPROM.zProbeSpeed);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 881, EEPROM.diagonalRod);
+            GCode.SendEEPROMVariable(3, 881, EEPROM.diagonalRod);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 885, EEPROM.HRadius);
+            GCode.SendEEPROMVariable(3, 885, EEPROM.HRadius);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(1, 893, EEPROM.offsetX);
+            GCode.SendEEPROMVariable(1, 893, EEPROM.offsetX);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(1, 895, EEPROM.offsetY);
+            GCode.SendEEPROMVariable(1, 895, EEPROM.offsetY);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(1, 897, EEPROM.offsetZ);
+            GCode.SendEEPROMVariable(1, 897, EEPROM.offsetZ);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 901, EEPROM.A);
+            GCode.SendEEPROMVariable(3, 901, EEPROM.A);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 905, EEPROM.B);
+            GCode.SendEEPROMVariable(3, 905, EEPROM.B);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 909, EEPROM.C);
+            GCode.SendEEPROMVariable(3, 909, EEPROM.C);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 913, EEPROM.DA);
+            GCode.SendEEPROMVariable(3, 913, EEPROM.DA);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 917, EEPROM.DB);
+            GCode.SendEEPROMVariable(3, 917, EEPROM.DB);
             Thread.Sleep(50);
-            GCode.sendEEPROMVariable(3, 921, EEPROM.DC);
+            GCode.SendEEPROMVariable(3, 921, EEPROM.DC);
             Thread.Sleep(50);
         }
     }

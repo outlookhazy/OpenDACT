@@ -25,7 +25,7 @@ namespace OpenDACT.Class_Files
                 {
                     string message = Connection._serialPort.ReadLine();
 
-                    UserInterface.logPrinter(message);
+                    UserInterface.LogPrinter(message);
 
                     //DecisionHandler.handleInput(message);
                     readLineData.Add(message);
@@ -63,7 +63,7 @@ namespace OpenDACT.Class_Files
                             canMove = false;
                         }
 
-                        DecisionHandler.handleInput(readLineData.First(), canMove);
+                        DecisionHandler.HandleInput(readLineData.First(), canMove);
                         readLineData.RemoveAt(0);
                     }//end while
                 }

@@ -16,108 +16,64 @@ namespace OpenDACT.Class_Files
         public static bool wasZProbeHeightSet = false;
         public static bool isHeuristicComplete = false;
 
-        public static void sendToPosition(float X, float Y, float Z)
+        public static void MoveToPosition(float X, float Y, float Z)
         {
-            if (Connection._serialPort.IsOpen)
-            {
-                Connection._serialPort.WriteLine("G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+            TrySend("G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        }
+
+        public static void RapidToPosition(float X, float Y, float Z) 
+        {
+            TrySend("G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        }
+
+        public static void SendEEPROMVariable(int type, int position, float value)
+        {
+            switch (type) {
+                case 1:
+                    TrySend("M206 T1 P" + position + " S" + value.ToString("F3"));
+                    break;
+                case 3:
+                    TrySend("M206 T3 P" + position + " X" + value.ToString("F3"));
+                    break;
+                default:
+                    UserInterface.LogConsole("Invalid EEPROM Variable.");
+                    break;
+            }          
+        }
+
+        public static bool TrySend(String serialCommand) {
+            if (Connection._serialPort.IsOpen) {
+                Connection._serialPort.WriteLine(serialCommand);
+                return true;
             }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
+            else {
+                UserInterface.LogConsole("Not Connected");
+                return false;
             }
         }
 
-        public static void homeAxes()
-        {
-            if (Connection._serialPort.IsOpen)
-            {
-                Connection._serialPort.WriteLine("G28");
-            }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
-            }
-        }
-        private static void probe()
-        {
-            if (Connection._serialPort.IsOpen)
-            {
-                Connection._serialPort.WriteLine("G30");
-            }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
-            }
-        }
-        public static void emergencyReset()
-        {
-            if (Connection._serialPort.IsOpen)
-            {
-                Connection._serialPort.WriteLine("M112");
-            }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
-            }
-        }
-        public static void sendReadEEPROMCommand()
-        {
-            if (Connection._serialPort.IsOpen)
-            {
-                Connection._serialPort.WriteLine("M205");
-            }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
-            }
-        }
-
-        public static void sendEEPROMVariable(int type, int position, float value)
-        {
-            if (Connection._serialPort.IsOpen)
-            {
-                if (type == 1)
-                {
-                    Connection._serialPort.WriteLine("M206 T1 P" + position + " S" + value.ToString("F3"));
-                }
-                else if (type == 3)
-                {
-                    Connection._serialPort.WriteLine("M206 T3 P" + position + " X" + value.ToString("F3"));
-                }
-                else
-                {
-                    UserInterface.logConsole("Invalid EEPROM Variable.");
-                }
-            }
-            else
-            {
-                UserInterface.logConsole("Not Connected");
-            }
-        }
-
-        public static void pauseTimeRadius()
+        public static void PauseTimeRadius()
         {
             Thread.Sleep(Convert.ToInt32(((UserVariables.plateDiameter / 2) / UserVariables.xySpeed) * 1000));//1000 s to ms x 1.25 for multiplier
         }
 
-        public static void pauseTimeProbe()
+        public static void PauseTimeProbe()
         {
             Thread.Sleep(Convert.ToInt32(((UserVariables.probingHeight * 2) / EEPROM.zProbeSpeed) * 1125));
         }
 
-        public static void pauseTimeZMax()
+        public static void PauseTimeZMax()
         {
             Thread.Sleep(Convert.ToInt32((EEPROM.zMaxLength / UserVariables.xySpeed) * 1025));
         }
 
-        public static void pauseTimeZMaxThird()
+        public static void PauseTimeZMaxThird()
         {
             Thread.Sleep(Convert.ToInt32(((EEPROM.zMaxLength / 3) / UserVariables.xySpeed) * 1000));
         }
 
 
-        public static void positionFlow()
+        public static void PositionFlow()
         {
             float probingHeight = UserVariables.probingHeight;
             float plateDiameter = UserVariables.plateDiameter;
@@ -126,25 +82,25 @@ namespace OpenDACT.Class_Files
             float valueXYLarge = 0.417F * plateDiameter;
             float valueXYSmall = 0.241F * plateDiameter;
 
-            if (UserVariables.probeChoice == "Z-Probe" && wasSet == false)
+            if (UserVariables.probeChoice == Printer.ProbeType.ZProbe && wasSet == false)
             {
                 switch (iteration)
                 {
                     case 0:
                         EEPROM.zProbeHeight = 0;
-                        homeAxes();
+                        TrySend(Command.HOME);
                         iteration++;
                         break;
                     case 1:
-                        Connection._serialPort.WriteLine("G1 Z" + Math.Round(EEPROM.zMaxLength / 6).ToString() + " X0 Y0");
+                        MoveToPosition(0, 0, Convert.ToSingle(Math.Round(EEPROM.zMaxLength / 6)));
                         iteration++;
                         break;
                     case 2:
-                        probe();
-                        
+                        TrySend(Command.PROBE);
+
                         wasSet = true;
-                        Program.mainFormTest.setEEPROMGUIList();
-                        EEPROMFunctions.sendEEPROM();
+                        Program.mainFormTest.SetEEPROMGUIList();
+                        EEPROMFunctions.SendEEPROM();
                         iteration = 0;
                         break;
                 }
@@ -156,7 +112,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                Connection._serialPort.WriteLine("G0 F" + UserVariables.xySpeed * 60);//converts mm/s to mm/min
+                TrySend("G0 F" + UserVariables.xySpeed * 60);//converts mm/s to mm/min
 
                 switch (currentPosition)
                 {
@@ -164,19 +120,19 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                homeAxes();
+                                TrySend(Command.HOME);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);
                                 iteration++;
                                 break;
                             case 2:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X-" + valueXYLarge.ToString() + " Y-" + valueXYSmall.ToString());
+                                MoveToPosition(-valueXYLarge, -valueXYSmall, probingHeight);
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -193,19 +149,19 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X-" + valueXYLarge.ToString() + " Y-" + valueXYSmall.ToString());
+                                MoveToPosition(-valueXYLarge, -valueXYSmall, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);
                                 iteration++;
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X" + valueXYLarge.ToString() + " Y" + valueXYSmall.ToString());
+                                MoveToPosition(valueXYLarge, valueXYSmall, probingHeight);                                
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -222,19 +178,19 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X" + valueXYLarge.ToString() + " Y" + valueXYSmall.ToString());
+                                MoveToPosition(valueXYLarge, valueXYSmall, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);                                
                                 iteration++;
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X" + valueXYLarge.ToString() + " Y-" + valueXYSmall.ToString());
+                                MoveToPosition(valueXYLarge, -valueXYSmall, probingHeight);                                
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -251,19 +207,19 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X" + valueXYLarge.ToString() + " Y-" + valueXYSmall.ToString());
+                                MoveToPosition(valueXYLarge, -valueXYSmall, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);                                
                                 iteration++;
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X-" + valueXYLarge.ToString() + " Y" + valueXYSmall.ToString());
+                                MoveToPosition(-valueXYLarge, valueXYSmall, probingHeight);                                
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -280,19 +236,19 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X-" + valueXYLarge.ToString() + " Y" + valueXYSmall.ToString());
+                                MoveToPosition(-valueXYLarge, valueXYSmall, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);
                                 iteration++;
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y" + valueZ.ToString());
+                                MoveToPosition(0, valueZ, probingHeight);                                
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -309,15 +265,15 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y" + valueZ.ToString());
+                                MoveToPosition(0, valueZ, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y-" + valueZ.ToString());
+                                MoveToPosition(0, -valueZ, probingHeight);
                                 currentPosition++;
                                 iteration = 0;
                                 break;
@@ -333,20 +289,20 @@ namespace OpenDACT.Class_Files
                         switch (iteration)
                         {
                             case 0:
-                                probe();
+                                TrySend(Command.PROBE);
                                 iteration++;
                                 break;
                             case 1:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y-" + valueZ.ToString());
+                                MoveToPosition(0, -valueZ, probingHeight);                                
                                 iteration++;
                                 break;
                             case 2:
-                                Connection._serialPort.WriteLine("G1 Z" + probingHeight.ToString() + " X0 Y0");
+                                MoveToPosition(0, 0, probingHeight);                                
                                 iteration++;
                                 if (Calibration.calibrateInProgress == false){ iteration++; }
                                 break;
                             case 3:
-                                Connection._serialPort.WriteLine("G1 Z" + Convert.ToInt32(EEPROM.zMaxLength / 3) + " X0 Y0");
+                                MoveToPosition(0, 0, Convert.ToInt32(EEPROM.zMaxLength / 3));                                
                                 iteration++;
                                 break;
                             case 4:
@@ -368,7 +324,7 @@ namespace OpenDACT.Class_Files
 
 
 
-        public static void heuristicLearning()
+        public static void HeuristicLearning()
         {
             //find base heights
             //find heights with each value increased by 1 - HRad, tower offset 1-3, diagonal rod
@@ -378,7 +334,7 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     EEPROM.stepsPerMM += 1;
-                    UserInterface.logConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
+                    UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
                 }
 
                 //check heights
@@ -394,11 +350,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     EEPROM.stepsPerMM -= 1;
-                    UserInterface.logConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
+                    UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
 
                     //set Hrad +1
                     EEPROM.HRadius += 1;
-                    UserInterface.logConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
+                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
                 }
 
                 //check heights
@@ -413,11 +369,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset horizontal radius
                     EEPROM.HRadius -= 1;
-                    UserInterface.logConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
+                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
 
                     //set X offset
                     EEPROM.offsetX += 80;
-                    UserInterface.logConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
+                    UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
                 }
 
                 //check heights
@@ -436,11 +392,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset X offset
                     EEPROM.offsetX -= 80;
-                    UserInterface.logConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
+                    UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
 
                     //set Y offset
                     EEPROM.offsetY += 80;
-                    UserInterface.logConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
+                    UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
                 }
 
                 //check heights
@@ -459,11 +415,11 @@ namespace OpenDACT.Class_Files
                 {
                     //reset Y offset
                     EEPROM.offsetY -= 80;
-                    UserInterface.logConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
+                    UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
 
                     //set Z offset
                     EEPROM.offsetZ += 80;
-                    UserInterface.logConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
+                    UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
                 }
 
                 //check heights
@@ -482,11 +438,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set Z offset
                     EEPROM.offsetZ -= 80;
-                    UserInterface.logConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
+                    UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
 
                     //set alpha rotation offset perc X
                     EEPROM.A += 1;
-                    UserInterface.logConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
+                    UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
                 }
 
                 //check heights
@@ -504,11 +460,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc X
                     EEPROM.A -= 1;
-                    UserInterface.logConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
+                    UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
 
                     //set alpha rotation offset perc Y
                     EEPROM.B += 1;
-                    UserInterface.logConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
+                    UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
                 }
 
                 //check heights
@@ -524,11 +480,11 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc Y
                     EEPROM.B -= 1;
-                    UserInterface.logConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
+                    UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
 
                     //set alpha rotation offset perc Z
                     EEPROM.C += 1;
-                    UserInterface.logConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
+                    UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
                 }
 
                 //check heights
@@ -545,14 +501,14 @@ namespace OpenDACT.Class_Files
                 {
                     //set alpha rotation offset perc Z
                     EEPROM.C -= 1;
-                    UserInterface.logConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
+                    UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
 
                 }
 
-                UserInterface.logConsole("Alpha offset percentage: " + UserVariables.alphaRotationPercentage);
+                UserInterface.LogConsole("Alpha offset percentage: " + UserVariables.alphaRotationPercentage);
 
                 UserVariables.advancedCalibration = false;
-                Program.mainFormTest.setButtonValues();
+                Program.mainFormTest.SetButtonValues();
                 UserVariables.advancedCalCount = 0;
                 isHeuristicComplete = true;
 
@@ -561,6 +517,13 @@ namespace OpenDACT.Class_Files
             }
 
             GCode.checkHeights = true;
+        }
+
+        public static class Command {
+            public static String HOME { get { return "G28"; } }
+            public static String PROBE { get { return "G30"; } }
+            public static String RESET { get { return "M112"; } }
+            public static String READ_EEPROM { get { return "M205"; } }
         }
     }
 }

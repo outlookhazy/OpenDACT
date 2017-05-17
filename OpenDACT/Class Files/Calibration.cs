@@ -16,21 +16,21 @@ namespace OpenDACT.Class_Files
         public static int iterationNum = 0;
         private static float tempAccuracy;
 
-        public static void calibrate()
+        public static void Calibrate()
         {
             if (calibrationSelection == 0)
             {
-                basicCalibration();
+                BasicCalibration();
             }
             else if (calibrationSelection == 1)
             {
-                fastCalibration();
+                FastCalibration();
             }
 
             iterationNum++;
         }
         
-        public static void fastCalibration()
+        public static void FastCalibration()
         {
             //check if eeprom object remains after this function is called for the second time
 
@@ -39,19 +39,19 @@ namespace OpenDACT.Class_Files
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
                     UserVariables.diagonalRodLength = EEPROM.diagonalRod;
-                    UserInterface.logConsole("Using default diagonal rod length from EEPROM");
+                    UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
                 }
             }
 
             tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
-            Program.mainFormTest.setAccuracyPoint(iterationNum, tempAccuracy);
-            checkAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+            Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
+            CheckAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
 
             if (calibrationState == true)
             {
-                towerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                alphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                stepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                TowerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                AlphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                StepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 HRad(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
             }
             else
@@ -60,7 +60,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static void basicCalibration()
+        public static void BasicCalibration()
         {
             //check if eeprom object remains after this function is called for the second time
             if (iterationNum == 0)
@@ -68,13 +68,13 @@ namespace OpenDACT.Class_Files
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
                     UserVariables.diagonalRodLength = EEPROM.diagonalRod;
-                    UserInterface.logConsole("Using default diagonal rod length from EEPROM");
+                    UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
                 }
             }
 
             tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
-            Program.mainFormTest.setAccuracyPoint(iterationNum, tempAccuracy);
-            checkAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+            Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
+            CheckAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
 
             if (calibrationState == true)
             {
@@ -117,19 +117,19 @@ namespace OpenDACT.Class_Files
                              Heights.ZOpp < Heights.XOpp + UserVariables.accuracy && Heights.ZOpp > Heights.XOpp - UserVariables.accuracy &&
                              Heights.ZOpp < Heights.YOpp + UserVariables.accuracy && Heights.ZOpp > Heights.YOpp - UserVariables.accuracy;
 
-                UserInterface.logConsole("Tower:" + tower + " SPM:" + spm + " Alpha:" + alpha + " HRad:" + hrad);
+                UserInterface.LogConsole("Tower:" + tower + " SPM:" + spm + " Alpha:" + alpha + " HRad:" + hrad);
 
                 if (tower)
                 {
-                    towerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                    TowerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 }
                 else if (alpha)
                 {
-                    alphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                    AlphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 }
                 else if (spm)
                 {
-                    stepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+                    StepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 }
                 else if (hrad)
                 {
@@ -144,16 +144,16 @@ namespace OpenDACT.Class_Files
         }
         
 
-        private static void checkAccuracy(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        private static void CheckAccuracy(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             float accuracy = UserVariables.accuracy;
 
             if (X <= accuracy && X >= -accuracy && XOpp <= accuracy && XOpp >= -accuracy && Y <= accuracy && Y >= -accuracy && YOpp <= accuracy && YOpp >= -accuracy && Z <= accuracy && Z >= -accuracy && ZOpp <= accuracy && ZOpp >= -accuracy)
             {
-                if (UserVariables.probeChoice == "FSR")
+                if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                 {
                     EEPROM.zMaxLength -= UserVariables.FSROffset;
-                    UserInterface.logConsole("Setting Z Max Length with adjustment for FSR");
+                    UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
                 }
 
                 calibrationState = false;
@@ -161,7 +161,7 @@ namespace OpenDACT.Class_Files
             else
             {
                 GCode.checkHeights = true;
-                UserInterface.logConsole("Continuing Calibration");
+                UserInterface.LogConsole("Continuing Calibration");
             }
         }
 
@@ -179,7 +179,7 @@ namespace OpenDACT.Class_Files
             YOpp -= HRadSA;
             ZOpp -= HRadSA;
 
-            UserInterface.logConsole("HRad:" + EEPROM.HRadius.ToString());
+            UserInterface.LogConsole("HRad:" + EEPROM.HRadius.ToString());
         }
 
         
@@ -194,7 +194,7 @@ namespace OpenDACT.Class_Files
         }
         */
 
-        private static void towerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        private static void TowerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             int j = 0;
             float accuracy = UserVariables.calculationAccuracy;
@@ -254,9 +254,9 @@ namespace OpenDACT.Class_Files
 
                     if (Math.Abs(tempX2) <= UserVariables.accuracy && Math.Abs(tempY2) <= UserVariables.accuracy && Math.Abs(tempZ2) <= UserVariables.accuracy)
                     {
-                        UserInterface.logConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
-                        UserInterface.logConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
-                        UserInterface.logConsole("No Hrad correction");
+                        UserInterface.LogConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
+                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.LogConsole("No Hrad correction");
 
                         float smallest = Math.Min(offsetX, Math.Min(offsetY, offsetZ));
 
@@ -264,7 +264,7 @@ namespace OpenDACT.Class_Files
                         offsetY -= smallest;
                         offsetZ -= smallest;
 
-                        UserInterface.logConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
 
                         X = tempX2;
                         XOpp = tempXOpp2;
@@ -282,8 +282,8 @@ namespace OpenDACT.Class_Files
                     }
                     else if (j == 99)
                     {
-                        UserInterface.logConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
-                        UserInterface.logConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
+                        UserInterface.LogConsole("VHeights :" + tempX2 + " " + tempXOpp2 + " " + tempY2 + " " + tempYOpp2 + " " + tempZ2 + " " + tempZOpp2);
+                        UserInterface.LogConsole("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
                         float dradCorr = tempX2 * -1.25F;
                         float HRadRatio = UserVariables.HRadRatio;
 
@@ -304,8 +304,8 @@ namespace OpenDACT.Class_Files
                         tempYOpp2 -= HRadOffset;
                         tempZOpp2 -= HRadOffset;
 
-                        UserInterface.logConsole("Hrad correction: " + dradCorr);
-                        UserInterface.logConsole("HRad: " + EEPROM.HRadius.ToString());
+                        UserInterface.LogConsole("Hrad correction: " + dradCorr);
+                        UserInterface.LogConsole("HRad: " + EEPROM.HRadius.ToString());
 
                         j = 0;
                     }
@@ -321,21 +321,21 @@ namespace OpenDACT.Class_Files
                 {
                     j = 100;
 
-                    UserInterface.logConsole("Tower Offsets and Delta Radii Calibrated");
+                    UserInterface.LogConsole("Tower Offsets and Delta Radii Calibrated");
                 }
             }
 
             if (EEPROM.offsetX > 1000 || EEPROM.offsetY > 1000 || EEPROM.offsetZ > 1000)
             {
-                UserInterface.logConsole("Tower offset calibration error, setting default values.");
-                UserInterface.logConsole("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
+                UserInterface.LogConsole("Tower offset calibration error, setting default values.");
+                UserInterface.LogConsole("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
                 offsetX = 0;
                 offsetY = 0;
                 offsetZ = 0;
             }
         }
 
-        private static void alphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        private static void AlphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             float offsetX = EEPROM.offsetX;
             float offsetY = EEPROM.offsetY;
@@ -408,7 +408,7 @@ namespace OpenDACT.Class_Files
                     k = 100;
 
                     //log
-                    UserInterface.logConsole("ABC:" + EEPROM.A + " " + EEPROM.B + " " + EEPROM.C);
+                    UserInterface.LogConsole("ABC:" + EEPROM.A + " " + EEPROM.B + " " + EEPROM.C);
                 }
                 else
                 {
@@ -425,7 +425,7 @@ namespace OpenDACT.Class_Files
 /// <param name="YOpp"></param>
 /// <param name="Z"></param>
 /// <param name="ZOpp"></param>
-        private static void stepsPMM(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        private static void StepsPMM(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             /*
             float diagChange = 1 / UserVariables.deltaOpp;
@@ -450,7 +450,7 @@ namespace OpenDACT.Class_Files
             ZOpp += (XYZ - XYZOpp) * towChange * 0.75f;
             
 
-            UserInterface.logConsole("Steps per Millimeter: " + EEPROM.stepsPerMM.ToString());
+            UserInterface.LogConsole("Steps per Millimeter: " + EEPROM.stepsPerMM.ToString());
         }
 
         /*

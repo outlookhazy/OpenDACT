@@ -8,6 +8,13 @@ using System.Globalization;
 
 namespace OpenDACT.Class_Files
 {
+    public static class Printer {
+        public enum ProbeType {            
+            FSR,
+            ZProbe
+        }
+    }
+
     public static class Heights
     {
         //store every set of heights
@@ -57,7 +64,7 @@ namespace OpenDACT.Class_Files
         public static bool heightsSet = false;
         public static bool checkHeightsOnly = false;
 
-        public static void setHeights(float probePosition)
+        public static void SetHeights(float probePosition)
         {
             float zMaxLength = EEPROM.zMaxLength;
             float probingHeight = UserVariables.probingHeight;
@@ -112,7 +119,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static float parseZProbe(string value)
+        public static float ParseZProbe(string value)
         {
             if (value.Contains("Z-probe:"))
             {
@@ -147,9 +154,9 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public static void printHeights()
+        public static void PrintHeights()
         {
-            UserInterface.logConsole("Center:" + Heights.center + " X:" + Heights.X + " XOpp:" + Heights.XOpp + " Y:" + Heights.Y + " YOpp:" + Heights.YOpp + " Z:" + Heights.Z + " ZOpp:" + Heights.ZOpp);
+            UserInterface.LogConsole("Center:" + Heights.center + " X:" + Heights.X + " XOpp:" + Heights.XOpp + " Y:" + Heights.Y + " YOpp:" + Heights.YOpp + " Z:" + Heights.Z + " ZOpp:" + Heights.ZOpp);
         }
     }
 }

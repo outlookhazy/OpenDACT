@@ -8,17 +8,15 @@ namespace OpenDACT.Class_Files
 {
     static class DecisionHandler
     {
-        public static void handleInput(string message, bool canMove)
+        public static void HandleInput(string message, bool canMove)
         {
-            Program.mainFormTest.setUserVariables();
+            Program.mainFormTest.SetUserVariables();
 
             if (EEPROMFunctions.tempEEPROMSet == false)
             {
-                int intParse;
-                float floatParse2;
 
-                EEPROMFunctions.parseEEPROM(message, out intParse, out floatParse2);
-                EEPROMFunctions.setEEPROM(intParse, floatParse2);
+                EEPROMFunctions.ParseEEPROM(message, out int intParse, out float floatParse2);
+                EEPROMFunctions.SetEEPROM(intParse, floatParse2);
             }
             else if (EEPROMFunctions.tempEEPROMSet == true && EEPROMFunctions.EEPROMReadOnly == true && EEPROMFunctions.EEPROMReadCount < 1)
             {
@@ -26,30 +24,30 @@ namespace OpenDACT.Class_Files
             }
             else if (GCode.checkHeights == true && EEPROMFunctions.tempEEPROMSet == true && Calibration.calibrateInProgress == false && EEPROMFunctions.EEPROMReadOnly == false)
             {
-                if (UserVariables.probeChoice == "Z-Probe" && GCode.wasZProbeHeightSet == false && GCode.wasSet == true)
+                if (UserVariables.probeChoice == Printer.ProbeType.ZProbe && GCode.wasZProbeHeightSet == false && GCode.wasSet == true)
                 {
-                    if (HeightFunctions.parseZProbe(message) != 1000)
+                    if (HeightFunctions.ParseZProbe(message) != 1000)
                     {
-                        EEPROM.zProbeHeight = Convert.ToSingle(Math.Round(EEPROM.zMaxLength / 6) - HeightFunctions.parseZProbe(message));
+                        EEPROM.zProbeHeight = Convert.ToSingle(Math.Round(EEPROM.zMaxLength / 6) - HeightFunctions.ParseZProbe(message));
 
                         GCode.wasZProbeHeightSet = true;
-                        Program.mainFormTest.setEEPROMGUIList();
-                        EEPROMFunctions.sendEEPROM();
+                        Program.mainFormTest.SetEEPROMGUIList();
+                        EEPROMFunctions.SendEEPROM();
                     }
                 }
                 else if (canMove == true)
                 {
                     //UserInterface.logConsole("position flow");
-                    GCode.positionFlow();
+                    GCode.PositionFlow();
                 }
-                else if (HeightFunctions.parseZProbe(message) != 1000 && HeightFunctions.heightsSet == false)
+                else if (HeightFunctions.ParseZProbe(message) != 1000 && HeightFunctions.heightsSet == false)
                 {
-                    HeightFunctions.setHeights(HeightFunctions.parseZProbe(message));
+                    HeightFunctions.SetHeights(HeightFunctions.ParseZProbe(message));
                 }
             }
             else if (Calibration.calibrationState == true && Calibration.calibrateInProgress == false && GCode.checkHeights == false && EEPROMFunctions.tempEEPROMSet == true && EEPROMFunctions.EEPROMReadOnly == false && HeightFunctions.heightsSet == true)
             {
-                Program.mainFormTest.setHeightsInvoke();
+                Program.mainFormTest.SetHeightsInvoke();
 
                 if (Calibration.calibrationState == true && HeightFunctions.checkHeightsOnly == false)
                 {
@@ -65,27 +63,27 @@ namespace OpenDACT.Class_Files
 
                     if (UserVariables.advancedCalibration == false || GCode.isHeuristicComplete == true)
                     {
-                        UserInterface.logConsole("Calibration Iteration Number: " + Calibration.iterationNum);
-                        Calibration.calibrate();
+                        UserInterface.LogConsole("Calibration Iteration Number: " + Calibration.iterationNum);
+                        Calibration.Calibrate();
 
-                        Program.mainFormTest.setEEPROMGUIList();
-                        EEPROMFunctions.sendEEPROM();
+                        Program.mainFormTest.SetEEPROMGUIList();
+                        EEPROMFunctions.SendEEPROM();
 
                         if (Calibration.calibrationState == false)
                         {
-                            GCode.homeAxes();
+                            GCode.TrySend(GCode.Command.HOME);
                             Calibration.calibrationComplete = true;
-                            UserInterface.logConsole("Calibration Complete");
+                            UserInterface.LogConsole("Calibration Complete");
                             //end calibration
                         }
                     }
                     else
                     {
-                        UserInterface.logConsole("Heuristic Step: " + UserVariables.advancedCalCount);
-                        GCode.heuristicLearning();
+                        UserInterface.LogConsole("Heuristic Step: " + UserVariables.advancedCalCount);
+                        GCode.HeuristicLearning();
 
-                        Program.mainFormTest.setEEPROMGUIList();
-                        EEPROMFunctions.sendEEPROM();
+                        Program.mainFormTest.SetEEPROMGUIList();
+                        EEPROMFunctions.SendEEPROM();
                     }
 
 
@@ -93,15 +91,15 @@ namespace OpenDACT.Class_Files
                 }
                 else
                 {
-                    if (UserVariables.probeChoice == "FSR")
+                    if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                     {
                         EEPROM.zMaxLength -= UserVariables.FSROffset;
-                        UserInterface.logConsole("Setting Z Max Length with adjustment for FSR");
+                        UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
                     }
 
-                    GCode.homeAxes();
+                    GCode.TrySend(GCode.Command.HOME);
 
-                    UserInterface.logConsole("Heights checked");
+                    UserInterface.LogConsole("Heights checked");
                 }
 
                 HeightFunctions.heightsSet = false;

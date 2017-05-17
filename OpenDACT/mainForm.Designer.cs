@@ -1,4 +1,6 @@
-﻿namespace OpenDACT.Class_Files
+﻿using System;
+
+namespace OpenDACT.Class_Files
 {
     partial class mainForm
     {
@@ -260,7 +262,7 @@
             this.connectButton.TabIndex = 2;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
-            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
+            this.connectButton.Click += new System.EventHandler(this.ConnectButton_Click);
             // 
             // disconnectButton
             // 
@@ -270,7 +272,7 @@
             this.disconnectButton.TabIndex = 3;
             this.disconnectButton.Text = "Disconnect";
             this.disconnectButton.UseVisualStyleBackColor = true;
-            this.disconnectButton.Click += new System.EventHandler(this.disconnectButton_Click);
+            this.disconnectButton.Click += new System.EventHandler(this.DisconnectButton_Click);
             // 
             // calibrateButton
             // 
@@ -280,7 +282,7 @@
             this.calibrateButton.TabIndex = 4;
             this.calibrateButton.Text = "Calibrate";
             this.calibrateButton.UseVisualStyleBackColor = true;
-            this.calibrateButton.Click += new System.EventHandler(this.calibrateButton_Click);
+            this.calibrateButton.Click += new System.EventHandler(this.CalibrateButton_Click);
             // 
             // baudRateCombo
             // 
@@ -306,7 +308,7 @@
             this.resetPrinter.TabIndex = 9;
             this.resetPrinter.Text = "Reset";
             this.resetPrinter.UseVisualStyleBackColor = true;
-            this.resetPrinter.Click += new System.EventHandler(this.resetPrinter_Click);
+            this.resetPrinter.Click += new System.EventHandler(this.ResetPrinter_Click);
             // 
             // openAdvanced
             // 
@@ -316,7 +318,7 @@
             this.openAdvanced.TabIndex = 10;
             this.openAdvanced.Text = "Advanced";
             this.openAdvanced.UseVisualStyleBackColor = true;
-            this.openAdvanced.Click += new System.EventHandler(this.openAdvanced_Click);
+            this.openAdvanced.Click += new System.EventHandler(this.OpenAdvanced_Click);
             // 
             // printerLogPanel
             // 
@@ -835,7 +837,7 @@
             this.readEEPROM.TabIndex = 199;
             this.readEEPROM.Text = "Read EEPROM Values";
             this.readEEPROM.UseVisualStyleBackColor = true;
-            this.readEEPROM.Click += new System.EventHandler(this.readEEPROM_Click);
+            this.readEEPROM.Click += new System.EventHandler(this.ReadEEPROM_Click);
             // 
             // label52
             // 
@@ -881,7 +883,7 @@
             this.sendEEPROMButton.TabIndex = 192;
             this.sendEEPROMButton.Text = "Send EEPROM Values";
             this.sendEEPROMButton.UseVisualStyleBackColor = true;
-            this.sendEEPROMButton.Click += new System.EventHandler(this.sendEEPROMButton_Click);
+            this.sendEEPROMButton.Click += new System.EventHandler(this.SendEEPROMButton_Click);
             // 
             // label47
             // 
@@ -1825,7 +1827,7 @@
             this.manualCalibrateBut.TabIndex = 205;
             this.manualCalibrateBut.Text = "Manually Calibrate";
             this.manualCalibrateBut.UseVisualStyleBackColor = true;
-            this.manualCalibrateBut.Click += new System.EventHandler(this.manualCalibrateBut_Click);
+            this.manualCalibrateBut.Click += new System.EventHandler(this.ManualCalibrateBut_Click);
             // 
             // xOppManual
             // 
@@ -1955,7 +1957,7 @@
             this.sendGCode.TabIndex = 19;
             this.sendGCode.Text = "Send GC";
             this.sendGCode.UseVisualStyleBackColor = true;
-            this.sendGCode.Click += new System.EventHandler(this.sendGCode_Click);
+            this.sendGCode.Click += new System.EventHandler(this.SendGCode_Click);
             // 
             // pictureBox2
             // 
@@ -1975,7 +1977,7 @@
             this.aboutButton.TabIndex = 21;
             this.aboutButton.Text = "About";
             this.aboutButton.UseVisualStyleBackColor = true;
-            this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
+            this.aboutButton.Click += new System.EventHandler(this.AboutButton_Click);
             // 
             // contactButton
             // 
@@ -1985,7 +1987,7 @@
             this.contactButton.TabIndex = 22;
             this.contactButton.Text = "Contact";
             this.contactButton.UseVisualStyleBackColor = true;
-            this.contactButton.Click += new System.EventHandler(this.contactButton_Click_1);
+            this.contactButton.Click += new System.EventHandler(this.ContactButton_Click_1);
             // 
             // donateButton
             // 
@@ -1995,7 +1997,7 @@
             this.donateButton.TabIndex = 23;
             this.donateButton.Text = "Donate";
             this.donateButton.UseVisualStyleBackColor = true;
-            this.donateButton.Click += new System.EventHandler(this.donateButton_Click_1);
+            this.donateButton.Click += new System.EventHandler(this.DonateButton_Click_1);
             // 
             // diagonalRodLengthText
             // 
@@ -2030,19 +2032,16 @@
             this.checkHeights.TabIndex = 202;
             this.checkHeights.Text = "Check Current Heights";
             this.checkHeights.UseVisualStyleBackColor = true;
-            this.checkHeights.Click += new System.EventHandler(this.checkHeights_Click);
+            this.checkHeights.Click += new System.EventHandler(this.CheckHeights_Click);
             // 
             // comboBoxZMin
             // 
             this.comboBoxZMin.FormattingEnabled = true;
-            this.comboBoxZMin.Items.AddRange(new object[] {
-            "FSR",
-            "Z-Probe"});
+            this.comboBoxZMin.DataSource = Enum.GetValues(typeof(Printer.ProbeType));            
             this.comboBoxZMin.Location = new System.Drawing.Point(343, 5);
             this.comboBoxZMin.Name = "comboBoxZMin";
             this.comboBoxZMin.Size = new System.Drawing.Size(100, 21);
-            this.comboBoxZMin.TabIndex = 203;
-            this.comboBoxZMin.Text = "FSR";
+            this.comboBoxZMin.TabIndex = 203;            
             // 
             // stopBut
             // 
@@ -2052,7 +2051,7 @@
             this.stopBut.TabIndex = 204;
             this.stopBut.Text = "Stop";
             this.stopBut.UseVisualStyleBackColor = true;
-            this.stopBut.Click += new System.EventHandler(this.stopBut_Click);
+            this.stopBut.Click += new System.EventHandler(this.StopBut_Click);
             // 
             // quickCalibrate
             // 
@@ -2062,7 +2061,7 @@
             this.quickCalibrate.TabIndex = 205;
             this.quickCalibrate.Text = "Quick Calibrate";
             this.quickCalibrate.UseVisualStyleBackColor = true;
-            this.quickCalibrate.Click += new System.EventHandler(this.quickCalibrate_Click);
+            this.quickCalibrate.Click += new System.EventHandler(this.QuickCalibrate_Click);
             // 
             // mainForm
             // 

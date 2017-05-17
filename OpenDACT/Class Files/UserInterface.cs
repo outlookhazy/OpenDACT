@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Diagnostics;
 using System.Threading;
+using static OpenDACT.Class_Files.Printer;
 
 namespace OpenDACT.Class_Files
 {
@@ -81,7 +82,7 @@ namespace OpenDACT.Class_Files
         public static float probingSpeed;
         public static float xySpeed;//feedrate in gcode
 
-        public static string probeChoice;
+        public static ProbeType probeChoice;
 
         public static bool advancedCalibration = false;
         
@@ -101,20 +102,20 @@ namespace OpenDACT.Class_Files
     static class UserInterface
     {
         
-        public static void logConsole(string value)
+        public static void LogConsole(string value)
         {
             if (UserVariables.isInitiated == true)
             {
-                Program.mainFormTest.appendMainConsole(value);
+                Program.mainFormTest.AppendMainConsole(value);
             }
         }
 
 
-        public static void logPrinter(string value)
+        public static void LogPrinter(string value)
         {
             if (UserVariables.isInitiated == true)
             {
-                Program.mainFormTest.appendPrinterConsole(value);
+                Program.mainFormTest.AppendPrinterConsole(value);
             }
         }
 
@@ -131,7 +132,7 @@ namespace OpenDACT.Class_Files
         */
 
         //
-        public static void setAdvancedCalVars()
+        public static void SetAdvancedCalVars()
         {
 
             /*

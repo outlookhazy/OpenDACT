@@ -20,7 +20,7 @@ namespace OpenDACT.Class_Files
         {
             if (_serialPort.IsOpen)
             {
-                UserInterface.logConsole("Already Connected");
+                UserInterface.LogConsole("Already Connected");
             }
             else
             {
@@ -44,7 +44,7 @@ namespace OpenDACT.Class_Files
                     // Open the serial port and start reading on a reader thread.
                     // _continue is a flag used to terminate the app.
 
-                    UserInterface.logConsole(Program.mainFormTest.portsCombo.Text);
+                    UserInterface.LogConsole(Program.mainFormTest.portsCombo.Text);
 
                     if (Program.mainFormTest.portsCombo.Text != "" && Program.mainFormTest.baudRateCombo.Text != "")
                     {
@@ -53,16 +53,16 @@ namespace OpenDACT.Class_Files
 
                         readThread.Start();
                         calcThread.Start();
-                        UserInterface.logConsole("Connected");
+                        UserInterface.LogConsole("Connected");
                     }
                     else
                     {
-                        UserInterface.logConsole("Please fill all text boxes above");
+                        UserInterface.LogConsole("Please fill all text boxes above");
                     }
                 }
                 catch (Exception e1)
                 {
-                    UserInterface.logConsole(e1.Message);
+                    UserInterface.LogConsole(e1.Message);
                     Threading._continue = false;
 
                     //check if connection is open
@@ -91,16 +91,16 @@ namespace OpenDACT.Class_Files
                     readThread.Join();
                     calcThread.Join();
                     _serialPort.Close();
-                    UserInterface.logConsole("Disconnected");
+                    UserInterface.LogConsole("Disconnected");
                 }
                 catch (Exception e1)
                 {
-                    UserInterface.logConsole(e1.Message);
+                    UserInterface.LogConsole(e1.Message);
                 }
             }
             else
             {
-                UserInterface.logConsole("Not Connected");
+                UserInterface.LogConsole("Not Connected");
             }
         }
     }
