@@ -245,12 +245,12 @@ namespace OpenDACT.Class_Files
                     tempYOpp2 -= tempZ2 * (-oppSub / towMain);
                     tempZ2 -= tempZ2 / 1;
 
-                    tempX2 = Validation.checkZero(tempX2);
-                    tempY2 = Validation.checkZero(tempY2);
-                    tempZ2 = Validation.checkZero(tempZ2);
-                    tempXOpp2 = Validation.checkZero(tempXOpp2);
-                    tempYOpp2 = Validation.checkZero(tempYOpp2);
-                    tempZOpp2 = Validation.checkZero(tempZOpp2);
+                    tempX2 = Validation.CheckZero(tempX2);
+                    tempY2 = Validation.CheckZero(tempY2);
+                    tempZ2 = Validation.CheckZero(tempZ2);
+                    tempXOpp2 = Validation.CheckZero(tempXOpp2);
+                    tempYOpp2 = Validation.CheckZero(tempYOpp2);
+                    tempZOpp2 = Validation.CheckZero(tempZOpp2);
 
                     if (Math.Abs(tempX2) <= UserVariables.accuracy && Math.Abs(tempY2) <= UserVariables.accuracy && Math.Abs(tempZ2) <= UserVariables.accuracy)
                     {
