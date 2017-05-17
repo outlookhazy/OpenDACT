@@ -10,22 +10,37 @@ namespace OpenDACT.Class_Files
 {
     public static class EEPROM
     {
-        public static float stepsPerMM;
+        public static EEPROM_Variable stepsPerMM = new EEPROM_Variable(3, 11);
         public static float tempSPM;
-        public static float zMaxLength;
-        public static float zProbeHeight;
-        public static float zProbeSpeed;
-        public static float HRadius;
-        public static float diagonalRod;
-        public static float offsetX;
-        public static float offsetY;
-        public static float offsetZ;
-        public static float A;
-        public static float B;
-        public static float C;
-        public static float DA;
-        public static float DB;
-        public static float DC;
+        public static EEPROM_Variable zMaxLength = new EEPROM_Variable(3, 153);
+        public static EEPROM_Variable zProbeHeight = new EEPROM_Variable(3, 808);
+        public static EEPROM_Variable zProbeSpeed = new EEPROM_Variable(3, 812);
+        public static EEPROM_Variable diagonalRod = new EEPROM_Variable(3, 881);
+        public static EEPROM_Variable HRadius = new EEPROM_Variable(3, 885);
+        public static EEPROM_Variable offsetX = new EEPROM_Variable(1, 893);
+        public static EEPROM_Variable offsetY = new EEPROM_Variable(1, 895);
+        public static EEPROM_Variable offsetZ = new EEPROM_Variable(1, 897);
+        public static EEPROM_Variable A = new EEPROM_Variable(3, 901);
+        public static EEPROM_Variable B = new EEPROM_Variable(3, 905);
+        public static EEPROM_Variable C = new EEPROM_Variable(3, 909);
+        public static EEPROM_Variable DA = new EEPROM_Variable(3, 913);
+        public static EEPROM_Variable DB = new EEPROM_Variable(3, 917);
+        public static EEPROM_Variable DC = new EEPROM_Variable(3, 921);
+    }
+
+    public class EEPROM_Variable {
+        public int Type { get; private set; }
+        public int Position { get; private set; }
+        public float Value;
+
+        public EEPROM_Variable(int Type, int Position) {
+            this.Type = Type;
+            this.Position = Position;
+        }
+
+        public override string ToString() {
+            return this.Value.ToString();
+        }
     }
 
     static class EEPROMFunctions
@@ -91,17 +106,17 @@ namespace OpenDACT.Class_Files
                 case 11:
                     UserInterface.LogConsole("EEPROM capture initiated");
 
-                    EEPROM.stepsPerMM = floatParse2;
+                    EEPROM.stepsPerMM.Value = floatParse2;
                     EEPROM.tempSPM = floatParse2;
                     break;
                 case 153:
-                    EEPROM.zMaxLength = floatParse2;
+                    EEPROM.zMaxLength.Value = floatParse2;
                     break;
                 case 808:
-                    EEPROM.zProbeHeight = floatParse2;
+                    EEPROM.zProbeHeight.Value = floatParse2;
                     break;
                 case 812:
-                    EEPROM.zProbeSpeed = floatParse2;
+                    EEPROM.zProbeSpeed.Value = floatParse2;
                     tempEEPROMSet = true;
                     GCode.checkHeights = true;
                     EEPROMReadCount++;
@@ -109,37 +124,37 @@ namespace OpenDACT.Class_Files
 
                     break;
                 case 881:
-                    EEPROM.diagonalRod = floatParse2;
+                    EEPROM.diagonalRod.Value = floatParse2;
                     break;
                 case 885:
-                    EEPROM.HRadius = floatParse2;
+                    EEPROM.HRadius.Value = floatParse2;
                     break;
                 case 893:
-                    EEPROM.offsetX = floatParse2;
+                    EEPROM.offsetX.Value = floatParse2;
                     break;
                 case 895:
-                    EEPROM.offsetY = floatParse2;
+                    EEPROM.offsetY.Value = floatParse2;
                     break;
                 case 897:
-                    EEPROM.offsetZ = floatParse2;
+                    EEPROM.offsetZ.Value = floatParse2;
                     break;
                 case 901:
-                    EEPROM.A = floatParse2;
+                    EEPROM.A.Value = floatParse2;
                     break;
                 case 905:
-                    EEPROM.B = floatParse2;
+                    EEPROM.B.Value = floatParse2;
                     break;
                 case 909:
-                    EEPROM.C = floatParse2;
+                    EEPROM.C.Value = floatParse2;
                     break;
                 case 913:
-                    EEPROM.DA = floatParse2;
+                    EEPROM.DA.Value = floatParse2;
                     break;
                 case 917:
-                    EEPROM.DB = floatParse2;
+                    EEPROM.DB.Value = floatParse2;
                     break;
                 case 921:
-                    EEPROM.DC = floatParse2;
+                    EEPROM.DC.Value = floatParse2;
                     break;
             }
         }
@@ -149,35 +164,35 @@ namespace OpenDACT.Class_Files
             //manually set all eeprom values
             UserInterface.LogConsole("Setting EEPROM.");
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 11, EEPROM.stepsPerMM);
+            GCode.SendEEPROMVariable(EEPROM.stepsPerMM);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 153, EEPROM.zMaxLength);
+            GCode.SendEEPROMVariable(EEPROM.zMaxLength);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 808, EEPROM.zProbeHeight);
+            GCode.SendEEPROMVariable(EEPROM.zProbeHeight);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 812, EEPROM.zProbeSpeed);
+            GCode.SendEEPROMVariable(EEPROM.zProbeSpeed);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 881, EEPROM.diagonalRod);
+            GCode.SendEEPROMVariable(EEPROM.diagonalRod);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 885, EEPROM.HRadius);
+            GCode.SendEEPROMVariable(EEPROM.HRadius);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(1, 893, EEPROM.offsetX);
+            GCode.SendEEPROMVariable(EEPROM.offsetX);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(1, 895, EEPROM.offsetY);
+            GCode.SendEEPROMVariable(EEPROM.offsetY);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(1, 897, EEPROM.offsetZ);
+            GCode.SendEEPROMVariable(EEPROM.offsetZ);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 901, EEPROM.A);
+            GCode.SendEEPROMVariable(EEPROM.A);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 905, EEPROM.B);
+            GCode.SendEEPROMVariable(EEPROM.B);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 909, EEPROM.C);
+            GCode.SendEEPROMVariable(EEPROM.C);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 913, EEPROM.DA);
+            GCode.SendEEPROMVariable(EEPROM.DA);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 917, EEPROM.DB);
+            GCode.SendEEPROMVariable(EEPROM.DB);
             Thread.Sleep(50);
-            GCode.SendEEPROMVariable(3, 921, EEPROM.DC);
+            GCode.SendEEPROMVariable(EEPROM.DC);
             Thread.Sleep(50);
         }
     }

@@ -66,7 +66,7 @@ namespace OpenDACT.Class_Files
 
         public static void SetHeights(float probePosition)
         {
-            float zMaxLength = EEPROM.zMaxLength;
+            float zMaxLength = EEPROM.zMaxLength.Value;
             float probingHeight = UserVariables.probingHeight;
 
             switch (position)
@@ -112,7 +112,7 @@ namespace OpenDACT.Class_Files
                     Heights.ZOpp = probePosition;
                     position = 0;
 
-                    EEPROM.zMaxLength = Heights.center;
+                    EEPROM.zMaxLength.Value = Heights.center;
 
                     heightsSet = true;
                     break;

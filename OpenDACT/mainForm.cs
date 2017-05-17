@@ -273,21 +273,21 @@ namespace OpenDACT.Class_Files
 
         private void SendEEPROMButton_Click(object sender, EventArgs e)
         {
-            EEPROM.stepsPerMM = Convert.ToInt32(this.Invoke((Func<double>)delegate { Double.TryParse(this.stepsPerMMText.Text, out double value); return value; }));
-            EEPROM.zMaxLength = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zMaxLengthText.Text, out double value); return value; }));
-            EEPROM.zProbeHeight = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeText.Text, out double value); return value; }));
-            EEPROM.zProbeSpeed = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeSpeedText.Text, out double value); return value; }));
-            EEPROM.diagonalRod = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.diagonalRod.Text, out double value); return value; }));
-            EEPROM.HRadius = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.HRadiusText.Text, out double value); return value; }));
-            EEPROM.offsetX = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetXText.Text, out double value); return value; }));
-            EEPROM.offsetY = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetYText.Text, out double value); return value; }));
-            EEPROM.offsetZ = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetZText.Text, out double value); return value; }));
-            EEPROM.A = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.AText.Text, out double value); return value; }));
-            EEPROM.B = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.BText.Text, out double value); return value; }));
-            EEPROM.C = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.CText.Text, out double value); return value; }));
-            EEPROM.DA = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DAText.Text, out double value); return value; }));
-            EEPROM.DB = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DBText.Text, out double value); return value; }));
-            EEPROM.DC = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DCText.Text, out double value); return value; }));
+            EEPROM.stepsPerMM.Value = Convert.ToInt32(this.Invoke((Func<double>)delegate { Double.TryParse(this.stepsPerMMText.Text, out double value); return value; }));
+            EEPROM.zMaxLength.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zMaxLengthText.Text, out double value); return value; }));
+            EEPROM.zProbeHeight.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeText.Text, out double value); return value; }));
+            EEPROM.zProbeSpeed.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeSpeedText.Text, out double value); return value; }));
+            EEPROM.diagonalRod.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.diagonalRod.Text, out double value); return value; }));
+            EEPROM.HRadius.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.HRadiusText.Text, out double value); return value; }));
+            EEPROM.offsetX.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetXText.Text, out double value); return value; }));
+            EEPROM.offsetY.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetYText.Text, out double value); return value; }));
+            EEPROM.offsetZ.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetZText.Text, out double value); return value; }));
+            EEPROM.A.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.AText.Text, out double value); return value; }));
+            EEPROM.B.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.BText.Text, out double value); return value; }));
+            EEPROM.C.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.CText.Text, out double value); return value; }));
+            EEPROM.DA.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DAText.Text, out double value); return value; }));
+            EEPROM.DB.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DBText.Text, out double value); return value; }));
+            EEPROM.DC.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DCText.Text, out double value); return value; }));
 
             EEPROMFunctions.SendEEPROM();
         }
@@ -440,22 +440,22 @@ namespace OpenDACT.Class_Files
                 Heights.Z = Convert.ToSingle(zManual.Text);
                 Heights.ZOpp = Convert.ToSingle(zOppManual.Text);
 
-                EEPROM.stepsPerMM = Convert.ToSingle(spmMan.Text);
+                EEPROM.stepsPerMM.Value = Convert.ToSingle(spmMan.Text);
                 EEPROM.tempSPM = Convert.ToSingle(spmMan.Text);
-                EEPROM.zMaxLength = Convert.ToSingle(zMaxMan.Text);
-                EEPROM.zProbeHeight = Convert.ToSingle(zProHeiMan.Text);
-                EEPROM.zProbeSpeed = Convert.ToSingle(zProSpeMan.Text);
-                EEPROM.HRadius = Convert.ToSingle(horRadMan.Text);
-                EEPROM.diagonalRod = Convert.ToSingle(diaRodMan.Text);
-                EEPROM.offsetX = Convert.ToSingle(towOffXMan.Text);
-                EEPROM.offsetY = Convert.ToSingle(towOffYMan.Text);
-                EEPROM.offsetZ = Convert.ToSingle(towOffZMan.Text);
-                EEPROM.A = Convert.ToSingle(alpRotAMan.Text);
-                EEPROM.B = Convert.ToSingle(alpRotBMan.Text);
-                EEPROM.C = Convert.ToSingle(alpRotCMan.Text);
-                EEPROM.DA = Convert.ToSingle(delRadAMan.Text);
-                EEPROM.DB = Convert.ToSingle(delRadBMan.Text);
-                EEPROM.DC = Convert.ToSingle(delRadCMan.Text);
+                EEPROM.zMaxLength.Value = Convert.ToSingle(zMaxMan.Text);
+                EEPROM.zProbeHeight.Value = Convert.ToSingle(zProHeiMan.Text);
+                EEPROM.zProbeSpeed.Value = Convert.ToSingle(zProSpeMan.Text);
+                EEPROM.HRadius.Value = Convert.ToSingle(horRadMan.Text);
+                EEPROM.diagonalRod.Value = Convert.ToSingle(diaRodMan.Text);
+                EEPROM.offsetX.Value = Convert.ToSingle(towOffXMan.Text);
+                EEPROM.offsetY.Value = Convert.ToSingle(towOffYMan.Text);
+                EEPROM.offsetZ.Value = Convert.ToSingle(towOffZMan.Text);
+                EEPROM.A.Value = Convert.ToSingle(alpRotAMan.Text);
+                EEPROM.B.Value = Convert.ToSingle(alpRotBMan.Text);
+                EEPROM.C.Value = Convert.ToSingle(alpRotCMan.Text);
+                EEPROM.DA.Value = Convert.ToSingle(delRadAMan.Text);
+                EEPROM.DB.Value = Convert.ToSingle(delRadBMan.Text);
+                EEPROM.DC.Value = Convert.ToSingle(delRadCMan.Text);
 
                 Calibration.BasicCalibration();
 

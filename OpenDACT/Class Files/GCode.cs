@@ -26,19 +26,8 @@ namespace OpenDACT.Class_Files
             TrySend("G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
         }
 
-        public static void SendEEPROMVariable(int type, int position, float value)
-        {
-            switch (type) {
-                case 1:
-                    TrySend("M206 T1 P" + position + " S" + value.ToString("F3"));
-                    break;
-                case 3:
-                    TrySend("M206 T3 P" + position + " X" + value.ToString("F3"));
-                    break;
-                default:
-                    UserInterface.LogConsole("Invalid EEPROM Variable.");
-                    break;
-            }          
+        public static void SendEEPROMVariable(EEPROM_Variable variable) {
+            TrySend(String.Format("M206 T{0} P{1} S{2}", variable.Type, variable.Position, variable.Value.ToString("F3")));
         }
 
         public static bool TrySend(String serialCommand) {
@@ -59,17 +48,17 @@ namespace OpenDACT.Class_Files
 
         public static void PauseTimeProbe()
         {
-            Thread.Sleep(Convert.ToInt32(((UserVariables.probingHeight * 2) / EEPROM.zProbeSpeed) * 1125));
+            Thread.Sleep(Convert.ToInt32(((UserVariables.probingHeight * 2) / EEPROM.zProbeSpeed.Value) * 1125));
         }
 
         public static void PauseTimeZMax()
         {
-            Thread.Sleep(Convert.ToInt32((EEPROM.zMaxLength / UserVariables.xySpeed) * 1025));
+            Thread.Sleep(Convert.ToInt32((EEPROM.zMaxLength.Value / UserVariables.xySpeed) * 1025));
         }
 
         public static void PauseTimeZMaxThird()
         {
-            Thread.Sleep(Convert.ToInt32(((EEPROM.zMaxLength / 3) / UserVariables.xySpeed) * 1000));
+            Thread.Sleep(Convert.ToInt32(((EEPROM.zMaxLength.Value / 3) / UserVariables.xySpeed) * 1000));
         }
 
 
@@ -87,12 +76,12 @@ namespace OpenDACT.Class_Files
                 switch (iteration)
                 {
                     case 0:
-                        EEPROM.zProbeHeight = 0;
+                        EEPROM.zProbeHeight.Value = 0;
                         TrySend(Command.HOME);
                         iteration++;
                         break;
                     case 1:
-                        MoveToPosition(0, 0, Convert.ToSingle(Math.Round(EEPROM.zMaxLength / 6)));
+                        MoveToPosition(0, 0, Convert.ToSingle(Math.Round(EEPROM.zMaxLength.Value / 6)));
                         iteration++;
                         break;
                     case 2:
@@ -302,7 +291,7 @@ namespace OpenDACT.Class_Files
                                 if (Calibration.calibrateInProgress == false){ iteration++; }
                                 break;
                             case 3:
-                                MoveToPosition(0, 0, Convert.ToInt32(EEPROM.zMaxLength / 3));                                
+                                MoveToPosition(0, 0, Convert.ToInt32(EEPROM.zMaxLength.Value / 3));                                
                                 iteration++;
                                 break;
                             case 4:
@@ -333,7 +322,7 @@ namespace OpenDACT.Class_Files
             {//start
                 if (Connection._serialPort.IsOpen)
                 {
-                    EEPROM.stepsPerMM += 1;
+                    EEPROM.stepsPerMM.Value += 1;
                     UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
                 }
 
@@ -349,12 +338,12 @@ namespace OpenDACT.Class_Files
 
                 if (Connection._serialPort.IsOpen)
                 {
-                    EEPROM.stepsPerMM -= 1;
+                    EEPROM.stepsPerMM.Value -= 1;
                     UserInterface.LogConsole("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
 
                     //set Hrad +1
-                    EEPROM.HRadius += 1;
-                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
+                    EEPROM.HRadius.Value += 1;
+                    UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius.Value).ToString());
                 }
 
                 //check heights
@@ -368,11 +357,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //reset horizontal radius
-                    EEPROM.HRadius -= 1;
+                    EEPROM.HRadius.Value -= 1;
                     UserInterface.LogConsole("Setting horizontal radius to: " + (EEPROM.HRadius).ToString());
 
                     //set X offset
-                    EEPROM.offsetX += 80;
+                    EEPROM.offsetX.Value += 80;
                     UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
                 }
 
@@ -391,11 +380,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //reset X offset
-                    EEPROM.offsetX -= 80;
+                    EEPROM.offsetX.Value -= 80;
                     UserInterface.LogConsole("Setting offset X to: " + (EEPROM.offsetX).ToString());
 
                     //set Y offset
-                    EEPROM.offsetY += 80;
+                    EEPROM.offsetY.Value += 80;
                     UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
                 }
 
@@ -414,11 +403,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //reset Y offset
-                    EEPROM.offsetY -= 80;
+                    EEPROM.offsetY.Value -= 80;
                     UserInterface.LogConsole("Setting offset Y to: " + (EEPROM.offsetY).ToString());
 
                     //set Z offset
-                    EEPROM.offsetZ += 80;
+                    EEPROM.offsetZ.Value += 80;
                     UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
                 }
 
@@ -437,11 +426,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //set Z offset
-                    EEPROM.offsetZ -= 80;
+                    EEPROM.offsetZ.Value -= 80;
                     UserInterface.LogConsole("Setting offset Z to: " + (EEPROM.offsetZ).ToString());
 
                     //set alpha rotation offset perc X
-                    EEPROM.A += 1;
+                    EEPROM.A.Value += 1;
                     UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
                 }
 
@@ -459,11 +448,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //set alpha rotation offset perc X
-                    EEPROM.A -= 1;
+                    EEPROM.A.Value -= 1;
                     UserInterface.LogConsole("Setting Alpha A to: " + (EEPROM.A).ToString());
 
                     //set alpha rotation offset perc Y
-                    EEPROM.B += 1;
+                    EEPROM.B.Value += 1;
                     UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
                 }
 
@@ -479,11 +468,11 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //set alpha rotation offset perc Y
-                    EEPROM.B -= 1;
+                    EEPROM.B.Value -= 1;
                     UserInterface.LogConsole("Setting Alpha B to: " + (EEPROM.B).ToString());
 
                     //set alpha rotation offset perc Z
-                    EEPROM.C += 1;
+                    EEPROM.C.Value += 1;
                     UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
                 }
 
@@ -500,7 +489,7 @@ namespace OpenDACT.Class_Files
                 if (Connection._serialPort.IsOpen)
                 {
                     //set alpha rotation offset perc Z
-                    EEPROM.C -= 1;
+                    EEPROM.C.Value -= 1;
                     UserInterface.LogConsole("Setting Alpha C to: " + (EEPROM.C).ToString());
 
                 }

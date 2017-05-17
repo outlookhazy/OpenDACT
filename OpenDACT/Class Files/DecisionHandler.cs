@@ -14,7 +14,6 @@ namespace OpenDACT.Class_Files
 
             if (EEPROMFunctions.tempEEPROMSet == false)
             {
-
                 EEPROMFunctions.ParseEEPROM(message, out int intParse, out float floatParse2);
                 EEPROMFunctions.SetEEPROM(intParse, floatParse2);
             }
@@ -28,7 +27,7 @@ namespace OpenDACT.Class_Files
                 {
                     if (HeightFunctions.ParseZProbe(message) != 1000)
                     {
-                        EEPROM.zProbeHeight = Convert.ToSingle(Math.Round(EEPROM.zMaxLength / 6) - HeightFunctions.ParseZProbe(message));
+                        EEPROM.zProbeHeight.Value = Convert.ToSingle(Math.Round(EEPROM.zMaxLength.Value / 6) - HeightFunctions.ParseZProbe(message));
 
                         GCode.wasZProbeHeightSet = true;
                         Program.mainFormTest.SetEEPROMGUIList();
@@ -93,7 +92,7 @@ namespace OpenDACT.Class_Files
                 {
                     if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                     {
-                        EEPROM.zMaxLength -= UserVariables.FSROffset;
+                        EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
                         UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
                     }
 

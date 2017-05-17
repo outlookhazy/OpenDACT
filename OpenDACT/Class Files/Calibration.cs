@@ -38,7 +38,7 @@ namespace OpenDACT.Class_Files
             {
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
-                    UserVariables.diagonalRodLength = EEPROM.diagonalRod;
+                    UserVariables.diagonalRodLength = EEPROM.diagonalRod.Value;
                     UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
                 }
             }
@@ -67,7 +67,7 @@ namespace OpenDACT.Class_Files
             {
                 if (UserVariables.diagonalRodLength.ToString() == "")
                 {
-                    UserVariables.diagonalRodLength = EEPROM.diagonalRod;
+                    UserVariables.diagonalRodLength = EEPROM.diagonalRod.Value;
                     UserInterface.LogConsole("Using default diagonal rod length from EEPROM");
                 }
             }
@@ -152,7 +152,7 @@ namespace OpenDACT.Class_Files
             {
                 if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                 {
-                    EEPROM.zMaxLength -= UserVariables.FSROffset;
+                    EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
                     UserInterface.LogConsole("Setting Z Max Length with adjustment for FSR");
                 }
 
@@ -170,7 +170,7 @@ namespace OpenDACT.Class_Files
             float HRadSA = ((X + XOpp + Y + YOpp + Z + ZOpp) / 6);
             float HRadRatio = UserVariables.HRadRatio;
 
-            EEPROM.HRadius += (HRadSA / HRadRatio);
+            EEPROM.HRadius.Value += (HRadSA / HRadRatio);
 
             X -= HRadSA;
             Y -= HRadSA;
@@ -204,10 +204,10 @@ namespace OpenDACT.Class_Files
             float tempYOpp2 = YOpp;
             float tempZ2 = Z;
             float tempZOpp2 = ZOpp;
-            float offsetX = EEPROM.offsetX;
-            float offsetY = EEPROM.offsetY;
-            float offsetZ = EEPROM.offsetZ;
-            float stepsPerMM = EEPROM.stepsPerMM;
+            float offsetX = EEPROM.offsetX.Value;
+            float offsetY = EEPROM.offsetY.Value;
+            float offsetZ = EEPROM.offsetZ.Value;
+            float stepsPerMM = EEPROM.stepsPerMM.Value;
 
             float towMain = UserVariables.offsetCorrection;//0.6
             float oppMain = UserVariables.mainOppPerc;//0.5
@@ -274,9 +274,9 @@ namespace OpenDACT.Class_Files
                         ZOpp = tempZOpp2;
 
                         //round to the nearest whole number
-                        EEPROM.offsetX = Convert.ToInt32(offsetX);
-                        EEPROM.offsetY = Convert.ToInt32(offsetY);
-                        EEPROM.offsetZ = Convert.ToInt32(offsetZ);
+                        EEPROM.offsetX.Value = Convert.ToInt32(offsetX);
+                        EEPROM.offsetY.Value = Convert.ToInt32(offsetY);
+                        EEPROM.offsetZ.Value = Convert.ToInt32(offsetZ);
 
                         j = 100;
                     }
@@ -287,11 +287,11 @@ namespace OpenDACT.Class_Files
                         float dradCorr = tempX2 * -1.25F;
                         float HRadRatio = UserVariables.HRadRatio;
 
-                        EEPROM.HRadius += dradCorr;
+                        EEPROM.HRadius.Value += dradCorr;
 
-                        EEPROM.offsetX = 0;
-                        EEPROM.offsetY = 0;
-                        EEPROM.offsetZ = 0;
+                        EEPROM.offsetX.Value = 0;
+                        EEPROM.offsetY.Value = 0;
+                        EEPROM.offsetZ.Value = 0;
 
                         //hradsa = dradcorr
                         //solve inversely from previous method
@@ -325,7 +325,7 @@ namespace OpenDACT.Class_Files
                 }
             }
 
-            if (EEPROM.offsetX > 1000 || EEPROM.offsetY > 1000 || EEPROM.offsetZ > 1000)
+            if (EEPROM.offsetX.Value > 1000 || EEPROM.offsetY.Value > 1000 || EEPROM.offsetZ.Value > 1000)
             {
                 UserInterface.LogConsole("Tower offset calibration error, setting default values.");
                 UserInterface.LogConsole("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
@@ -337,9 +337,9 @@ namespace OpenDACT.Class_Files
 
         private static void AlphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
-            float offsetX = EEPROM.offsetX;
-            float offsetY = EEPROM.offsetY;
-            float offsetZ = EEPROM.offsetZ;
+            float offsetX = EEPROM.offsetX.Value;
+            float offsetY = EEPROM.offsetY.Value;
+            float offsetZ = EEPROM.offsetZ.Value;
             float accuracy = UserVariables.accuracy;
 
             //change to object
@@ -352,7 +352,7 @@ namespace OpenDACT.Class_Files
                 if (YOpp > ZOpp)
                 {
                     float ZYOppAvg = (YOpp - ZOpp) / 2;
-                    EEPROM.A = EEPROM.A + (ZYOppAvg * alphaRotationPercentage); // (0.5/((diff y0 and z0 at X + 0.5)-(diff y0 and z0 at X = 0))) * 2 = 1.75
+                    EEPROM.A.Value = EEPROM.A.Value + (ZYOppAvg * alphaRotationPercentage); // (0.5/((diff y0 and z0 at X + 0.5)-(diff y0 and z0 at X = 0))) * 2 = 1.75
                     YOpp = YOpp - ZYOppAvg;
                     ZOpp = ZOpp + ZYOppAvg;
                 }
@@ -360,7 +360,7 @@ namespace OpenDACT.Class_Files
                 {
                     float ZYOppAvg = (ZOpp - YOpp) / 2;
 
-                    EEPROM.A = EEPROM.A - (ZYOppAvg * alphaRotationPercentage);
+                    EEPROM.A.Value = EEPROM.A.Value - (ZYOppAvg * alphaRotationPercentage);
                     YOpp = YOpp + ZYOppAvg;
                     ZOpp = ZOpp - ZYOppAvg;
                 }
@@ -369,7 +369,7 @@ namespace OpenDACT.Class_Files
                 if (ZOpp > XOpp)
                 {
                     float XZOppAvg = (ZOpp - XOpp) / 2;
-                    EEPROM.B = EEPROM.B + (XZOppAvg * alphaRotationPercentage);
+                    EEPROM.B.Value = EEPROM.B.Value + (XZOppAvg * alphaRotationPercentage);
                     ZOpp = ZOpp - XZOppAvg;
                     XOpp = XOpp + XZOppAvg;
                 }
@@ -377,7 +377,7 @@ namespace OpenDACT.Class_Files
                 {
                     float XZOppAvg = (XOpp - ZOpp) / 2;
 
-                    EEPROM.B = EEPROM.B - (XZOppAvg * alphaRotationPercentage);
+                    EEPROM.B.Value = EEPROM.B.Value - (XZOppAvg * alphaRotationPercentage);
                     ZOpp = ZOpp + XZOppAvg;
                     XOpp = XOpp - XZOppAvg;
                 }
@@ -385,7 +385,7 @@ namespace OpenDACT.Class_Files
                 if (XOpp > YOpp)
                 {
                     float YXOppAvg = (XOpp - YOpp) / 2;
-                    EEPROM.C = EEPROM.C + (YXOppAvg * alphaRotationPercentage);
+                    EEPROM.C.Value = EEPROM.C.Value + (YXOppAvg * alphaRotationPercentage);
                     XOpp = XOpp - YXOppAvg;
                     YOpp = YOpp + YXOppAvg;
                 }
@@ -393,7 +393,7 @@ namespace OpenDACT.Class_Files
                 {
                     float YXOppAvg = (YOpp - XOpp) / 2;
 
-                    EEPROM.C = EEPROM.C - (YXOppAvg * alphaRotationPercentage);
+                    EEPROM.C.Value = EEPROM.C.Value - (YXOppAvg * alphaRotationPercentage);
                     XOpp = XOpp + YXOppAvg;
                     YOpp = YOpp - YXOppAvg;
                 }
@@ -438,7 +438,7 @@ namespace OpenDACT.Class_Files
             float XYZ = (X + Y + Z) / 3;
             float XYZOpp = (XOpp + YOpp + ZOpp) / 3;
 
-            EEPROM.stepsPerMM -= (XYZ - XYZOpp) * ((diagChange + towChange) / 2);
+            EEPROM.stepsPerMM.Value -= (XYZ - XYZOpp) * ((diagChange + towChange) / 2);
 
             //XYZ is increased by the offset
 
