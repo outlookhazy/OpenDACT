@@ -14,8 +14,9 @@ namespace OpenDACT.Class_Files
 
             if (EEPROMFunctions.tempEEPROMSet == false)
             {
-                EEPROMFunctions.ParseEEPROM(message, out int intParse, out float floatParse2);
-                EEPROMFunctions.SetEEPROM(intParse, floatParse2);
+                EEPROMFunctions.ParseEEPROM(message, out int parsedInt, out float parsedFloat);
+                if(parsedInt != 0)
+                    EEPROMFunctions.SetEEPROM((EEPROM_Position)parsedInt, parsedFloat);
             }
             else if (EEPROMFunctions.tempEEPROMSet == true && EEPROMFunctions.EEPROMReadOnly == true && EEPROMFunctions.EEPROMReadCount < 1)
             {
