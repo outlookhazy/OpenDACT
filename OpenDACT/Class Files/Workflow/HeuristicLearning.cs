@@ -9,12 +9,16 @@ namespace OpenDACT.Class_Files.Workflow
     static class HeuristicLearning
     {
         static internal bool isHeuristicComplete = false;
+        static internal int heuristicStep = 0;
+
         public static void NextAction()
         {
+            UserInterface.consoleLog.Log("Heuristic Step: " + heuristicStep);
+
             //find base heights
             //find heights with each value increased by 1 - HRad, tower offset 1-3, diagonal rod
 
-            if (UserVariables.advancedCalCount == 0)
+            if (heuristicStep == 0)
             {//start
                 if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
@@ -24,9 +28,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 1)
+            else if (heuristicStep == 1)
             {//get diagonal rod percentages
 
                 UserVariables.deltaTower = ((Heights.teX - Heights.X) + (Heights.teY - Heights.Y) + (Heights.teZ - Heights.Z)) / 3;
@@ -44,9 +48,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 2)
+            else if (heuristicStep == 2)
             {//get HRad percentages
                 UserVariables.HRadRatio = -(Math.Abs((Heights.X - Heights.teX) + (Heights.Y - Heights.teY) + (Heights.Z - Heights.teZ) + (Heights.XOpp - Heights.teXOpp) + (Heights.YOpp - Heights.teYOpp) + (Heights.ZOpp - Heights.teZOpp))) / 6;
 
@@ -63,9 +67,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 3)
+            else if (heuristicStep == 3)
             {//get X offset percentages
 
                 UserVariables.offsetCorrection += Math.Abs(1 / (Heights.X - Heights.teX));
@@ -86,9 +90,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 4)
+            else if (heuristicStep == 4)
             {//get Y offset percentages
 
                 UserVariables.offsetCorrection += Math.Abs(1 / (Heights.Y - Heights.teY));
@@ -109,9 +113,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 5)
+            else if (heuristicStep == 5)
             {//get Z offset percentages
 
                 UserVariables.offsetCorrection += Math.Abs(1 / (Heights.Z - Heights.teZ));
@@ -132,10 +136,10 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
 
             }
-            else if (UserVariables.advancedCalCount == 6)//6
+            else if (heuristicStep == 6)//6
             {
                 //get A alpha rotation
 
@@ -154,9 +158,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 7)//7
+            else if (heuristicStep == 7)//7
             {//get B alpha rotation
 
                 UserVariables.alphaRotationPercentage += (2 / Math.Abs((Heights.ZOpp - Heights.XOpp) - (Heights.teXOpp - Heights.teXOpp)));
@@ -174,9 +178,9 @@ namespace OpenDACT.Class_Files.Workflow
 
                 //check heights
 
-                UserVariables.advancedCalCount++;
+                heuristicStep++;
             }
-            else if (UserVariables.advancedCalCount == 8)//8
+            else if (heuristicStep == 8)//8
             {//get C alpha rotation
 
                 UserVariables.alphaRotationPercentage += (2 / Math.Abs((Heights.XOpp - Heights.YOpp) - (Heights.teXOpp - Heights.teYOpp)));
@@ -194,14 +198,14 @@ namespace OpenDACT.Class_Files.Workflow
 
                 UserVariables.advancedCalibration = false;
                 Program.mainFormTest.SetButtonValues();
-                UserVariables.advancedCalCount = 0;
+                heuristicStep = 0;
                 isHeuristicComplete = true;
 
                 //check heights
 
             }
 
-            GCode.checkHeights = true;
+            MeasureHeights.checkHeights = true;
         }
 
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
+using OpenDACT.Class_Files.Workflow;
 
 namespace OpenDACT.Class_Files
 {
@@ -135,7 +136,7 @@ namespace OpenDACT.Class_Files
                 case EEPROM_Position.zProbeSpeed:
                     EEPROM.zProbeSpeed.Value = value;
                     tempEEPROMSet = true;
-                    GCode.checkHeights = true;
+                    MeasureHeights.checkHeights = true;
                     Program.mainFormTest.SetEEPROMGUIList();
                     break;
                 case EEPROM_Position.diagonalRod:

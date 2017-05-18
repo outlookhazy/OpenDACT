@@ -11,7 +11,6 @@ namespace OpenDACT.Class_Files
 {
     static class GCode
     {
-        public static bool checkHeights = false;
         public static bool isHeuristicComplete = false;
 
         public static bool MoveToPosition(float X, float Y, float Z) {

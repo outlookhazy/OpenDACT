@@ -12,6 +12,7 @@ namespace OpenDACT.Class_Files.Workflow
         private static int currentPosition = 0;
         private static int iteration = 0;
         internal static bool heightsSet = false;
+        internal static bool checkHeights = false;
 
         public static void NextCommand()
         {

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO.Ports;
 using System.Globalization;
+using OpenDACT.Class_Files.Workflow;
 
 namespace OpenDACT.Class_Files
 {
@@ -63,13 +64,12 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                GCode.checkHeights = true;
+                MeasureHeights.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
                 Heights.checkHeightsOnly = false;
-                Printer.isCalibrating = true;
             }
             else
             {
@@ -81,13 +81,12 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                GCode.checkHeights = true;
+                MeasureHeights.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
                 Heights.checkHeightsOnly = false;
-                Printer.isCalibrating = true;
             }
             else
             {
@@ -363,7 +362,7 @@ namespace OpenDACT.Class_Files
                 EEPROMFunctions.ReadEEPROM();
             }
 
-            GCode.checkHeights = true;
+            MeasureHeights.checkHeights = true;
             EEPROMFunctions.EEPROMReadOnly = false;
             Calibration.calibrationState = true;
             Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
@@ -378,7 +377,6 @@ namespace OpenDACT.Class_Files
                 Connection.serialManager.ClearOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);
                 Connection.Disconnect();
-                Printer.isCalibrating = false;
                 Connection.Connect();
             }
         }

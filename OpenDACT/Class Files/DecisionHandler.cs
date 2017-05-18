@@ -25,7 +25,7 @@ namespace OpenDACT.Class_Files
                 case true:
                     if (!Calibration.calibrateInProgress && !EEPROMFunctions.EEPROMReadOnly)
                     {
-                        if (GCode.checkHeights == true)
+                        if (MeasureHeights.checkHeights == true)
                         {
                             if (UserVariables.probeChoice == Printer.ProbeType.ZProbe)
                             {
@@ -71,7 +71,7 @@ namespace OpenDACT.Class_Files
                                 }
                                 else
                                 {
-                                    UserInterface.consoleLog.Log("Heuristic Step: " + UserVariables.advancedCalCount);
+                                    
                                     HeuristicLearning.NextAction();
 
                                     Program.mainFormTest.SetEEPROMGUIList();

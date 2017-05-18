@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using OpenDACT.Class_Files.Workflow;
 
 namespace OpenDACT.Class_Files
 {
@@ -151,7 +152,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                GCode.checkHeights = true;
+                MeasureHeights.checkHeights = true;
                 UserInterface.consoleLog.Log("Continuing Calibration");
             }
         }
