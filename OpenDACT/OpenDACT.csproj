@@ -97,14 +97,16 @@
     <Compile Include="Class Files\Calibration.cs" />
     <Compile Include="Class Files\Connection.cs" />
     <Compile Include="Class Files\LogConsole.cs" />
+    <Compile Include="Class Files\Position3D.cs" />
     <Compile Include="Class Files\SerialManager.cs" />
     <Compile Include="Class Files\DecisionHandler.cs" />
     <Compile Include="Class Files\EEPROM.cs" />
     <Compile Include="Class Files\GCode.cs" />
     <Compile Include="Class Files\Printer.cs" />
-    <Compile Include="Class Files\Test.cs" />
     <Compile Include="Class Files\UserInterface.cs" />
     <Compile Include="Class Files\Validation.cs" />
+    <Compile Include="Class Files\Workflow\MeasureHeights.cs" />
+    <Compile Include="Class Files\Workflow\MeasureZProbe.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

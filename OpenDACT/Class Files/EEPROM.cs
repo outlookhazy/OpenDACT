@@ -66,7 +66,6 @@ namespace OpenDACT.Class_Files
         public static bool tempEEPROMSet = false;
         public static bool EEPROMRequestSent = false;
         public static bool EEPROMReadOnly = false;
-        public static int EEPROMReadCount = 0;
 
         public static void ReadEEPROM()
         {
@@ -137,7 +136,6 @@ namespace OpenDACT.Class_Files
                     EEPROM.zProbeSpeed.Value = value;
                     tempEEPROMSet = true;
                     GCode.checkHeights = true;
-                    EEPROMReadCount++;
                     Program.mainFormTest.SetEEPROMGUIList();
                     break;
                 case EEPROM_Position.diagonalRod:

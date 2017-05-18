@@ -37,99 +37,11 @@ namespace OpenDACT.Class_Files
 
     public static class HeightFunctions
     {
-        private static int position = 0;
+        
         public static bool heightsSet = false;
         public static bool checkHeightsOnly = false;
 
-        public static void SetHeights(float probePosition)
-        {
-            float zMaxLength = EEPROM.zMaxLength.Value;
-            float probingHeight = UserVariables.probingHeight;
-
-            switch (position)
-            {
-                case 0:
-                    probePosition = zMaxLength - probingHeight + probePosition;
-                    Heights.center = probePosition;
-                    position++;
-                    break;
-                case 1:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.X = probePosition;
-                    position++;
-                    break;
-                case 2:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.XOpp = probePosition;
-                    position++;
-                    break;
-                case 3:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.Y = probePosition;
-                    position++;
-                    break;
-                case 4:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.YOpp = probePosition;
-                    position++;
-                    break;
-                case 5:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.Z = probePosition;
-                    position++;
-                    break;
-                case 6:
-                    probePosition = Heights.center - (zMaxLength - probingHeight + probePosition);
-                    probePosition = -probePosition;
-                    Heights.ZOpp = probePosition;
-                    position = 0;
-
-                    EEPROM.zMaxLength.Value = Heights.center;
-
-                    heightsSet = true;
-                    break;
-            }
-        }
-
-        public static float ParseZProbe(string value)
-        {
-            if (value.Contains("Z-probe:"))
-            {
-                //Z-probe: 10.66 zCorr: 0
-
-                string[] parseInData = value.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                string[] parseFirstLine = parseInData[0].Split(new char[] { ':', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                //: 10.66 zCorr: 0
-                string[] parseZProbe = value.Split(new string[] { "Z-probe", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                string[] parseZProbeSpace = parseZProbe[0].Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                float zProbeParse;
-
-                //check if there is a space between
-                if (parseZProbeSpace[0] == ":")
-                {
-                    //Space
-                    zProbeParse = float.Parse(parseZProbeSpace[1], CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    //No space
-                    zProbeParse = float.Parse(parseZProbeSpace[0].Substring(1), CultureInfo.InvariantCulture);
-                }
-
-                return float.Parse(parseFirstLine[1], CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                return 1000;
-            }
-        }
+        
 
         public static void PrintHeights()
         {

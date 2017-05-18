@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using OpenDACT.Class_Files.Workflow;
+using System.Globalization;
 
 namespace OpenDACT.Class_Files
 {
@@ -12,7 +14,6 @@ namespace OpenDACT.Class_Files
         public static int currentPosition = 0;
         public static int iteration = 0;
         public static bool checkHeights = false;
-        public static bool wasSet = false;
         public static bool wasZProbeHeightSet = false;
         public static bool isHeuristicComplete = false;
 
@@ -59,254 +60,7 @@ namespace OpenDACT.Class_Files
         */
 
 
-        public static void PositionFlow()
-        {
-            float probingHeight = UserVariables.probingHeight;
-            float plateDiameter = UserVariables.plateDiameter;
-            int pauseTimeSet = UserVariables.pauseTimeSet;
-            float valueZ = 0.482F * plateDiameter;
-            float valueXYLarge = 0.417F * plateDiameter;
-            float valueXYSmall = 0.241F * plateDiameter;
-
-            if (UserVariables.probeChoice == Printer.ProbeType.ZProbe && wasSet == false)
-            {
-                switch (iteration)
-                {
-                    case 0:
-                        EEPROM.zProbeHeight.Value = 0;
-                        TrySend(Command.HOME);
-                        iteration++;
-                        break;
-                    case 1:
-                        MoveToPosition(0, 0, Convert.ToSingle(Math.Round(EEPROM.zMaxLength.Value / 6)));
-                        iteration++;
-                        break;
-                    case 2:
-                        TrySend(Command.PROBE);
-
-                        wasSet = true;
-                        Program.mainFormTest.SetEEPROMGUIList();
-                        EEPROMFunctions.SendEEPROM();
-                        iteration = 0;
-                        break;
-                }
-                /*
-                pauseTimeZMax();
-                pauseTimeZMax();
-                pauseTimeProbe();
-                */
-            }
-            else
-            {
-                TrySend("G0 F" + UserVariables.xySpeed * 60);//converts mm/s to mm/min
-
-                switch (currentPosition)
-                {
-                    case 0:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.HOME);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(0, 0, probingHeight);
-                                iteration++;
-                                break;
-                            case 2:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 3:
-                                MoveToPosition(-valueXYLarge, -valueXYSmall, probingHeight);
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeZMaxThird();
-                        pauseTimeZMaxThird();
-                        pauseTimeZMax();
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        */
-                        break;
-                    case 1:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(-valueXYLarge, -valueXYSmall, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, 0, probingHeight);
-                                iteration++;
-                                break;
-                            case 3:
-                                MoveToPosition(valueXYLarge, valueXYSmall, probingHeight);                                
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        currentPosition++;
-                        */
-                        break;
-                    case 2:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(valueXYLarge, valueXYSmall, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, 0, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 3:
-                                MoveToPosition(valueXYLarge, -valueXYSmall, probingHeight);                                
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        currentPosition++;
-                        */
-                        break;
-                    case 3:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(valueXYLarge, -valueXYSmall, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, 0, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 3:
-                                MoveToPosition(-valueXYLarge, valueXYSmall, probingHeight);                                
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        currentPosition++;
-                        */
-                        break;
-                    case 4:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(-valueXYLarge, valueXYSmall, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, 0, probingHeight);
-                                iteration++;
-                                break;
-                            case 3:
-                                MoveToPosition(0, valueZ, probingHeight);                                
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        currentPosition++;
-                        */
-                        break;
-                    case 5:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(0, valueZ, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, -valueZ, probingHeight);
-                                currentPosition++;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        currentPosition++;
-                        */
-                        break;
-                    case 6:
-                        switch (iteration)
-                        {
-                            case 0:
-                                TrySend(Command.PROBE);
-                                iteration++;
-                                break;
-                            case 1:
-                                MoveToPosition(0, -valueZ, probingHeight);                                
-                                iteration++;
-                                break;
-                            case 2:
-                                MoveToPosition(0, 0, probingHeight);                                
-                                iteration++;
-                                if (Calibration.calibrateInProgress == false){ iteration++; }
-                                break;
-                            case 3:
-                                MoveToPosition(0, 0, Convert.ToInt32(EEPROM.zMaxLength.Value / 3));                                
-                                iteration++;
-                                break;
-                            case 4:
-                                currentPosition = 0;
-                                checkHeights = false;
-                                iteration = 0;
-                                break;
-                        }
-                        /*
-                        pauseTimeProbe();
-                        pauseTimeRadius();
-                        pauseTimeRadius();
-                        pauseTimeZMaxThird();
-                        */
-                        break;
-                }//end switch
-            }//end else
-        }
+        
 
         public static void HeuristicLearning()
         {
@@ -501,6 +255,41 @@ namespace OpenDACT.Class_Files
             }
 
             GCode.checkHeights = true;
+        }
+
+        public static float ParseZProbe(string value)
+        {
+            if (value.Contains("Z-probe:"))
+            {
+                //Z-probe: 10.66 zCorr: 0
+
+                string[] parseInData = value.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] parseFirstLine = parseInData[0].Split(new char[] { ':', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                //: 10.66 zCorr: 0
+                string[] parseZProbe = value.Split(new string[] { "Z-probe", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] parseZProbeSpace = parseZProbe[0].Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                float zProbeParse;
+
+                //check if there is a space between
+                if (parseZProbeSpace[0] == ":")
+                {
+                    //Space
+                    zProbeParse = float.Parse(parseZProbeSpace[1], CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    //No space
+                    zProbeParse = float.Parse(parseZProbeSpace[0].Substring(1), CultureInfo.InvariantCulture);
+                }
+
+                return float.Parse(parseFirstLine[1], CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                return 1000;
+            }
         }
 
         public static class Command {

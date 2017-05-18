@@ -282,7 +282,6 @@ namespace OpenDACT.Class_Files
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = true;
                 HeightFunctions.checkHeightsOnly = false;
-                EEPROMFunctions.EEPROMReadCount = 0;
             }
             else
             {

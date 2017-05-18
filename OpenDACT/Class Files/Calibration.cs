@@ -53,11 +53,7 @@ namespace OpenDACT.Class_Files
                 AlphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 StepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 HRad(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-            }
-            else
-            {
-                //analyzeGeometry(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-            }
+            }            
         }
 
         public static void BasicCalibration()
@@ -136,11 +132,7 @@ namespace OpenDACT.Class_Files
                     HRad(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
                 }
                 
-            }
-            else
-            {
-                //analyzeGeometry(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-            }
+            }            
         }
         
 
@@ -181,16 +173,6 @@ namespace OpenDACT.Class_Files
 
             UserInterface.consoleLog.Log("HRad:" + EEPROM.HRadius.ToString());
         }
-
-        /*
-        public void analyzeGeometry(float X, float XOpp, float Y, float YOpp, float Z, float ZOpp)
-        {
-            int analyzeCount = 0;
-
-
-            UserInterface.consoleLog.Log("Expect a slight inaccuracy in the geometry analysis; basic calibration.");
-        }
-        */
 
         private static void TowerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
