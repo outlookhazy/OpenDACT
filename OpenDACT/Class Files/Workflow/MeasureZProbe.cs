@@ -42,7 +42,6 @@ namespace OpenDACT.Class_Files.Workflow
             {
                 EEPROM.zProbeHeight.Value = Convert.ToSingle(Math.Round(EEPROM.zMaxLength.Value / 6) - value);
 
-                GCode.wasZProbeHeightSet = true;
                 Program.mainFormTest.SetEEPROMGUIList();
                 EEPROMFunctions.SendEEPROM();
             }

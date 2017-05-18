@@ -41,16 +41,16 @@ namespace OpenDACT.Class_Files
                                 //UserInterface.consoleLog.Log("position flow");
                                 MeasureHeights.NextCommand();
                             }
-                            else if (GCode.ParseZProbe(message) != 1000 && HeightFunctions.heightsSet == false)
+                            else if (GCode.ParseZProbe(message) != 1000 && Heights.heightsSet == false)
                             {
                                 MeasureHeights.RecordHeight(GCode.ParseZProbe(message));
                             }
                         }
-                        else if (Calibration.calibrationState == true && HeightFunctions.heightsSet == true)
+                        else if (Calibration.calibrationState == true && Heights.heightsSet == true)
                         {
                             Program.mainFormTest.SetHeightsInvoke();
 
-                            if (HeightFunctions.checkHeightsOnly == false)
+                            if (Heights.checkHeightsOnly == false)
                             {
                                 Calibration.calibrateInProgress = true;
 
@@ -64,8 +64,7 @@ namespace OpenDACT.Class_Files
 
                                     if (Calibration.calibrationState == false)
                                     {
-                                        GCode.TrySend(GCode.Command.HOME);
-                                        Calibration.calibrationComplete = true;
+                                        GCode.TrySend(GCode.Command.HOME);                                        
                                         UserInterface.consoleLog.Log("Calibration Complete");
                                         //end calibration
                                     }
@@ -73,7 +72,7 @@ namespace OpenDACT.Class_Files
                                 else
                                 {
                                     UserInterface.consoleLog.Log("Heuristic Step: " + UserVariables.advancedCalCount);
-                                    GCode.HeuristicLearning();
+                                    HeuristicLearning.NextAction();
 
                                     Program.mainFormTest.SetEEPROMGUIList();
                                     EEPROMFunctions.SendEEPROM();
@@ -94,7 +93,7 @@ namespace OpenDACT.Class_Files
                                 UserInterface.consoleLog.Log("Heights checked");
                             }
 
-                            HeightFunctions.heightsSet = false;
+                            Heights.heightsSet = false;
                         }
                     }
                     break;

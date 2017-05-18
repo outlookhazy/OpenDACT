@@ -66,10 +66,9 @@ namespace OpenDACT.Class_Files
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
-                Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
-                HeightFunctions.checkHeightsOnly = false;
+                Heights.checkHeightsOnly = false;
                 Printer.isCalibrating = true;
             }
             else
@@ -85,10 +84,9 @@ namespace OpenDACT.Class_Files
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
-                Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
-                HeightFunctions.checkHeightsOnly = false;
+                Heights.checkHeightsOnly = false;
                 Printer.isCalibrating = true;
             }
             else
@@ -281,7 +279,7 @@ namespace OpenDACT.Class_Files
                 EEPROMFunctions.tempEEPROMSet = false;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = true;
-                HeightFunctions.checkHeightsOnly = false;
+                Heights.checkHeightsOnly = false;
             }
             else
             {
@@ -368,10 +366,9 @@ namespace OpenDACT.Class_Files
             GCode.checkHeights = true;
             EEPROMFunctions.EEPROMReadOnly = false;
             Calibration.calibrationState = true;
-            Calibration.calibrationSelection = 0;
-            HeightFunctions.checkHeightsOnly = true;
-            HeightFunctions.heightsSet = false;
-            Calibration.calibrationComplete = false;
+            Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
+            Heights.checkHeightsOnly = true;
+            Heights.heightsSet = false;
         }
 
         private void StopBut_Click(object sender, EventArgs e)

@@ -33,15 +33,9 @@ namespace OpenDACT.Class_Files
         public static float teZ;
         public static float teZOpp;
         public static bool firstHeights = true;
-    }
 
-    public static class HeightFunctions
-    {
-        
         public static bool heightsSet = false;
         public static bool checkHeightsOnly = false;
-
-        
 
         public static void PrintHeights()
         {

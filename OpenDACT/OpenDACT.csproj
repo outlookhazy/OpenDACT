@@ -105,6 +105,7 @@
     <Compile Include="Class Files\Printer.cs" />
     <Compile Include="Class Files\UserInterface.cs" />
     <Compile Include="Class Files\Validation.cs" />
+    <Compile Include="Class Files\Workflow\HeuristicLearning.cs" />
     <Compile Include="Class Files\Workflow\MeasureHeights.cs" />
     <Compile Include="Class Files\Workflow\MeasureZProbe.cs" />
     <Compile Include="mainForm.cs">
