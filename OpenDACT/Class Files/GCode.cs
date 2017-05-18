@@ -29,7 +29,7 @@ namespace OpenDACT.Class_Files
         }
 
         public static bool TrySend(String serialCommand) {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED) {
+            if (Connection.serialManager.CurrentState == ConnectionState.Connected) {
                 if (UserInterface.printerLog.ConsoleLogLevel == LogConsole.LogLevel.DEBUG)
                     UserInterface.printerLog.Log(String.Format("Sending: {0}", serialCommand));
                 return Connection.serialManager.WriteLine(serialCommand);
@@ -315,7 +315,7 @@ namespace OpenDACT.Class_Files
 
             if (UserVariables.advancedCalCount == 0)
             {//start
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     EEPROM.stepsPerMM.Value += 1;
                     UserInterface.consoleLog.Log("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
@@ -331,7 +331,7 @@ namespace OpenDACT.Class_Files
                 UserVariables.deltaTower = ((Heights.teX - Heights.X) + (Heights.teY - Heights.Y) + (Heights.teZ - Heights.Z)) / 3;
                 UserVariables.deltaOpp = ((Heights.teXOpp - Heights.XOpp) + (Heights.teYOpp - Heights.YOpp) + (Heights.teZOpp - Heights.ZOpp)) / 3;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     EEPROM.stepsPerMM.Value -= 1;
                     UserInterface.consoleLog.Log("Setting steps per millimeter to: " + (EEPROM.stepsPerMM).ToString());
@@ -349,7 +349,7 @@ namespace OpenDACT.Class_Files
             {//get HRad percentages
                 UserVariables.HRadRatio = -(Math.Abs((Heights.X - Heights.teX) + (Heights.Y - Heights.teY) + (Heights.Z - Heights.teZ) + (Heights.XOpp - Heights.teXOpp) + (Heights.YOpp - Heights.teYOpp) + (Heights.ZOpp - Heights.teZOpp))) / 6;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //reset horizontal radius
                     EEPROM.HRadius.Value -= 1;
@@ -372,7 +372,7 @@ namespace OpenDACT.Class_Files
                 UserVariables.towPerc += (Math.Abs((Heights.Y - Heights.teY) / (Heights.X - Heights.teX)) + Math.Abs((Heights.Z - Heights.teZ) / (Heights.X - Heights.teX))) / 2;
                 UserVariables.oppPerc += (Math.Abs((Heights.YOpp - Heights.teYOpp) / (Heights.X - Heights.teX)) + Math.Abs((Heights.ZOpp - Heights.teZOpp) / (Heights.X - Heights.teX))) / 2;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //reset X offset
                     EEPROM.offsetX.Value -= 80;
@@ -395,7 +395,7 @@ namespace OpenDACT.Class_Files
                 UserVariables.towPerc += (Math.Abs((Heights.X - Heights.teX) / (Heights.Y - Heights.teY)) + Math.Abs((Heights.Z - Heights.teZ) / (Heights.Y - Heights.teY))) / 2;
                 UserVariables.oppPerc += (Math.Abs((Heights.XOpp - Heights.teXOpp) / (Heights.Y - Heights.teY)) + Math.Abs((Heights.ZOpp - Heights.teZOpp) / (Heights.Y - Heights.teY))) / 2;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //reset Y offset
                     EEPROM.offsetY.Value -= 80;
@@ -418,7 +418,7 @@ namespace OpenDACT.Class_Files
                 UserVariables.towPerc += (Math.Abs((Heights.X - Heights.teX) / (Heights.Z - Heights.teZ)) + Math.Abs((Heights.Y - Heights.teY) / (Heights.Z - Heights.teZ))) / 2;
                 UserVariables.oppPerc += (Math.Abs((Heights.XOpp - Heights.teXOpp) / (Heights.Z - Heights.teZ)) + Math.Abs((Heights.YOpp - Heights.teYOpp) / (Heights.Z - Heights.teZ))) / 2;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //set Z offset
                     EEPROM.offsetZ.Value -= 80;
@@ -440,7 +440,7 @@ namespace OpenDACT.Class_Files
 
                 UserVariables.alphaRotationPercentage += (2 / Math.Abs((Heights.YOpp - Heights.ZOpp) - (Heights.teYOpp - Heights.teZOpp)));
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //set alpha rotation offset perc X
                     EEPROM.A.Value -= 1;
@@ -460,7 +460,7 @@ namespace OpenDACT.Class_Files
 
                 UserVariables.alphaRotationPercentage += (2 / Math.Abs((Heights.ZOpp - Heights.XOpp) - (Heights.teXOpp - Heights.teXOpp)));
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //set alpha rotation offset perc Y
                     EEPROM.B.Value -= 1;
@@ -481,7 +481,7 @@ namespace OpenDACT.Class_Files
                 UserVariables.alphaRotationPercentage += (2 / Math.Abs((Heights.XOpp - Heights.YOpp) - (Heights.teXOpp - Heights.teYOpp)));
                 UserVariables.alphaRotationPercentage /= 3;
 
-                if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+                if (Connection.serialManager.CurrentState == ConnectionState.Connected)
                 {
                     //set alpha rotation offset perc Z
                     EEPROM.C.Value -= 1;

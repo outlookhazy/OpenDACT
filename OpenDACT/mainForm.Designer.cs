@@ -31,9 +31,9 @@ namespace OpenDACT.Class_Files
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.consoleMain = new System.Windows.Forms.RichTextBox();
             this.consolePrinter = new System.Windows.Forms.RichTextBox();
             this.connectButton = new System.Windows.Forms.Button();
@@ -242,6 +242,7 @@ namespace OpenDACT.Class_Files
             // 
             this.consoleMain.Location = new System.Drawing.Point(262, 99);
             this.consoleMain.Name = "consoleMain";
+            this.consoleMain.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
             this.consoleMain.Size = new System.Drawing.Size(354, 298);
             this.consoleMain.TabIndex = 0;
             this.consoleMain.Text = "";
@@ -250,6 +251,7 @@ namespace OpenDACT.Class_Files
             // 
             this.consolePrinter.Location = new System.Drawing.Point(14, 16);
             this.consolePrinter.Name = "consolePrinter";
+            this.consolePrinter.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
             this.consolePrinter.Size = new System.Drawing.Size(604, 202);
             this.consolePrinter.TabIndex = 1;
             this.consolePrinter.Text = "";
@@ -294,6 +296,7 @@ namespace OpenDACT.Class_Files
             // 
             // portsCombo
             // 
+            this.portsCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.portsCombo.FormattingEnabled = true;
             this.portsCombo.Location = new System.Drawing.Point(509, 32);
             this.portsCombo.Name = "portsCombo";
@@ -1372,22 +1375,22 @@ namespace OpenDACT.Class_Files
             // accuracyTime
             // 
             this.accuracyTime.BackColor = System.Drawing.Color.Transparent;
-            chartArea1.BackHatchStyle = System.Windows.Forms.DataVisualization.Charting.ChartHatchStyle.Percent60;
-            chartArea1.Name = "ChartArea1";
-            this.accuracyTime.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.accuracyTime.Legends.Add(legend1);
+            chartArea3.BackHatchStyle = System.Windows.Forms.DataVisualization.Charting.ChartHatchStyle.Percent60;
+            chartArea3.Name = "ChartArea1";
+            this.accuracyTime.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            this.accuracyTime.Legends.Add(legend3);
             this.accuracyTime.Location = new System.Drawing.Point(3, 3);
             this.accuracyTime.Name = "accuracyTime";
-            series1.BackImageTransparentColor = System.Drawing.Color.White;
-            series1.BorderColor = System.Drawing.Color.Transparent;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.IsXValueIndexed = true;
-            series1.Legend = "Legend1";
-            series1.Name = "Accuracy";
-            this.accuracyTime.Series.Add(series1);
+            series3.BackImageTransparentColor = System.Drawing.Color.White;
+            series3.BorderColor = System.Drawing.Color.Transparent;
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.IsXValueIndexed = true;
+            series3.Legend = "Legend1";
+            series3.Name = "Accuracy";
+            this.accuracyTime.Series.Add(series3);
             this.accuracyTime.Size = new System.Drawing.Size(317, 580);
             this.accuracyTime.TabIndex = 0;
             this.accuracyTime.Text = "chart1";
@@ -1987,7 +1990,7 @@ namespace OpenDACT.Class_Files
             this.contactButton.TabIndex = 22;
             this.contactButton.Text = "Contact";
             this.contactButton.UseVisualStyleBackColor = true;
-            this.contactButton.Click += new System.EventHandler(this.ContactButton_Click_1);
+            this.contactButton.Click += new System.EventHandler(this.ContactButton_Click);
             // 
             // donateButton
             // 
@@ -1997,7 +2000,7 @@ namespace OpenDACT.Class_Files
             this.donateButton.TabIndex = 23;
             this.donateButton.Text = "Donate";
             this.donateButton.UseVisualStyleBackColor = true;
-            this.donateButton.Click += new System.EventHandler(this.DonateButton_Click_1);
+            this.donateButton.Click += new System.EventHandler(this.DonateButton_Click);
             // 
             // diagonalRodLengthText
             // 
@@ -2036,9 +2039,7 @@ namespace OpenDACT.Class_Files
             // 
             // comboBoxZMin
             // 
-            this.comboBoxZMin.DataSource = new OpenDACT.Class_Files.Printer.ProbeType[] {
-        OpenDACT.Class_Files.Printer.ProbeType.FSR,
-        OpenDACT.Class_Files.Printer.ProbeType.ZProbe};
+            this.comboBoxZMin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxZMin.FormattingEnabled = true;
             this.comboBoxZMin.Location = new System.Drawing.Point(343, 5);
             this.comboBoxZMin.Name = "comboBoxZMin";
@@ -2102,6 +2103,7 @@ namespace OpenDACT.Class_Files
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "mainForm";
             this.Text = "OpenDACT";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.printerLogPanel.ResumeLayout(false);
             this.printerLogPanel.PerformLayout();

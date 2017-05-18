@@ -33,30 +33,6 @@ namespace OpenDACT.Class_Files
         public static float teZ;
         public static float teZOpp;
         public static bool firstHeights = true;
-
-        /*
-        public Heights(float _center, float _X, float _XOpp, float _Y, float _YOpp, float _Z, float _ZOpp)
-        {
-            center = _center;
-            X = _X;
-            XOpp = _XOpp;
-            Y = _Y;
-            YOpp = _YOpp;
-            Z = _Z;
-            ZOpp = _ZOpp;
-
-            if (firstHeights == true)
-            {
-                teX = _X;
-                teXOpp = _XOpp;
-                teY = _Y;
-                teYOpp = _YOpp;
-                teZ = _Z;
-                teZOpp = _ZOpp;
-                firstHeights = false;
-            }
-        }
-        */
     }
 
     public static class HeightFunctions

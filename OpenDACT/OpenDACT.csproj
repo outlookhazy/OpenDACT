@@ -98,7 +98,6 @@
     <Compile Include="Class Files\Connection.cs" />
     <Compile Include="Class Files\LogConsole.cs" />
     <Compile Include="Class Files\SerialManager.cs" />
-    <Compile Include="Class Files\Threading.cs" />
     <Compile Include="Class Files\DecisionHandler.cs" />
     <Compile Include="Class Files\EEPROM.cs" />
     <Compile Include="Class Files\GCode.cs" />

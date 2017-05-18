@@ -23,7 +23,7 @@ namespace OpenDACT.Class_Files
 
         public static void Connect()
         {
-            if (serialManager.CurrentState == ConnectionState.CONNECTED) {
+            if (serialManager.CurrentState == ConnectionState.Connected) {
                 UserInterface.consoleLog.Log("Already Connected");
             } else {
                 try {                   
@@ -66,7 +66,7 @@ namespace OpenDACT.Class_Files
 
         public static void Disconnect()
         {
-            if (serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (serialManager.CurrentState == ConnectionState.Connected)
             {
                 serialManager.Disconnect();
             }

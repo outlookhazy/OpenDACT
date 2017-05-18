@@ -22,13 +22,7 @@ namespace OpenDACT.Class_Files
             
             Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            InitializeComponent();            
-
-            consoleMain.Text = "";
-            consoleMain.ScrollBars = RichTextBoxScrollBars.Vertical;
-            consolePrinter.Text = "";
-            consolePrinter.ScrollBars = RichTextBoxScrollBars.Vertical;
-
+            InitializeComponent();
 
             // Basic set of standard baud rates.
             baudRateCombo.Items.Add("250000");
@@ -39,38 +33,19 @@ namespace OpenDACT.Class_Files
             baudRateCombo.Items.Add("9600");
             baudRateCombo.Text = "250000";  // This is the default for most RAMBo controllers.
 
+            this.comboBoxZMin.Items.AddRange(new object[] {
+            OpenDACT.Class_Files.Printer.ProbeType.FSR,
+            OpenDACT.Class_Files.Printer.ProbeType.ZProbe});
+            this.comboBoxZMin.SelectedItem = OpenDACT.Class_Files.Printer.ProbeType.ZProbe;
+
             advancedPanel.Visible = false;
             printerLogPanel.Visible = false;
 
             Connection.Init();
 
-
             // Build the combobox of available ports.
-            string[] ports = SerialPort.GetPortNames();
-
-            if (ports.Length >= 1)
-            {
-                Dictionary<string, string> comboSource = new Dictionary<string, string>();
-
-                int count = 0;
-
-                foreach (string element in ports)
-                {
-                    comboSource.Add(ports[count], ports[count]);
-                    count++;
-                }
-
-                portsCombo.DataSource = new BindingSource(comboSource, null);
-                portsCombo.DisplayMember = "Key";
-                portsCombo.ValueMember = "Value";
-            }
-            /* else
-            {
-                UserInterface.consoleLog.Log("No ports available");
-            }
-            */
-
-            //accuracyTime.Series["Accuracy"].Points.AddXY(0, 0);
+            portsCombo.DataSource = new BindingSource(new List<string>(SerialPort.GetPortNames()), null);
+            
             UserVariables.isInitiated = true;
         }
 
@@ -86,14 +61,14 @@ namespace OpenDACT.Class_Files
 
         private void CalibrateButton_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
-                Calibration.calibrationSelection = 0;
+                Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
                 HeightFunctions.checkHeightsOnly = false;
                 Printer.isCalibrating = true;
             }
@@ -105,14 +80,14 @@ namespace OpenDACT.Class_Files
         
         private void QuickCalibrate_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
                 EEPROMFunctions.EEPROMReadOnly = false;
                 Calibration.calibrationComplete = false;
                 Calibration.calibrationState = true;
-                Calibration.calibrationSelection = 1;
+                Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
                 HeightFunctions.checkHeightsOnly = false;
                 Printer.isCalibrating = true;
             }
@@ -180,17 +155,20 @@ namespace OpenDACT.Class_Files
 
         private void AboutButton_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("Version: 3.1.0A\n\nCreated by Steven T. Rowland\n\nWith help from Gene Buckle and Michael Hackney\n");
+            System.Windows.Forms.MessageBox.Show("Version: ??\n\nCreated by Steven T. Rowland\n\nWith help from Gene Buckle and Michael Hackney\n\nMajor Rewrite by Outlookhazy");
         }
-        private void ContactButton_Click_1(object sender, EventArgs e)
+        private void ContactButton_Click(object sender, EventArgs e)
         {
+            /*
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = "mailto:steventrowland@gmail.com";
             proc.Start();
+            */
         }
 
-        private void DonateButton_Click_1(object sender, EventArgs e)
+        private void DonateButton_Click(object sender, EventArgs e)
         {
+            /*
             string url = "";
 
             string business = "steventrowland@gmail.com";
@@ -207,6 +185,7 @@ namespace OpenDACT.Class_Files
                 "&bn=" + "PP%2dDonationsBF";
 
             System.Diagnostics.Process.Start(url);
+            */
         }
 
         public void SetHeightsInvoke()
@@ -221,30 +200,34 @@ namespace OpenDACT.Class_Files
             //set base heights for advanced calibration comparison
             if (Calibration.iterationNum == 0)
             {
-                Invoke((MethodInvoker)delegate { this.iXtext.Text = Math.Round(X, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.iXOpptext.Text = Math.Round(XOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.iYtext.Text = Math.Round(Y, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.iYOpptext.Text = Math.Round(YOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.iZtext.Text = Math.Round(Z, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.iZOpptext.Text = Math.Round(ZOpp, 3).ToString(); });
+                Invoke((MethodInvoker)delegate {
+                    this.iXtext.Text = Math.Round(X, 3).ToString();
+                    this.iXOpptext.Text = Math.Round(XOpp, 3).ToString();
+                    this.iYtext.Text = Math.Round(Y, 3).ToString();
+                    this.iYOpptext.Text = Math.Round(YOpp, 3).ToString();
+                    this.iZtext.Text = Math.Round(Z, 3).ToString();
+                    this.iZOpptext.Text = Math.Round(ZOpp, 3).ToString();
+                });
 
                 Calibration.iterationNum++;
 
-                Invoke((MethodInvoker)delegate { this.XText.Text = Math.Round(X, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.XOppText.Text = Math.Round(XOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.YText.Text = Math.Round(Y, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.YOppText.Text = Math.Round(YOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.ZText.Text = Math.Round(Z, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.ZOppText.Text = Math.Round(ZOpp, 3).ToString(); });
+                Invoke((MethodInvoker)delegate { this.XText.Text = Math.Round(X, 3).ToString();
+                    this.XOppText.Text = Math.Round(XOpp, 3).ToString();
+                    this.YText.Text = Math.Round(Y, 3).ToString();
+                    this.YOppText.Text = Math.Round(YOpp, 3).ToString();
+                    this.ZText.Text = Math.Round(Z, 3).ToString();
+                    this.ZOppText.Text = Math.Round(ZOpp, 3).ToString();
+                });
             }
             else
             {
-                Invoke((MethodInvoker)delegate { this.XText.Text = Math.Round(X, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.XOppText.Text = Math.Round(XOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.YText.Text = Math.Round(Y, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.YOppText.Text = Math.Round(YOpp, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.ZText.Text = Math.Round(Z, 3).ToString(); });
-                Invoke((MethodInvoker)delegate { this.ZOppText.Text = Math.Round(ZOpp, 3).ToString(); });
+                Invoke((MethodInvoker)delegate { this.XText.Text = Math.Round(X, 3).ToString();
+                    this.XOppText.Text = Math.Round(XOpp, 3).ToString();
+                    this.YText.Text = Math.Round(Y, 3).ToString();
+                    this.YOppText.Text = Math.Round(YOpp, 3).ToString();
+                    this.ZText.Text = Math.Round(Z, 3).ToString();
+                    this.ZOppText.Text = Math.Round(ZOpp, 3).ToString();
+                });
             }
         }
 
@@ -293,7 +276,7 @@ namespace OpenDACT.Class_Files
 
         private void ReadEEPROM_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
                 EEPROMFunctions.tempEEPROMSet = false;
                 EEPROMFunctions.ReadEEPROM();
@@ -338,27 +321,12 @@ namespace OpenDACT.Class_Files
         }
         private Printer.ProbeType GetZMin()
         {
-            if (comboBoxZMin.InvokeRequired)
-            {
-                
-                return (Printer.ProbeType)comboBoxZMin.Invoke(new Func<Printer.ProbeType>(GetZMin));
-            }
-            else
-            {
-                return (Printer.ProbeType)Enum.Parse(typeof(Printer.ProbeType), comboBoxZMin.SelectedItem.ToString());
-            }
+            return comboBoxZMin.InvokeRequired ? (Printer.ProbeType)comboBoxZMin.Invoke(new Func<Printer.ProbeType>(GetZMin)) : (Printer.ProbeType)Enum.Parse(typeof(Printer.ProbeType), comboBoxZMin.SelectedItem.ToString());
         }
 
         private string GetHeuristic()
         {
-            if (heuristicComboBox.InvokeRequired)
-            {
-                return (string)heuristicComboBox.Invoke(new Func<string>(GetHeuristic));
-            }
-            else
-            {
-                return heuristicComboBox.Text;
-            }
+            return heuristicComboBox.InvokeRequired ? (string)heuristicComboBox.Invoke(new Func<string>(GetHeuristic)) : heuristicComboBox.Text;
         }
 
         public void SetUserVariables()
@@ -409,7 +377,7 @@ namespace OpenDACT.Class_Files
 
         private void StopBut_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
                 Connection.serialManager.ClearOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);
@@ -489,6 +457,14 @@ namespace OpenDACT.Class_Files
 
         private void MainForm_Load(object sender, EventArgs e) {
             UserInterface.Init();
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if(Connection.serialManager != null)
+            {
+                Connection.serialManager.Dispose();
+            }
         }
     }
 }

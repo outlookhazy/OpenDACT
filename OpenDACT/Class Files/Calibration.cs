@@ -12,21 +12,21 @@ namespace OpenDACT.Class_Files
         public static bool calibrateInProgress = false;
         public static bool calibrationState = false;
         public static bool calibrationComplete = false;
-        public static int calibrationSelection = 0;
+        public static CalibrationType calibrationSelection = CalibrationType.NORMAL;
         public static int iterationNum = 0;
         private static float tempAccuracy;
 
         public static void Calibrate()
         {
-            if (calibrationSelection == 0)
+            switch (Calibration.calibrationSelection)
             {
-                BasicCalibration();
-            }
-            else if (calibrationSelection == 1)
-            {
-                FastCalibration();
-            }
-
+                case CalibrationType.NORMAL:
+                    BasicCalibration();
+                    break;
+                case CalibrationType.QUICK:
+                    FastCalibration();
+                    break;
+            }            
             iterationNum++;
         }
         
@@ -181,8 +181,6 @@ namespace OpenDACT.Class_Files
 
             UserInterface.consoleLog.Log("HRad:" + EEPROM.HRadius.ToString());
         }
-
-        
 
         /*
         public void analyzeGeometry(float X, float XOpp, float Y, float YOpp, float Z, float ZOpp)
@@ -492,5 +490,11 @@ namespace OpenDACT.Class_Files
             slope = sCo / ssX;
         }
         */
+
+        public enum CalibrationType
+        {
+            NORMAL,
+            QUICK            
+        }
     }
 }

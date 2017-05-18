@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files
 {
-    class SerialManager
+    class SerialManager : IDisposable
     {
         private SerialPort _port;
         private string _readBuffer;
@@ -44,7 +44,7 @@ namespace OpenDACT.Class_Files
                     this._port.ErrorReceived += _port_ErrorReceived;
                     this._port.DataReceived += _port_DataReceived;
                     this._port.Open();
-                    this.CurrentState = ConnectionState.CONNECTED;
+                    this.CurrentState = ConnectionState.Connected;
                     this.OnConnectionStateChanged(this.CurrentState);
                     return true;
 
@@ -87,7 +87,7 @@ namespace OpenDACT.Class_Files
 
         public bool WriteLine(string text)
         {
-            if (this.CurrentState == ConnectionState.CONNECTED)
+            if (this.CurrentState == ConnectionState.Connected)
             {
                 this._port.WriteLine(text);
                 return true;
@@ -167,11 +167,16 @@ namespace OpenDACT.Class_Files
         {
             SerialConnectionChanged?.Invoke(this, e);
         }
+
+        public void Dispose()
+        {
+            this.Disconnect();
+        }
     }
 
     public enum ConnectionState
     {
-        CONNECTED,
+        Connected,
         DISCONNECTED
     }
 
