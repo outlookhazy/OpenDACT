@@ -13,6 +13,7 @@ namespace OpenDACT.Class_Files
             FSR,
             ZProbe
         }
+        public static bool isCalibrating = true;
     }
 
     public static class Heights

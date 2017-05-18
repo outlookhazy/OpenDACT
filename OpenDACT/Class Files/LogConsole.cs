@@ -11,15 +11,16 @@ namespace OpenDACT.Class_Files {
         private RichTextBox ConsoleUI;
         public LogLevel ConsoleLogLevel = LogLevel.NORMAL;
 
-        public LogConsole(RichTextBox targetUIElement) {
+        public LogConsole(RichTextBox targetUIElement, LogLevel consoleLogLevel = LogLevel.NORMAL) {
             this.ConsoleUI = targetUIElement;
+            this.ConsoleLogLevel = consoleLogLevel;
         }
 
         public void Log(string message, LogLevel logLevel = LogLevel.NORMAL) {
             if (!UserVariables.isInitiated)
                 return;
 
-            if (logLevel == LogLevel.NORMAL || (logLevel == LogLevel.DEBUG && this.ConsoleLogLevel == LogLevel.DEBUG))
+            if (logLevel == LogLevel.NORMAL || this.ConsoleLogLevel == LogLevel.DEBUG)
                 this.ConsoleUI.Invoke(new Action(
                     () => {
                         this.ConsoleUI.AppendText(message + "\n");

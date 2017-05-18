@@ -17,11 +17,11 @@ namespace OpenDACT.Class_Files
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            createMainForm();
+            CreateMainForm();
             Application.Run(mainFormTest);
         }
 
-        public static void createMainForm()
+        public static void CreateMainForm()
         {
             mainFormTest = new mainForm();
         }

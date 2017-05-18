@@ -42,9 +42,7 @@ namespace OpenDACT.Class_Files
             advancedPanel.Visible = false;
             printerLogPanel.Visible = false;
 
-            Connection.readThread = new Thread(Threading.Read);
-            Connection.calcThread = new Thread(Threading.HandleRead);
-            Connection._serialPort = new SerialPort();
+            Connection.Init();
 
 
             // Build the combobox of available ports.
@@ -88,7 +86,7 @@ namespace OpenDACT.Class_Files
 
         private void CalibrateButton_Click(object sender, EventArgs e)
         {
-            if (Connection._serialPort.IsOpen)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
@@ -97,7 +95,7 @@ namespace OpenDACT.Class_Files
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = 0;
                 HeightFunctions.checkHeightsOnly = false;
-                Threading.isCalibrating = true;
+                Printer.isCalibrating = true;
             }
             else
             {
@@ -107,7 +105,7 @@ namespace OpenDACT.Class_Files
         
         private void QuickCalibrate_Click(object sender, EventArgs e)
         {
-            if (Connection._serialPort.IsOpen)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 GCode.checkHeights = true;
                 EEPROMFunctions.ReadEEPROM();
@@ -116,7 +114,7 @@ namespace OpenDACT.Class_Files
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = 1;
                 HeightFunctions.checkHeightsOnly = false;
-                Threading.isCalibrating = true;
+                Printer.isCalibrating = true;
             }
             else
             {
@@ -295,7 +293,7 @@ namespace OpenDACT.Class_Files
 
         private void ReadEEPROM_Click(object sender, EventArgs e)
         {
-            if (Connection._serialPort.IsOpen)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 EEPROMFunctions.tempEEPROMSet = false;
                 EEPROMFunctions.ReadEEPROM();
@@ -411,19 +409,14 @@ namespace OpenDACT.Class_Files
 
         private void StopBut_Click(object sender, EventArgs e)
         {
-            try
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
-                Connection._serialPort.DiscardOutBuffer();
+                Connection.serialManager.ClearOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);
                 Connection.Disconnect();
-                Threading.isCalibrating = false;
+                Printer.isCalibrating = false;
                 Connection.Connect();
             }
-            catch
-            {
-
-            }
-
         }
 
         private void ManualCalibrateBut_Click(object sender, EventArgs e)

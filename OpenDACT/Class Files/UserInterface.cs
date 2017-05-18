@@ -106,7 +106,7 @@ namespace OpenDACT.Class_Files
 
         public static void Init() {
             UserInterface.consoleLog = new LogConsole(Program.mainFormTest.consoleMain);
-            UserInterface.printerLog = new LogConsole(Program.mainFormTest.consolePrinter);
+            UserInterface.printerLog = new LogConsole(Program.mainFormTest.consolePrinter, LogConsole.LogLevel.DEBUG);
         }
 
         /* 

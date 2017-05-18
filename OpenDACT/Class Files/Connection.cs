@@ -12,44 +12,33 @@ namespace OpenDACT.Class_Files
 {
     static class Connection
     {
-        public static SerialPort _serialPort;
-        public static Thread readThread;
-        public static Thread calcThread;
+        public static SerialManager serialManager;
+
+        public static void Init()
+        {
+            Connection.serialManager = new SerialManager();
+            Connection.serialManager.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
+            Connection.serialManager.NewSerialLine += SerialManager_NewSerialLine;
+        }
 
         public static void Connect()
         {
-            if (_serialPort.IsOpen) {
+            if (serialManager.CurrentState == ConnectionState.CONNECTED) {
                 UserInterface.consoleLog.Log("Already Connected");
             } else {
-                try {
-                    // Opens a new thread if there has been a previous thread that has closed.
-                    if (readThread.IsAlive == false)
-                    {
-                        readThread = new Thread(Threading.Read);
-                        calcThread = new Thread(Threading.HandleRead);
-                        _serialPort = new SerialPort();
-                    }
+                try {                   
+                    string PortName = Program.mainFormTest.portsCombo.Text;
+                    int BaudRate = int.Parse(Program.mainFormTest.baudRateCombo.Text, CultureInfo.InvariantCulture);
                     
-                    _serialPort.PortName = Program.mainFormTest.portsCombo.Text;
-                    _serialPort.BaudRate = int.Parse(Program.mainFormTest.baudRateCombo.Text, CultureInfo.InvariantCulture);
-
-                    // Set the read/write timeouts.
-                    _serialPort.ReadTimeout = 500;
-                    _serialPort.WriteTimeout = 500;
-
                     // Open the serial port and start reading on a reader thread.
                     // _continue is a flag used to terminate the app.
 
                     UserInterface.consoleLog.Log(Program.mainFormTest.portsCombo.Text);
 
-                    if (Program.mainFormTest.portsCombo.Text != "" && Program.mainFormTest.baudRateCombo.Text != "")
+                    if (PortName != "" && BaudRate != 0)
                     {
-                        _serialPort.Open();
-                        Threading._continue = true;
-
-                        readThread.Start();
-                        calcThread.Start();
-                        UserInterface.consoleLog.Log("Connected");
+                        UserInterface.consoleLog.Log("Connecting");
+                        Connection.serialManager.Connect(PortName, BaudRate);                       
                     }
                     else
                     {
@@ -59,40 +48,27 @@ namespace OpenDACT.Class_Files
                 catch (Exception e1)
                 {
                     UserInterface.consoleLog.Log(e1.Message);
-                    Threading._continue = false;
-
-                    //check if connection is open
-                    if (readThread.IsAlive)
-                    {
-                        readThread.Join();
-                    }
-
-                    if (calcThread.IsAlive)
-                    {
-                        calcThread.Join();
-                    }
-
-                    _serialPort.Close();
+                    serialManager.Disconnect();
                 }
             }
         }
 
+        private static void SerialManager_NewSerialLine(object sender, string data)
+        {
+            UserInterface.printerLog.Log(String.Format("Received: {0}", data), LogConsole.LogLevel.DEBUG);
+            DecisionHandler.HandleInput(data);
+        }
+
+        private static void SerialManager_SerialConnectionChanged(object sender, ConnectionState newState)
+        {
+            UserInterface.consoleLog.Log(String.Format("Serial {0}",newState));
+        }
+
         public static void Disconnect()
         {
-            if (_serialPort.IsOpen && readThread.IsAlive)
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
-                try
-                {
-                    Threading._continue = false;
-                    readThread.Join();
-                    calcThread.Join();
-                    _serialPort.Close();
-                    UserInterface.consoleLog.Log("Disconnected");
-                }
-                catch (Exception e1)
-                {
-                    UserInterface.consoleLog.Log(e1.Message);
-                }
+                serialManager.Disconnect();
             }
             else
             {
