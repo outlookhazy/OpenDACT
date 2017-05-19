@@ -64,12 +64,11 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                MeasureHeights.checkHeights = true;
-                EEPROMFunctions.ReadEEPROM();
-                EEPROMFunctions.EEPROMReadOnly = false;
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.CALIBRATE);
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
-                Heights.checkHeightsOnly = false;
             }
             else
             {
@@ -81,12 +80,11 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                MeasureHeights.checkHeights = true;
-                EEPROMFunctions.ReadEEPROM();
-                EEPROMFunctions.EEPROMReadOnly = false;
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
-                Heights.checkHeightsOnly = false;
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.CALIBRATE);
             }
             else
             {
@@ -275,10 +273,7 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                EEPROMFunctions.tempEEPROMSet = false;
-                EEPROMFunctions.ReadEEPROM();
-                EEPROMFunctions.EEPROMReadOnly = true;
-                Heights.checkHeightsOnly = false;
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);                
             }
             else
             {
@@ -357,17 +352,8 @@ namespace OpenDACT.Class_Files
 
         private void CheckHeights_Click(object sender, EventArgs e)
         {
-            if (EEPROMFunctions.tempEEPROMSet == false)
-            {
-                EEPROMFunctions.ReadEEPROM();
-            }
-
-            MeasureHeights.checkHeights = true;
-            EEPROMFunctions.EEPROMReadOnly = false;
-            Calibration.calibrationState = true;
-            Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
-            Heights.checkHeightsOnly = true;
-            Heights.heightsSet = false;
+            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
+            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_PROBE);
         }
 
         private void StopBut_Click(object sender, EventArgs e)
@@ -377,7 +363,6 @@ namespace OpenDACT.Class_Files
                 Connection.serialManager.ClearOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);
                 Connection.Disconnect();
-                Connection.Connect();
             }
         }
 

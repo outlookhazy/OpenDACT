@@ -205,7 +205,7 @@ namespace OpenDACT.Class_Files.Workflow
 
             }
 
-            MeasureHeights.checkHeights = true;
+            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
         }
 
     }

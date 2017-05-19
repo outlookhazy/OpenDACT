@@ -10,6 +10,7 @@ namespace OpenDACT.Class_Files.Workflow
     static class MeasureZProbe
     {
         internal static bool zProbeMeasuringComplete = false;
+        internal static bool zProbeMeasuringActive = false;
         internal static bool zProbeHeightSet = false;
         private static int iteration = 0;
         public static void DoNextStep()
@@ -22,15 +23,10 @@ namespace OpenDACT.Class_Files.Workflow
                     iteration++;
                     break;
                 case 1:
-                    GCode.MoveToPosition(0, 0, Convert.ToSingle(Math.Round(EEPROM.zMaxLength.Value / 6)));
-                    iteration++;
-                    break;
-                case 2:
                     GCode.TrySend(Command.PROBE);
 
                     zProbeMeasuringComplete = true;
-                    Program.mainFormTest.SetEEPROMGUIList();
-                    EEPROMFunctions.SendEEPROM();
+                    
                     iteration = 0;
                     break;
             }

@@ -11,6 +11,8 @@ namespace OpenDACT.Class_Files
 {
     public static class EEPROM
     {
+        public static bool Reading { get; set; }
+
         public static EEPROM_Variable stepsPerMM = new EEPROM_Variable(3, EEPROM_Position.StepsPerMM);
         public static float tempSPM;
         public static EEPROM_Variable zMaxLength = new EEPROM_Variable(3, EEPROM_Position.zMaxLength);
@@ -27,6 +29,46 @@ namespace OpenDACT.Class_Files
         public static EEPROM_Variable DA = new EEPROM_Variable(3, EEPROM_Position.DA);
         public static EEPROM_Variable DB = new EEPROM_Variable(3, EEPROM_Position.DB);
         public static EEPROM_Variable DC = new EEPROM_Variable(3, EEPROM_Position.DC);
+
+        public static List<EEPROM_Variable> GetVarList()
+        {
+            return new List<EEPROM_Variable>
+            {
+                stepsPerMM,
+                zMaxLength,
+                zProbeHeight,
+                zProbeSpeed,
+                diagonalRod,
+                HRadius,
+                offsetX,
+                offsetY,
+                offsetZ,
+                A,
+                B,
+                C,
+                DA,
+                DB,
+                DC
+            };
+        }
+
+        public static bool ReadComplete()
+        {
+            foreach(EEPROM_Variable v in EEPROM.GetVarList())
+            {
+                if (v.Pending)
+                    return false;
+            }
+            return true;
+        }
+
+        public static void SetPending()
+        {
+            foreach (EEPROM_Variable v in EEPROM.GetVarList())
+            {
+                v.Pending = true;
+            }
+        }
     }
 
     public enum EEPROM_Position:int {
@@ -50,11 +92,15 @@ namespace OpenDACT.Class_Files
     public class EEPROM_Variable {
         public int Type { get; private set; }
         public int Position { get; private set; }
-        public float Value;
+
+        private float varValue;
+        public float Value { get { return varValue; } set { varValue = value; this.Pending = false; } }
+        public bool Pending { get; set; }
 
         public EEPROM_Variable(int Type, EEPROM_Position Position) {
             this.Type = Type;
             this.Position = (int)Position;
+            this.Pending = true;
         }
 
         public override string ToString() {
@@ -64,12 +110,9 @@ namespace OpenDACT.Class_Files
 
     static class EEPROMFunctions
     {
-        public static bool tempEEPROMSet = false;
-        public static bool EEPROMRequestSent = false;
-        public static bool EEPROMReadOnly = false;
-
         public static void ReadEEPROM()
         {
+            EEPROM.SetPending();            
             GCode.TrySend(GCode.Command.READ_EEPROM);
         }
 
@@ -122,8 +165,6 @@ namespace OpenDACT.Class_Files
             switch (settingPosition)
             {
                 case EEPROM_Position.StepsPerMM:
-                    UserInterface.consoleLog.Log("EEPROM capture initiated");
-
                     EEPROM.stepsPerMM.Value = value;
                     EEPROM.tempSPM = value;
                     break;
@@ -134,10 +175,7 @@ namespace OpenDACT.Class_Files
                     EEPROM.zProbeHeight.Value = value;
                     break;
                 case EEPROM_Position.zProbeSpeed:
-                    EEPROM.zProbeSpeed.Value = value;
-                    tempEEPROMSet = true;
-                    MeasureHeights.checkHeights = true;
-                    Program.mainFormTest.SetEEPROMGUIList();
+                    EEPROM.zProbeSpeed.Value = value;          
                     break;
                 case EEPROM_Position.diagonalRod:
                     EEPROM.diagonalRod.Value = value;

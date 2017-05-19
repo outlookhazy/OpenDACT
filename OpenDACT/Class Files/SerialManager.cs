@@ -75,6 +75,8 @@ namespace OpenDACT.Class_Files
             {
                 if (this._port.IsOpen)
                 {
+                    this._port.ErrorReceived -= this._port_ErrorReceived;
+                    this._port.DataReceived -= this._port_DataReceived;
                     this._port.Close();
                 }
                 this._port.Dispose();
@@ -105,7 +107,13 @@ namespace OpenDACT.Class_Files
         private void _port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             lock (this._bufferlock) {
-                this._readBuffer += _port.ReadExisting();
+                try
+                {
+                    this._readBuffer += _port.ReadExisting();
+                } catch (Exception ex)
+                {
+                    //ignore case where port is closed before data can be read
+                }
             }
             ProcessBufferContents();
             ProcessQueueContents();

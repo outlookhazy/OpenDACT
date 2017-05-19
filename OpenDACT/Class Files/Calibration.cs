@@ -152,7 +152,7 @@ namespace OpenDACT.Class_Files
             }
             else
             {
-                MeasureHeights.checkHeights = true;
+                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
                 UserInterface.consoleLog.Log("Continuing Calibration");
             }
         }
