@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using OpenDACT.Class_Files.Workflow;
+using OpenDACT.Class_Files.Workflow_Classes;
 
 namespace OpenDACT.Class_Files
 {
@@ -45,7 +45,7 @@ namespace OpenDACT.Class_Files
 
             tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
             Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
-            CheckAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+            CheckAccuracy(Heights.X, Heights.XOpp, Heights.Y, Heights.YOpp, Heights.Z, Heights.ZOpp);
 
             if (calibrationState == true)
             {
@@ -70,7 +70,7 @@ namespace OpenDACT.Class_Files
 
             tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
             Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
-            CheckAccuracy(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
+            CheckAccuracy(Heights.X, Heights.XOpp, Heights.Y, Heights.YOpp, Heights.Z, Heights.ZOpp);
 
             if (calibrationState == true)
             {
@@ -136,23 +136,28 @@ namespace OpenDACT.Class_Files
         }
         
 
-        private static void CheckAccuracy(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        private static void CheckAccuracy(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
         {
             float accuracy = UserVariables.accuracy;
 
-            if (X <= accuracy && X >= -accuracy && XOpp <= accuracy && XOpp >= -accuracy && Y <= accuracy && Y >= -accuracy && YOpp <= accuracy && YOpp >= -accuracy && Z <= accuracy && Z >= -accuracy && ZOpp <= accuracy && ZOpp >= -accuracy)
-            {
+            if (Math.Abs(offset_X) <= accuracy && 
+                Math.Abs(offset_XOpp) <= accuracy && 
+                Math.Abs(offset_Y) <= accuracy &&
+                Math.Abs(offset_YOpp) <= accuracy &&
+                Math.Abs(offset_Z) <= accuracy &&
+                Math.Abs(offset_ZOpp) <= accuracy
+                ){
                 if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                 {
                     EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
                     UserInterface.consoleLog.Log("Setting Z Max Length with adjustment for FSR");
                 }
-
+                UserInterface.consoleLog.Log("Calibration Meets Accuracy");
                 calibrationState = false;
             }
             else
             {
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
+                //WorkflowManager.WorkflowQueue.AddLast(new MeasureHeightsWF());
                 UserInterface.consoleLog.Log("Continuing Calibration");
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -74,12 +75,26 @@ namespace OpenDACT.Class_Files
             if(this._port != null)
             {
                 if (this._port.IsOpen)
-                {
+                {                    
                     this._port.ErrorReceived -= this._port_ErrorReceived;
                     this._port.DataReceived -= this._port_DataReceived;
-                    this._port.Close();
+                    
+                    Task.Run(new Action(() => {
+                        SerialPort cljRef = this._port; //capture reference to serial port
+                        if (cljRef != null)
+                        {
+                            if (cljRef.IsOpen)
+                                try
+                                {
+                                    cljRef.Close(); //close in another thread
+                                } catch (Exception e)
+                                {
+                                    Debug.WriteLine(e);
+                                }
+                        }
+                    }));
                 }
-                this._port.Dispose();
+                this._port = null; //dispose of local reference
                 this.CurrentState = ConnectionState.DISCONNECTED;
                 this.OnConnectionStateChanged(ConnectionState.DISCONNECTED);
                 return true;
@@ -178,7 +193,13 @@ namespace OpenDACT.Class_Files
 
         public void Dispose()
         {
-            this.Disconnect();
+            try
+            {
+                this.Disconnect();
+            } catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
         }
     }
 

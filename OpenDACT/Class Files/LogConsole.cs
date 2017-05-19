@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,12 +22,22 @@ namespace OpenDACT.Class_Files {
                 return;
 
             if (logLevel == LogLevel.NORMAL || this.ConsoleLogLevel == LogLevel.DEBUG)
-                this.ConsoleUI.Invoke(new Action(
+                try
+                {
+                    this.ConsoleUI.Invoke(new Action(
                     () => {
-                        this.ConsoleUI.AppendText(message + "\n");
-                        this.ConsoleUI.ScrollToCaret();
+
+                            this.ConsoleUI.AppendText(message + "\n");
+                            this.ConsoleUI.ScrollToCaret();
+                        
                         }
                     ));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    Debug.WriteLine(message + "\n");
+                }
         }
 
         public enum LogLevel {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
-using OpenDACT.Class_Files.Workflow;
+using OpenDACT.Class_Files.Workflow_Classes;
 
 namespace OpenDACT.Class_Files
 {

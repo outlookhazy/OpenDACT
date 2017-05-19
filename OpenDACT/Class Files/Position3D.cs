@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files
 {
-    class Position3D
+    public class Position3D
     {
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+
+        public Position3D(float x, float y, float z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
 
         public override string ToString()
         {

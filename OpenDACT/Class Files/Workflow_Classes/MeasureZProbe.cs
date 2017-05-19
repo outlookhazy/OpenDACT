@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using static OpenDACT.Class_Files.GCode;
 
-namespace OpenDACT.Class_Files.Workflow
+namespace OpenDACT.Class_Files.Workflow_Classes
 {
     static class MeasureZProbe
     {
         internal static bool zProbeMeasuringComplete = false;
         internal static bool zProbeMeasuringActive = false;
-        internal static bool zProbeHeightSet = false;
         private static int iteration = 0;
         public static void DoNextStep()
         {

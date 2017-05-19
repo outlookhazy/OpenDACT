@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static OpenDACT.Class_Files.GCode;
 
-namespace OpenDACT.Class_Files.Workflow
+namespace OpenDACT.Class_Files.Workflow_Classes
 {
     static class MeasureHeights
     {

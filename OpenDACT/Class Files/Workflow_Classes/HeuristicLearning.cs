@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenDACT.Class_Files.Workflow
+namespace OpenDACT.Class_Files.Workflow_Classes
 {
     static class HeuristicLearning
     {
@@ -205,7 +205,7 @@ namespace OpenDACT.Class_Files.Workflow
 
             }
 
-            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
+            //WorkflowManager.WorkflowQueue.AddLast(new MeasureHeightsWF());
         }
 
     }

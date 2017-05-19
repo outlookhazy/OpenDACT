@@ -10,7 +10,8 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO.Ports;
 using System.Globalization;
-using OpenDACT.Class_Files.Workflow;
+using OpenDACT.Class_Files.Workflow_Classes;
+using System.Diagnostics;
 
 namespace OpenDACT.Class_Files
 {
@@ -64,9 +65,9 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.CALIBRATE);
+                //WorkflowManager.WorkflowQueue.AddLast(new ReadEEPROMWF());
+                WorkflowManager.ActivateWorkflow(new MeasureHeightsWF());
+                //WorkflowManager.WorkflowQueue.AddLast(WorkflowManager.WorkflowType.CALIBRATE);
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
             }
@@ -80,11 +81,11 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_HEIGHTS);
+                //WorkflowManager.WorkflowQueue.AddLast(new ReadEEPROMWF());
+                WorkflowManager.ActivateWorkflow(new MeasureHeightsWF());
                 Calibration.calibrationState = true;
                 Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.CALIBRATE);
+                //WorkflowManager.WorkflowQueue.AddLast(WorkflowManager.WorkflowType.CALIBRATE);
             }
             else
             {
@@ -273,7 +274,8 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);                
+                Debug.WriteLine("Added Read EEPROM WF Item");
+                WorkflowManager.ActivateWorkflow(new ReadEEPROMWF());                
             }
             else
             {
@@ -352,8 +354,8 @@ namespace OpenDACT.Class_Files
 
         private void CheckHeights_Click(object sender, EventArgs e)
         {
-            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.READ_EEPROM);
-            DecisionHandler.DecisionLogic.AddLast(DecisionHandler.DecisionTree.MEASURE_PROBE);
+
+            WorkflowManager.ActivateWorkflow(new ZProbeMeasure());
         }
 
         private void StopBut_Click(object sender, EventArgs e)
@@ -440,6 +442,7 @@ namespace OpenDACT.Class_Files
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Connection.Disconnect();
             if(Connection.serialManager != null)
             {
                 Connection.serialManager.Dispose();

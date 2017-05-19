@@ -99,15 +99,23 @@
     <Compile Include="Class Files\LogConsole.cs" />
     <Compile Include="Class Files\Position3D.cs" />
     <Compile Include="Class Files\SerialManager.cs" />
-    <Compile Include="Class Files\DecisionHandler.cs" />
+    <Compile Include="Class Files\WorkflowManager.cs" />
     <Compile Include="Class Files\EEPROM.cs" />
     <Compile Include="Class Files\GCode.cs" />
     <Compile Include="Class Files\Printer.cs" />
     <Compile Include="Class Files\UserInterface.cs" />
     <Compile Include="Class Files\Validation.cs" />
-    <Compile Include="Class Files\Workflow\HeuristicLearning.cs" />
-    <Compile Include="Class Files\Workflow\MeasureHeights.cs" />
-    <Compile Include="Class Files\Workflow\MeasureZProbe.cs" />
+    <Compile Include="Class Files\Workflow_Classes\HeuristicLearning.cs" />
+    <Compile Include="Class Files\Workflow_Classes\Home.cs" />
+    <Compile Include="Class Files\Workflow_Classes\MeasureHeights.cs" />
+    <Compile Include="Class Files\Workflow_Classes\MeasureHeightsWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\MeasureZProbe.cs" />
+    <Compile Include="Class Files\Workflow_Classes\Move.cs" />
+    <Compile Include="Class Files\Workflow_Classes\Probe.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ProbeAtLocation.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ReadEEPROMWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\Workflow.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ZProbeMeasure.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

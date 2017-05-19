@@ -56,7 +56,7 @@ namespace OpenDACT.Class_Files
         private static void SerialManager_NewSerialLine(object sender, string data)
         {
             UserInterface.printerLog.Log(String.Format("Received: {0}", data), LogConsole.LogLevel.DEBUG);
-            DecisionHandler.HandleInput(data);
+            WorkflowManager.DelegateInput(data);
         }
 
         private static void SerialManager_SerialConnectionChanged(object sender, ConnectionState newState)
@@ -68,6 +68,8 @@ namespace OpenDACT.Class_Files
         {
             if (serialManager.CurrentState == ConnectionState.Connected)
             {
+                Connection.serialManager.SerialConnectionChanged -= SerialManager_SerialConnectionChanged;
+                Connection.serialManager.NewSerialLine -= SerialManager_NewSerialLine;
                 serialManager.Disconnect();
             }
             else
