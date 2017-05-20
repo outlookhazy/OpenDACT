@@ -190,7 +190,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             string debugtag = ID == null ? "<anonymous>" : this.ID; 
             if (this.ID != null)
-                Debug.WriteLine(String.Format("(Workflow Debug {0}): {1}", debugtag, logmessage));
+                Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
         }
     }
 

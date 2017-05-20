@@ -105,6 +105,8 @@
     <Compile Include="Class Files\Printer.cs" />
     <Compile Include="Class Files\UserInterface.cs" />
     <Compile Include="Class Files\Validation.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ApplySettingsWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ApplySettingWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\HeuristicLearning.cs" />
     <Compile Include="Class Files\Workflow_Classes\HomeWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\MeasureHeightsWF.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Class Files\Workflow_Classes\ProbeWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\ProbeAtLocationWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\ReadEEPROMWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\SendEEPROMWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\Workflow.cs" />
     <Compile Include="Class Files\Workflow_Classes\ZProbeMeasureWF.cs" />
     <Compile Include="mainForm.cs">

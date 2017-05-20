@@ -13,22 +13,22 @@ namespace OpenDACT.Class_Files
     {
         public static bool Reading { get; set; }
 
-        public static EEPROM_Variable stepsPerMM = new EEPROM_Variable(3, EEPROM_Position.StepsPerMM);
+        public static EEPROM_Variable stepsPerMM = new EEPROM_Variable("stepsPerMM",3, EEPROM_Position.StepsPerMM);
         public static float tempSPM;
-        public static EEPROM_Variable zMaxLength = new EEPROM_Variable(3, EEPROM_Position.zMaxLength);
-        public static EEPROM_Variable zProbeHeight = new EEPROM_Variable(3, EEPROM_Position.zProbeHeight);
-        public static EEPROM_Variable zProbeSpeed = new EEPROM_Variable(3, EEPROM_Position.zProbeSpeed);
-        public static EEPROM_Variable diagonalRod = new EEPROM_Variable(3, EEPROM_Position.diagonalRod);
-        public static EEPROM_Variable HRadius = new EEPROM_Variable(3, EEPROM_Position.HRadius);
-        public static EEPROM_Variable offsetX = new EEPROM_Variable(1, EEPROM_Position.offsetX);
-        public static EEPROM_Variable offsetY = new EEPROM_Variable(1, EEPROM_Position.offsetY);
-        public static EEPROM_Variable offsetZ = new EEPROM_Variable(1, EEPROM_Position.offsetZ);
-        public static EEPROM_Variable A = new EEPROM_Variable(3, EEPROM_Position.A);
-        public static EEPROM_Variable B = new EEPROM_Variable(3, EEPROM_Position.B);
-        public static EEPROM_Variable C = new EEPROM_Variable(3, EEPROM_Position.C);
-        public static EEPROM_Variable DA = new EEPROM_Variable(3, EEPROM_Position.DA);
-        public static EEPROM_Variable DB = new EEPROM_Variable(3, EEPROM_Position.DB);
-        public static EEPROM_Variable DC = new EEPROM_Variable(3, EEPROM_Position.DC);
+        public static EEPROM_Variable zMaxLength = new EEPROM_Variable("zMaxLength",3, EEPROM_Position.zMaxLength);
+        public static EEPROM_Variable zProbeHeight = new EEPROM_Variable("zProbeHeight",3, EEPROM_Position.zProbeHeight);
+        public static EEPROM_Variable zProbeSpeed = new EEPROM_Variable("zProbeSpeed",3, EEPROM_Position.zProbeSpeed);
+        public static EEPROM_Variable diagonalRod = new EEPROM_Variable("diagonalRod",3, EEPROM_Position.diagonalRod);
+        public static EEPROM_Variable HRadius = new EEPROM_Variable("HRadius",3, EEPROM_Position.HRadius);
+        public static EEPROM_Variable offsetX = new EEPROM_Variable("offsetX",1, EEPROM_Position.offsetX);
+        public static EEPROM_Variable offsetY = new EEPROM_Variable("offsetY",1, EEPROM_Position.offsetY);
+        public static EEPROM_Variable offsetZ = new EEPROM_Variable("offsetZ",1, EEPROM_Position.offsetZ);
+        public static EEPROM_Variable A = new EEPROM_Variable("A",3, EEPROM_Position.A);
+        public static EEPROM_Variable B = new EEPROM_Variable("B",3, EEPROM_Position.B);
+        public static EEPROM_Variable C = new EEPROM_Variable("C",3, EEPROM_Position.C);
+        public static EEPROM_Variable DA = new EEPROM_Variable("DA",3, EEPROM_Position.DA);
+        public static EEPROM_Variable DB = new EEPROM_Variable("DB",3, EEPROM_Position.DB);
+        public static EEPROM_Variable DC = new EEPROM_Variable("DC",3, EEPROM_Position.DC);
 
         public static List<EEPROM_Variable> GetVarList()
         {
@@ -90,6 +90,7 @@ namespace OpenDACT.Class_Files
     }
 
     public class EEPROM_Variable {
+        public string Name { get; private set; }
         public int Type { get; private set; }
         public int Position { get; private set; }
 
@@ -97,7 +98,8 @@ namespace OpenDACT.Class_Files
         public float Value { get { return varValue; } set { varValue = value; this.Pending = false; } }
         public bool Pending { get; set; }
 
-        public EEPROM_Variable(int Type, EEPROM_Position Position) {
+        public EEPROM_Variable(string Name, int Type, EEPROM_Position Position) {
+            this.Name = Name;
             this.Type = Type;
             this.Position = (int)Position;
             this.Pending = true;
@@ -216,7 +218,7 @@ namespace OpenDACT.Class_Files
         public static void SendEEPROM()
         {
             //manually set all eeprom values
-            UserInterface.consoleLog.Log("Setting EEPROM.");
+            UserInterface.consoleLog.Log("Sending EEPROM.");
             Thread.Sleep(50);
             GCode.SendEEPROMVariable(EEPROM.stepsPerMM);
             Thread.Sleep(50);
