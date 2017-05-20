@@ -7,10 +7,12 @@ using static OpenDACT.Class_Files.GCode;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-    public class Move : Workflow
+    public class MoveWF : Workflow
     {
+        public override string ID { get { return "MoveWF"; } set { return; } }
+
         private Position3D targetLocation;
-        public Move(Position3D location)
+        public MoveWF(Position3D location)
         {
             this.targetLocation = location;
         }

@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-    public class ZProbeMeasure : Workflow
+    public class ZProbeMeasureWF : Workflow
     {
-        public Probe MeasurementProbe;
+        public override string ID { get { return "ZProbeMeasureWF"; } set { return; } }
+
+        public ProbeWF MeasurementProbe;
         protected override void OnStarted()
         {
             this.AddWorkflowItem(new ReadEEPROMWF());
-            this.AddWorkflowItem(new Home());
-            MeasurementProbe = new Probe();
+            this.AddWorkflowItem(new HomeWF());
+            MeasurementProbe = new ProbeWF();
             this.AddWorkflowItem(MeasurementProbe);
-            this.FinishOrAdvance();
         }
 
         protected override void OnChildrenFinished()

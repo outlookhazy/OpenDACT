@@ -106,16 +106,14 @@
     <Compile Include="Class Files\UserInterface.cs" />
     <Compile Include="Class Files\Validation.cs" />
     <Compile Include="Class Files\Workflow_Classes\HeuristicLearning.cs" />
-    <Compile Include="Class Files\Workflow_Classes\Home.cs" />
-    <Compile Include="Class Files\Workflow_Classes\MeasureHeights.cs" />
+    <Compile Include="Class Files\Workflow_Classes\HomeWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\MeasureHeightsWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\MeasureZProbe.cs" />
-    <Compile Include="Class Files\Workflow_Classes\Move.cs" />
-    <Compile Include="Class Files\Workflow_Classes\Probe.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ProbeAtLocation.cs" />
+    <Compile Include="Class Files\Workflow_Classes\MoveWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ProbeWF.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ProbeAtLocationWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\ReadEEPROMWF.cs" />
     <Compile Include="Class Files\Workflow_Classes\Workflow.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ZProbeMeasure.cs" />
+    <Compile Include="Class Files\Workflow_Classes\ZProbeMeasureWF.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

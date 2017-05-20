@@ -29,7 +29,6 @@ namespace OpenDACT.Class_Files
             Program.mainFormTest.SetUserVariables();
 
             if (currentWorkflow != null)
-                if (currentWorkflow.Status == WorkflowState.STARTED)
                     currentWorkflow.RouteMessage(message);
 
             

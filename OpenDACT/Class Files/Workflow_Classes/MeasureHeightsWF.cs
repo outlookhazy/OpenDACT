@@ -8,13 +8,15 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class MeasureHeightsWF : Workflow
     {
-        ProbeAtLocation X;
-        ProbeAtLocation Xopp;
-        ProbeAtLocation Y;
-        ProbeAtLocation Yopp;
-        ProbeAtLocation Z;
-        ProbeAtLocation Zopp;
-        ProbeAtLocation Center;
+        public override string ID { get { return "MeasureHeightsWF"; } set { return; } }
+
+        ProbeAtLocationWF X;
+        ProbeAtLocationWF Xopp;
+        ProbeAtLocationWF Y;
+        ProbeAtLocationWF Yopp;
+        ProbeAtLocationWF Z;
+        ProbeAtLocationWF Zopp;
+        ProbeAtLocationWF Center;
 
         protected override void OnStarted()
         {
@@ -25,14 +27,14 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             float valueXYLarge = 0.417F * plateDiameter;
             float valueXYSmall = 0.241F * plateDiameter;
 
-            Center = new ProbeAtLocation(new Position3D(0, 0, probingHeight));
-            X = new ProbeAtLocation(new Position3D(-valueXYLarge, -valueXYSmall, probingHeight));
-            Xopp = new ProbeAtLocation(new Position3D(valueXYLarge, valueXYSmall, probingHeight));
-            Y = new ProbeAtLocation(new Position3D(valueXYLarge, -valueXYSmall, probingHeight));
-            Yopp = new ProbeAtLocation(new Position3D(-valueXYLarge, valueXYSmall, probingHeight));
-            Z = new ProbeAtLocation(new Position3D(0, valueZ, probingHeight));
-            Zopp = new ProbeAtLocation(new Position3D(0, -valueZ, probingHeight));
-            Move park = new Move(new Position3D(0, 0, Convert.ToInt32(EEPROM.zMaxLength.Value / 3)));// park
+            Center = new ProbeAtLocationWF(new Position3D(0, 0, probingHeight));
+            X = new ProbeAtLocationWF(new Position3D(-valueXYLarge, -valueXYSmall, probingHeight));
+            Xopp = new ProbeAtLocationWF(new Position3D(valueXYLarge, valueXYSmall, probingHeight));
+            Y = new ProbeAtLocationWF(new Position3D(valueXYLarge, -valueXYSmall, probingHeight));
+            Yopp = new ProbeAtLocationWF(new Position3D(-valueXYLarge, valueXYSmall, probingHeight));
+            Z = new ProbeAtLocationWF(new Position3D(0, valueZ, probingHeight));
+            Zopp = new ProbeAtLocationWF(new Position3D(0, -valueZ, probingHeight));
+            MoveWF park = new MoveWF(new Position3D(0, 0, Convert.ToInt32(EEPROM.zMaxLength.Value / 3)));// park
 
             this.AddWorkflowItem(Center);
             this.AddWorkflowItem(X);
@@ -43,7 +45,6 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.AddWorkflowItem(Zopp);
             this.AddWorkflowItem(park);
 
-            this.FinishOrAdvance();
         }
 
         protected override void OnChildrenFinished()

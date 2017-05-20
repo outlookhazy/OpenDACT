@@ -355,7 +355,7 @@ namespace OpenDACT.Class_Files
         private void CheckHeights_Click(object sender, EventArgs e)
         {
 
-            WorkflowManager.ActivateWorkflow(new ZProbeMeasure());
+            WorkflowManager.ActivateWorkflow(new ZProbeMeasureWF());
         }
 
         private void StopBut_Click(object sender, EventArgs e)

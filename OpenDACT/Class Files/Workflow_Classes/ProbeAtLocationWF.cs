@@ -6,22 +6,23 @@ using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-    public class ProbeAtLocation : Workflow
+    public class ProbeAtLocationWF : Workflow
     {
+        public override string ID { get { return "ProbeAtLocationWF"; } set { return; } }
+
         private Position3D probePoint;
-        private Probe probeWorkflow;
+        private ProbeWF probeWorkflow;
         public float Result { get { return this.probeWorkflow.Result; }  }
 
-        public ProbeAtLocation(Position3D location)
+        public ProbeAtLocationWF(Position3D location)
         {
             this.probePoint = location;
         }
         protected override void OnStarted()
         {
-            AddWorkflowItem(new Move(probePoint));
-            this.probeWorkflow = new Probe();
+            AddWorkflowItem(new MoveWF(probePoint));
+            this.probeWorkflow = new ProbeWF();
             AddWorkflowItem(this.probeWorkflow);
-            this.FinishOrAdvance();
         }
     }
 }
