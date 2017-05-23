@@ -13,29 +13,60 @@ namespace OpenDACT.Class_Files
             FSR,
             ZProbe
         }
-        public static bool isCalibrating = true;
     }
 
-    public static class Heights
+    public class HeightMap : Dictionary<Position,Position3D>
     {
-        //store every set of heights
-        public static float center;
-        public static float X;
-        public static float XOpp;
-        public static float Y;
-        public static float YOpp;
-        public static float Z;
-        public static float ZOpp;
-        public static float teX;
-        public static float teXOpp;
-        public static float teY;
-        public static float teYOpp;
-        public static float teZ;
-        public static float teZOpp;
-
-        public static void PrintHeights()
+        public HeightMap()
         {
-            UserInterface.consoleLog.Log("Center:" + Heights.center + " X:" + Heights.X + " XOpp:" + Heights.XOpp + " Y:" + Heights.Y + " YOpp:" + Heights.YOpp + " Z:" + Heights.Z + " ZOpp:" + Heights.ZOpp);
+            foreach(Position p in typeof(Position).GetEnumValues())
+            {
+                this[p] = new Position3D();
+            }
         }
+
+        public float AverageAccuracy()
+        {
+            return (Convert.ToSingle(
+            (Math.Abs(this[Position.X].Z) +
+            Math.Abs(this[Position.XOPP].Z) +
+            Math.Abs(this[Position.Y].Z) +
+            Math.Abs(this[Position.YOPP].Z) +
+            Math.Abs(this[Position.Z].Z) +
+            Math.Abs(this[Position.ZOPP].Z)) / 6.0));
+        }
+
+        public bool PrecisionReached(float targetAccuracy)
+        {
+            return (Math.Abs(this[Position.X].Z) <= targetAccuracy &&
+                Math.Abs(this[Position.XOPP].Z) <= targetAccuracy &&
+                Math.Abs(this[Position.Y].Z) <= targetAccuracy &&
+                Math.Abs(this[Position.YOPP].Z) <= targetAccuracy &&
+                Math.Abs(this[Position.Z].Z) <= targetAccuracy &&
+                Math.Abs(this[Position.ZOPP].Z) <= targetAccuracy
+                );
+        }
+
+        public void PrintHeights()
+        {
+            UserInterface.consoleLog.Log("Center:" + this[Position.CENTER] + " X:" + this[Position.X] + " XOpp:" + this[Position.XOPP] + " Y:" + this[Position.Y] + " YOpp:" + this[Position.YOPP] + " Z:" + this[Position.Z] + " ZOpp:" + this[Position.ZOPP]);
+        }
+    }
+
+    public enum Position
+    {
+        CENTER,
+        X,
+        XOPP,
+        Y,
+        YOPP,
+        Z,
+        ZOPP,
+        TEX,
+        TEXOPP,
+        TEY,
+        TEYOPP,
+        TEZ,
+        TEZOPP
     }
 }

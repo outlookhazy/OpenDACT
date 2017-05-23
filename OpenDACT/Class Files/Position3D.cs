@@ -12,7 +12,7 @@ namespace OpenDACT.Class_Files
         public float Y { get; set; }
         public float Z { get; set; }
 
-        public Position3D(float x, float y, float z)
+        public Position3D(float x = 0, float y = 0, float z = 0)
         {
             this.X = x;
             this.Y = y;

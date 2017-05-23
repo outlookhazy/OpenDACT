@@ -9,22 +9,22 @@ namespace ReDACT.Classes
 {
     public class TestData
     {
-        public int numpoints { get; private set; }
-        public NumFactors numfactors { get; private set; }
-        public double[,] testpoints { get; private set; }
-        public bool normalize { get; private set; }
+        public int NumPoints { get; private set; }
+        public NumFactors NumFactors { get; private set; }
+        public double[,] TestPoints { get; private set; }
+        public bool Normalize { get; private set; }
 
-        public double bedRadius { get; private set; }
+        public double BedRadius { get; private set; }
 
         public TestData(int numpoints, NumFactors numfactors, double bedRadius, double[,] testpoints, bool normalize)
         {
             if ((int)numfactors > numpoints)
                 throw new Exception("Error: need at least as many points as factors you want to calibrate");
-            this.numpoints = numpoints;
-            this.numfactors = numfactors;
-            this.bedRadius = bedRadius;
-            this.testpoints = testpoints;
-            this.normalize = normalize;
+            this.NumPoints = numpoints;
+            this.NumFactors = numfactors;
+            this.BedRadius = bedRadius;
+            this.TestPoints = testpoints;
+            this.Normalize = normalize;
         }
 
         public static double[,] CalcProbePoints(int points, double radius)

@@ -133,41 +133,15 @@ namespace OpenDACT.Class_Files
             }            
         }
 
-        public static float AverageAccuracy()
-        {
-            return (Convert.ToSingle(
-            (Math.Abs(Heights.X) +
-            Math.Abs(Heights.XOpp) +
-            Math.Abs(Heights.Y) +
-            Math.Abs(Heights.YOpp) +
-            Math.Abs(Heights.Z) +
-            Math.Abs(Heights.ZOpp)) / 6.0));
-        }
         
-        public static bool PrecisionReached(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
+        
+        
+
+        public static void CheckAccuracy(HeightMap Heights)
         {
             float accuracy = UserVariables.accuracy;
 
-            return (Math.Abs(offset_X) <= accuracy &&
-                Math.Abs(offset_XOpp) <= accuracy &&
-                Math.Abs(offset_Y) <= accuracy &&
-                Math.Abs(offset_YOpp) <= accuracy &&
-                Math.Abs(offset_Z) <= accuracy &&
-                Math.Abs(offset_ZOpp) <= accuracy
-                );
-        }
-
-        public static void CheckAccuracy(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
-        {
-            float accuracy = UserVariables.accuracy;
-
-            if (Math.Abs(offset_X) <= accuracy && 
-                Math.Abs(offset_XOpp) <= accuracy && 
-                Math.Abs(offset_Y) <= accuracy &&
-                Math.Abs(offset_YOpp) <= accuracy &&
-                Math.Abs(offset_Z) <= accuracy &&
-                Math.Abs(offset_ZOpp) <= accuracy
-                ){
+            if(Heights.PrecisionReached(accuracy)){
                 if (UserVariables.probeChoice == Printer.ProbeType.FSR)
                 {
                     EEPROM.zMaxLength.Value -= UserVariables.FSROffset;

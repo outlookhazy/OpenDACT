@@ -21,7 +21,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected override void OnStarted()
         {
-            foreach(EEPROM_Position pos in typeof(EEPROM_Position).GetEnumValues())
+            foreach(EEPROM_POSITION pos in typeof(EEPROM_POSITION).GetEnumValues())
             {
                 this.AddWorkflowItem(new ApplySettingWF(this.serialSource, this.romSource, pos));
             }            

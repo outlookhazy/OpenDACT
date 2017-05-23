@@ -15,7 +15,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         private SerialManager serialSource;
 
-        public ApplySettingWF(SerialManager serialSource, EEPROM romSource, EEPROM_Position setting)
+        public ApplySettingWF(SerialManager serialSource, EEPROM romSource, EEPROM_POSITION setting)
         {
             this.serialSource = serialSource;
             this.targetSetting = romSource[setting];
@@ -24,7 +24,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected override void OnStarted()
         {
-            this.serialSource.WriteLine(GCode.SendEEPROMVariable(this.targetSetting));            
+            this.serialSource.WriteLine(GCode.Command.SEND_EEPROM_VARIABLE(this.targetSetting));            
         }
 
         protected override void OnMessage(string serialMessage)

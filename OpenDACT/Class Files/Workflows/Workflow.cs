@@ -8,7 +8,7 @@ using static OpenDACT.Class_Files.Workflow_Classes.Workflow;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-     public abstract class Workflow
+     public class Workflow
     {
         private event WorkflowStateChangeHandler OnEvent;
         private LinkedList<Workflow> WorkflowQueue = new LinkedList<Workflow>();
@@ -16,7 +16,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         private WorkflowStateChangeHandler _parent;
         private WorkflowState status = WorkflowState.PENDING;
         public WorkflowState Status { get { return status; } private set { status = value; } }
-        public abstract string ID { get; set; }
+        public string ID { get; set; }
 
         public void AddWorkflowItem(Workflow item)
         {
@@ -113,7 +113,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.SendEvent(newStatus);
         }
 
-        protected void Abort()
+        public void Abort()
         {
             this.DebugState("Aborting Self");
             this.OnAborted();
@@ -153,15 +153,17 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
                 }
                 else //first item has been activated
-                {
+                {                    
+                    WorkflowQueue.Remove(this.WorkflowItem); //remove completed item from the queue
                     if (this.WorkflowItem.Next != null) //queue has a next item
-                    {
+                    {                        
                         this.DebugState("Activating next Child");
-                        this.WorkflowItem = this.WorkflowItem.Next;
+                        this.WorkflowItem = this.WorkflowItem.Next;                        
                         this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
                     }
                     else
                     {
+                        this.WorkflowItem = null; //dispose of the current item
                         this.DebugState("Children are done");
                         complete = true;
                     }

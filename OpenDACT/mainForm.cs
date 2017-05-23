@@ -12,11 +12,15 @@ using System.IO.Ports;
 using System.Globalization;
 using OpenDACT.Class_Files.Workflow_Classes;
 using System.Diagnostics;
+using static OpenDACT.Class_Files.Printer;
 
 namespace OpenDACT.Class_Files
 {
     public partial class mainForm : Form
     {
+        public static SerialManager serialManager;
+        public Workflow masterWorkflow;        
+
         public mainForm()
         {
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -25,6 +29,12 @@ namespace OpenDACT.Class_Files
             Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
             InitializeComponent();
+
+            serialManager = new SerialManager();
+            serialManager.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
+            serialManager.NewSerialLine += SerialManager_NewSerialLine;
+
+            masterWorkflow.ID = "MasterWorkflow";
 
             // Basic set of standard baud rates.
             baudRateCombo.Items.Add("250000");
@@ -36,14 +46,12 @@ namespace OpenDACT.Class_Files
             baudRateCombo.Text = "250000";  // This is the default for most RAMBo controllers.
 
             this.comboBoxZMin.Items.AddRange(new object[] {
-            OpenDACT.Class_Files.Printer.ProbeType.FSR,
-            OpenDACT.Class_Files.Printer.ProbeType.ZProbe});
-            this.comboBoxZMin.SelectedItem = OpenDACT.Class_Files.Printer.ProbeType.ZProbe;
+            ProbeType.FSR,
+            ProbeType.ZProbe});
+            this.comboBoxZMin.SelectedItem = ProbeType.ZProbe;
 
             advancedPanel.Visible = false;
             printerLogPanel.Visible = false;
-
-            Connection.Init();
 
             // Build the combobox of available ports.
             portsCombo.DataSource = new BindingSource(new List<string>(SerialPort.GetPortNames()), null);
@@ -53,25 +61,85 @@ namespace OpenDACT.Class_Files
             UserVariables.isInitiated = true;
         }
 
+        void ActivateWorkflow(Workflow workflow)
+        {
+            this.masterWorkflow.Abort();
+            this.masterWorkflow.AddWorkflowItem(workflow);
+            this.masterWorkflow.Start();
+        }
+
+        private void SerialManager_SerialConnectionChanged(object sender, ConnectionState newState)
+        {
+            UserInterface.consoleLog.Log(String.Format("Serial {0}", newState));
+        }
+
+        private void SerialManager_NewSerialLine(object sender, string data)
+        {
+            UserInterface.printerLog.Log(String.Format("Received: {0}", data), LogConsole.LogLevel.DEBUG);
+            masterWorkflow.RouteMessage(data);
+        }
+
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            Connection.Connect();
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
+            {
+                UserInterface.consoleLog.Log("Already Connected");
+            }
+            else
+            {                
+                this.Connect();
+            }
+        }
+
+        private void Connect()
+        {
+            try
+            {
+                string PortName = Program.mainFormTest.portsCombo.Text;
+                int BaudRate = int.Parse(Program.mainFormTest.baudRateCombo.Text, CultureInfo.InvariantCulture);
+                UserInterface.consoleLog.Log(Program.mainFormTest.portsCombo.Text);
+
+                if (PortName != "" && BaudRate != 0)
+                {
+                    UserInterface.consoleLog.Log("Connecting");
+                    serialManager.Connect(PortName, BaudRate);
+                }
+                else
+                {
+                    UserInterface.consoleLog.Log("Please fill all text boxes above");
+                }
+            }
+            catch (Exception e1)
+            {
+                UserInterface.consoleLog.Log("Connection Failed " + e1.Message);
+                serialManager.Disconnect();
+            }
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            Connection.Disconnect();
+            this.Disconnect();            
+        }
+
+        private void Disconnect()
+        {
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
+            {
+                serialManager.Disconnect();
+            }
+            else
+            {
+                UserInterface.consoleLog.Log("Not Connected");
+            }
         }
 
         private void CalibrateButton_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 //WorkflowManager.WorkflowQueue.AddLast(new ReadEEPROMWF());
-                WorkflowManager.ActivateWorkflow(new MeasureHeightsWF());
+                //ActivateWorkflow(new MeasureHeightsWF(serialManager));
                 //WorkflowManager.WorkflowQueue.AddLast(WorkflowManager.WorkflowType.CALIBRATE);
-                Calibration.calibrationState = true;
-                Calibration.calibrationSelection = Calibration.CalibrationType.NORMAL;
             }
             else
             {
@@ -81,9 +149,9 @@ namespace OpenDACT.Class_Files
         
         private void QuickCalibrate_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
-                WorkflowManager.ActivateWorkflow(new FastCalibrationWF());
+                ActivateWorkflow(new FastCalibrationWF());
             }
             else
             {
@@ -92,9 +160,11 @@ namespace OpenDACT.Class_Files
         }
 
         private void ResetPrinter_Click(object sender, EventArgs e)
-        {
-                GCode.TrySend(GCode.Command.RESET);
+        {            
+            serialManager.ClearOutBuffer();
+            serialManager.WriteLine(GCode.Command.ESTOP);
         }
+
         public void AppendMainConsole(string value)
         {
             Invoke((MethodInvoker)delegate { consoleMain.AppendText(value + "\n"); });
@@ -128,12 +198,15 @@ namespace OpenDACT.Class_Files
 
         private void GCodeBox_KeyUp(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
+            {
                 SendGCodeText();
+                GCodeBox.SelectAll();
+            }
         }
 
         private void SendGCodeText() 
             {
-            if (GCode.TrySend(GCodeBox.Text.ToString().ToUpper())) {                
+            if (serialManager.WriteLine(GCodeBox.Text.ToString().ToUpper())) {                
                 UserInterface.consoleLog.Log("Sent: " + GCodeBox.Text.ToString().ToUpper());
             }            
         }
@@ -182,14 +255,14 @@ namespace OpenDACT.Class_Files
             */
         }
 
-        public void SetHeightsInvoke()
+        public void SetHeightsInvoke( HeightMap Heights)
         {
-            float X = Heights.X;
-            float XOpp = Heights.XOpp;
-            float Y = Heights.Y;
-            float YOpp = Heights.YOpp;
-            float Z = Heights.Z;
-            float ZOpp = Heights.ZOpp;
+            float X = Heights[Position.X].Z;
+            float XOpp = Heights[Position.XOPP].Z;
+            float Y = Heights[Position.Y].Z;
+            float YOpp = Heights[Position.YOPP].Z;
+            float Z = Heights[Position.Z].Z;
+            float ZOpp = Heights[Position.ZOPP].Z;
 
             //set base heights for advanced calibration comparison
             if (Calibration.iterationNum == 0)
@@ -225,55 +298,56 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        public void SetEEPROMGUIList()
+        public void SetEEPROMGUIList(EEPROM values)
         {
             Invoke((MethodInvoker)delegate
             {
-                this.stepsPerMMText.Text = EEPROM.stepsPerMM.ToString();
-                this.zMaxLengthText.Text = EEPROM.zMaxLength.ToString();
-                this.zProbeText.Text = EEPROM.zProbeHeight.ToString();
-                this.zProbeSpeedText.Text = EEPROM.zProbeSpeed.ToString();
-                this.diagonalRod.Text = EEPROM.diagonalRod.ToString();
-                this.HRadiusText.Text = EEPROM.HRadius.ToString();
-                this.offsetXText.Text = EEPROM.offsetX.ToString();
-                this.offsetYText.Text = EEPROM.offsetY.ToString();
-                this.offsetZText.Text = EEPROM.offsetZ.ToString();
-                this.AText.Text = EEPROM.A.ToString();
-                this.BText.Text = EEPROM.B.ToString();
-                this.CText.Text = EEPROM.C.ToString();
-                this.DAText.Text = EEPROM.DA.ToString();
-                this.DBText.Text = EEPROM.DB.ToString();
-                this.DCText.Text = EEPROM.DC.ToString();
+                this.stepsPerMMText.Text = values[EEPROM_POSITION.StepsPerMM].Value.ToString();
+                this.zMaxLengthText.Text = values[EEPROM_POSITION.zMaxLength].Value.ToString();
+                this.zProbeText.Text = values[EEPROM_POSITION.zProbeHeight].Value.ToString();
+                this.zProbeSpeedText.Text = values[EEPROM_POSITION.zProbeSpeed].Value.ToString();
+                this.diagonalRod.Text = values[EEPROM_POSITION.diagonalRod].Value.ToString();
+                this.HRadiusText.Text = values[EEPROM_POSITION.HRadius].Value.ToString();
+                this.offsetXText.Text = values[EEPROM_POSITION.offsetX].Value.ToString();
+                this.offsetYText.Text = values[EEPROM_POSITION.offsetY].Value.ToString();
+                this.offsetZText.Text = values[EEPROM_POSITION.offsetZ].Value.ToString();
+                this.AText.Text = values[EEPROM_POSITION.A].Value.ToString();
+                this.BText.Text = values[EEPROM_POSITION.B].Value.ToString();
+                this.CText.Text = values[EEPROM_POSITION.C].Value.ToString();
+                this.DAText.Text = values[EEPROM_POSITION.DA].Value.ToString();
+                this.DBText.Text = values[EEPROM_POSITION.DB].Value.ToString();
+                this.DCText.Text = values[EEPROM_POSITION.DC].Value.ToString();
             });
         }
 
         private void SendEEPROMButton_Click(object sender, EventArgs e)
         {
-            EEPROM.stepsPerMM.Value = Convert.ToInt32(this.Invoke((Func<double>)delegate { Double.TryParse(this.stepsPerMMText.Text, out double value); return value; }));
-            EEPROM.zMaxLength.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zMaxLengthText.Text, out double value); return value; }));
-            EEPROM.zProbeHeight.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeText.Text, out double value); return value; }));
-            EEPROM.zProbeSpeed.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.zProbeSpeedText.Text, out double value); return value; }));
-            EEPROM.diagonalRod.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.diagonalRod.Text, out double value); return value; }));
-            EEPROM.HRadius.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.HRadiusText.Text, out double value); return value; }));
-            EEPROM.offsetX.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetXText.Text, out double value); return value; }));
-            EEPROM.offsetY.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetYText.Text, out double value); return value; }));
-            EEPROM.offsetZ.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.offsetZText.Text, out double value); return value; }));
-            EEPROM.A.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.AText.Text, out double value); return value; }));
-            EEPROM.B.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.BText.Text, out double value); return value; }));
-            EEPROM.C.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.CText.Text, out double value); return value; }));
-            EEPROM.DA.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DAText.Text, out double value); return value; }));
-            EEPROM.DB.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DBText.Text, out double value); return value; }));
-            EEPROM.DC.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DCText.Text, out double value); return value; }));
+            EEPROM uiValues = new EEPROM();
+            uiValues[EEPROM_POSITION.StepsPerMM].Value = Int32.Parse(this.stepsPerMMText.Text);
+            uiValues[EEPROM_POSITION.zMaxLength].Value = float.Parse(this.zMaxLengthText.Text);
+            uiValues[EEPROM_POSITION.zProbeHeight].Value = float.Parse(this.zProbeText.Text);
+            uiValues[EEPROM_POSITION.zProbeSpeed].Value = float.Parse(this.zProbeSpeedText.Text);
+            uiValues[EEPROM_POSITION.diagonalRod].Value = float.Parse(this.diagonalRod.Text);
+            uiValues[EEPROM_POSITION.HRadius].Value = float.Parse(this.HRadiusText.Text);
+            uiValues[EEPROM_POSITION.offsetX].Value = float.Parse(this.offsetXText.Text);
+            uiValues[EEPROM_POSITION.offsetY].Value = float.Parse(this.offsetYText.Text);
+            uiValues[EEPROM_POSITION.offsetZ].Value = float.Parse(this.offsetZText.Text);
+            uiValues[EEPROM_POSITION.A].Value = float.Parse(this.AText.Text);
+            uiValues[EEPROM_POSITION.B].Value = float.Parse(this.BText.Text);
+            uiValues[EEPROM_POSITION.C].Value = float.Parse(this.CText.Text);
+            uiValues[EEPROM_POSITION.DA].Value = float.Parse(this.DAText.Text);
+            uiValues[EEPROM_POSITION.DB].Value = float.Parse(this.DBText.Text);
+            uiValues[EEPROM_POSITION.DC].Value = float.Parse(this.DCText.Text);
 
-            WorkflowManager.ActivateWorkflow(new ApplySettingsWF());
+            ActivateWorkflow(new ApplySettingsWF(serialManager,uiValues));
         }
 
         private void ReadEEPROM_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 Debug.WriteLine("Added Read EEPROM WF Item");
-                WorkflowManager.ActivateWorkflow(new ReadEEPROMWF());                
+                ActivateWorkflow(new ReadEEPROMWF(serialManager));                
             }
             else
             {
@@ -358,11 +432,11 @@ namespace OpenDACT.Class_Files
 
         private void StopBut_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
+            if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
-                Connection.serialManager.ClearOutBuffer();
-                GCode.TrySend(GCode.Command.RESET);
-                Connection.Disconnect();
+                serialManager.ClearOutBuffer();
+                serialManager.WriteLine(GCode.Command.ESTOP);
+                Disconnect();
             }
         }
 
@@ -374,56 +448,60 @@ namespace OpenDACT.Class_Files
 
                 Program.mainFormTest.SetUserVariables();
 
-                Heights.X = Convert.ToSingle(xManual.Text);
-                Heights.XOpp = Convert.ToSingle(xOppManual.Text);
-                Heights.Y = Convert.ToSingle(yManual.Text);
-                Heights.YOpp = Convert.ToSingle(yOppManual.Text);
-                Heights.Z = Convert.ToSingle(zManual.Text);
-                Heights.ZOpp = Convert.ToSingle(zOppManual.Text);
+                HeightMap Heights = new HeightMap();
 
-                EEPROM.stepsPerMM.Value = Convert.ToSingle(spmMan.Text);
-                EEPROM.tempSPM = Convert.ToSingle(spmMan.Text);
-                EEPROM.zMaxLength.Value = Convert.ToSingle(zMaxMan.Text);
-                EEPROM.zProbeHeight.Value = Convert.ToSingle(zProHeiMan.Text);
-                EEPROM.zProbeSpeed.Value = Convert.ToSingle(zProSpeMan.Text);
-                EEPROM.HRadius.Value = Convert.ToSingle(horRadMan.Text);
-                EEPROM.diagonalRod.Value = Convert.ToSingle(diaRodMan.Text);
-                EEPROM.offsetX.Value = Convert.ToSingle(towOffXMan.Text);
-                EEPROM.offsetY.Value = Convert.ToSingle(towOffYMan.Text);
-                EEPROM.offsetZ.Value = Convert.ToSingle(towOffZMan.Text);
-                EEPROM.A.Value = Convert.ToSingle(alpRotAMan.Text);
-                EEPROM.B.Value = Convert.ToSingle(alpRotBMan.Text);
-                EEPROM.C.Value = Convert.ToSingle(alpRotCMan.Text);
-                EEPROM.DA.Value = Convert.ToSingle(delRadAMan.Text);
-                EEPROM.DB.Value = Convert.ToSingle(delRadBMan.Text);
-                EEPROM.DC.Value = Convert.ToSingle(delRadCMan.Text);
+                Heights[Position.X].Z = Convert.ToSingle(xManual.Text);
+                Heights[Position.XOPP].Z = Convert.ToSingle(xOppManual.Text);
+                Heights[Position.Y].Z = Convert.ToSingle(yManual.Text);
+                Heights[Position.YOPP].Z = Convert.ToSingle(yOppManual.Text);
+                Heights[Position.Z].Z = Convert.ToSingle(zManual.Text);
+                Heights[Position.ZOPP].Z = Convert.ToSingle(zOppManual.Text);
+
+                EEPROM manual = new EEPROM();
+                manual[EEPROM_POSITION.StepsPerMM].Value = Convert.ToSingle(spmMan.Text);
+                manual.tempSPM = Convert.ToSingle(spmMan.Text);
+
+                manual[EEPROM_POSITION.zMaxLength].Value = Convert.ToSingle(zMaxMan.Text);
+                manual[EEPROM_POSITION.zProbeHeight].Value = Convert.ToSingle(zProHeiMan.Text);
+                manual[EEPROM_POSITION.zProbeSpeed].Value = Convert.ToSingle(zProSpeMan.Text);
+                manual[EEPROM_POSITION.HRadius].Value = Convert.ToSingle(horRadMan.Text);
+                manual[EEPROM_POSITION.diagonalRod].Value = Convert.ToSingle(diaRodMan.Text);
+                manual[EEPROM_POSITION.offsetX].Value = Convert.ToSingle(towOffXMan.Text);
+                manual[EEPROM_POSITION.offsetY].Value = Convert.ToSingle(towOffYMan.Text);
+                manual[EEPROM_POSITION.offsetZ].Value = Convert.ToSingle(towOffZMan.Text);
+                manual[EEPROM_POSITION.A].Value = Convert.ToSingle(alpRotAMan.Text);
+                manual[EEPROM_POSITION.B].Value = Convert.ToSingle(alpRotBMan.Text);
+                manual[EEPROM_POSITION.C].Value = Convert.ToSingle(alpRotCMan.Text);
+                manual[EEPROM_POSITION.DA].Value = Convert.ToSingle(delRadAMan.Text);
+                manual[EEPROM_POSITION.DB].Value = Convert.ToSingle(delRadBMan.Text);
+                manual[EEPROM_POSITION.DC].Value = Convert.ToSingle(delRadCMan.Text);
 
                 Calibration.BasicCalibration();
 
                 //set eeprom vals in manual calibration
-                this.spmMan.Text = EEPROM.stepsPerMM.ToString();
-                this.zMaxMan.Text = EEPROM.zMaxLength.ToString();
-                this.zProHeiMan.Text = EEPROM.zProbeHeight.ToString();
-                this.zProSpeMan.Text = EEPROM.zProbeSpeed.ToString();
-                this.diaRodMan.Text = EEPROM.diagonalRod.ToString();
-                this.horRadMan.Text = EEPROM.HRadius.ToString();
-                this.towOffXMan.Text = EEPROM.offsetX.ToString();
-                this.towOffYMan.Text = EEPROM.offsetY.ToString();
-                this.towOffZMan.Text = EEPROM.offsetZ.ToString();
-                this.alpRotAMan.Text = EEPROM.A.ToString();
-                this.alpRotBMan.Text = EEPROM.B.ToString();
-                this.alpRotCMan.Text = EEPROM.C.ToString();
-                this.delRadAMan.Text = EEPROM.DA.ToString();
-                this.delRadBMan.Text = EEPROM.DB.ToString();
-                this.delRadCMan.Text = EEPROM.DC.ToString();
+                this.spmMan.Text = manual[EEPROM_POSITION.StepsPerMM].Value.ToString();
+                this.zMaxMan.Text = manual[EEPROM_POSITION.zMaxLength].Value.ToString();
+                this.zProHeiMan.Text = manual[EEPROM_POSITION.zProbeHeight].Value.ToString();
+                this.zProSpeMan.Text = manual[EEPROM_POSITION.zProbeSpeed].Value.ToString();
+                this.diaRodMan.Text = manual[EEPROM_POSITION.diagonalRod].Value.ToString();
+                this.horRadMan.Text = manual[EEPROM_POSITION.HRadius].Value.ToString();
+                this.towOffXMan.Text = manual[EEPROM_POSITION.offsetX].Value.ToString();
+                this.towOffYMan.Text = manual[EEPROM_POSITION.offsetY].Value.ToString();
+                this.towOffZMan.Text = manual[EEPROM_POSITION.offsetZ].Value.ToString();
+                this.alpRotAMan.Text = manual[EEPROM_POSITION.A].Value.ToString();
+                this.alpRotBMan.Text = manual[EEPROM_POSITION.B].Value.ToString();
+                this.alpRotCMan.Text = manual[EEPROM_POSITION.C].Value.ToString();
+                this.delRadAMan.Text = manual[EEPROM_POSITION.DA].Value.ToString();
+                this.delRadBMan.Text = manual[EEPROM_POSITION.DB].Value.ToString();
+                this.delRadCMan.Text = manual[EEPROM_POSITION.DC].Value.ToString();
 
                 //set expected height map
-                this.xExp.Text = Heights.X.ToString();
-                this.xOppExp.Text = Heights.XOpp.ToString();
-                this.yExp.Text = Heights.Y.ToString();
-                this.yOppExp.Text = Heights.YOpp.ToString();
-                this.zExp.Text = Heights.Z.ToString();
-                this.zOppExp.Text = Heights.ZOpp.ToString();
+                this.xExp.Text = Heights[Position.X].Z.ToString();
+                this.xOppExp.Text = Heights[Position.XOPP].Z.ToString();
+                this.yExp.Text = Heights[Position.Y].Z.ToString();
+                this.yOppExp.Text = Heights[Position.YOPP].Z.ToString();
+                this.zExp.Text = Heights[Position.Z].Z.ToString();
+                this.zOppExp.Text = Heights[Position.ZOPP].Z.ToString();
 
 
                 Calibration.calibrationState = false;
@@ -440,10 +518,10 @@ namespace OpenDACT.Class_Files
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Connection.Disconnect();
-            if(Connection.serialManager != null)
+            Disconnect();
+            if(serialManager != null)
             {
-                Connection.serialManager.Dispose();
+                serialManager.Dispose();
             }
         }
     }

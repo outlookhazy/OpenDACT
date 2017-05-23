@@ -9,17 +9,19 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class MoveWF : Workflow
     {
-        public override string ID { get { return "MoveWF"; } set { return; } }
+        public new string ID { get { return "MoveWF"; } set { return; } }
 
         private Position3D targetLocation;
-        public MoveWF(Position3D location)
+        private SerialManager serialSource;
+        public MoveWF(SerialManager serialSource, Position3D location)
         {
+            this.serialSource = serialSource;
             this.targetLocation = location;
         }
 
         protected override void OnStarted()
         {
-            GCode.Command.MOVE(this.targetLocation.X, this.targetLocation.Y, this.targetLocation.Z);
+            serialSource.WriteLine(GCode.Command.MOVE(targetLocation.X, targetLocation.Y, targetLocation.Z));
         }
 
         protected override void OnMessage(string serialMessage)

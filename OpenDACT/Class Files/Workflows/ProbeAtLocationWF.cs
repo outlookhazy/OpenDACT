@@ -8,20 +8,22 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ProbeAtLocationWF : Workflow
     {
-        public override string ID { get { return "ProbeAtLocationWF"; } set { return; } }
+        public new string ID { get { return "ProbeAtLocationWF"; } set { return; } }
 
         private Position3D probePoint;
         private ProbeWF probeWorkflow;
+        private SerialManager serialSource;
         public float Result { get { return this.probeWorkflow.Result; }  }
 
-        public ProbeAtLocationWF(Position3D location)
+        public ProbeAtLocationWF(SerialManager serialSource, Position3D location)
         {
+            this.serialSource = serialSource;
             this.probePoint = location;
         }
         protected override void OnStarted()
         {
-            AddWorkflowItem(new MoveWF(probePoint));
-            this.probeWorkflow = new ProbeWF();
+            AddWorkflowItem(new MoveWF(serialSource,probePoint));
+            this.probeWorkflow = new ProbeWF(serialSource);
             AddWorkflowItem(this.probeWorkflow);
         }
     }

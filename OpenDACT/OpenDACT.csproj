@@ -95,29 +95,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class Files\Calibration.cs" />
-    <Compile Include="Class Files\Connection.cs" />
     <Compile Include="Class Files\LogConsole.cs" />
     <Compile Include="Class Files\Position3D.cs" />
-    <Compile Include="Class Files\Serial\SerialManager.cs" />
-    <Compile Include="Class Files\WorkflowManager.cs" />
     <Compile Include="Class Files\EEPROM.cs" />
-    <Compile Include="Class Files\GCode.cs" />
+    <Compile Include="Class Files\Serial\SerialManager.cs" />
+    <Compile Include="Class Files\Util.cs" />
+    <Compile Include="Class Files\Serial\GCode.cs" />
     <Compile Include="Class Files\Printer.cs" />
     <Compile Include="Class Files\UserInterface.cs" />
-    <Compile Include="Class Files\Validation.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ApplySettingsWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ApplySettingWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\FastCalibrationWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\HeuristicLearning.cs" />
-    <Compile Include="Class Files\Workflow_Classes\HomeWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\MeasureHeightsWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\MoveWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ProbeWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ProbeAtLocationWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ReadEEPROMWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\SendEEPROMWF.cs" />
-    <Compile Include="Class Files\Workflow_Classes\Workflow.cs" />
-    <Compile Include="Class Files\Workflow_Classes\ZProbeMeasureWF.cs" />
+    <Compile Include="Class Files\Workflows\ApplySettingsWF.cs" />
+    <Compile Include="Class Files\Workflows\ApplySettingWF.cs" />
+    <Compile Include="Class Files\Workflows\FastCalibrationWF.cs" />
+    <Compile Include="Class Files\Workflows\HeuristicLearning.cs" />
+    <Compile Include="Class Files\Workflows\HomeWF.cs" />
+    <Compile Include="Class Files\Workflows\MeasureHeightsWF.cs" />
+    <Compile Include="Class Files\Workflows\MoveWF.cs" />
+    <Compile Include="Class Files\Workflows\ProbeWF.cs" />
+    <Compile Include="Class Files\Workflows\ProbeAtLocationWF.cs" />
+    <Compile Include="Class Files\Workflows\ReadEEPROMWF.cs" />
+    <Compile Include="Class Files\Workflows\Workflow.cs" />
+    <Compile Include="Class Files\Workflows\ZProbeMeasureWF.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

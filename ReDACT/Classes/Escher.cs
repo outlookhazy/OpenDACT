@@ -32,15 +32,15 @@ namespace ReDACT
         {
 
             // Transform the probing points to motor endpoints and store them in a matrix, so that we can do multiple iterations using the same data
-            var probeMotorPositions = new Matrix(data.numpoints, 3);
-            var corrections = new double[data.numpoints];
+            var probeMotorPositions = new Matrix(data.NumPoints, 3);
+            var corrections = new double[data.NumPoints];
             var initialSumOfSquares = 0.0;
-            for (var i = 0; i < data.numpoints; ++i)
+            for (var i = 0; i < data.NumPoints; ++i)
             {
                 corrections[i] = 0.0;
                 double[] machinePos = new double[3];
-                var xp = data.testpoints[i, 0];
-                var yp = data.testpoints[i, 1];
+                var xp = data.TestPoints[i, 0];
+                var yp = data.TestPoints[i, 1];
                 machinePos[0] = (xp);
                 machinePos[1] = (yp);
                 machinePos[2] = (0.0);
@@ -49,7 +49,7 @@ namespace ReDACT
                 probeMotorPositions.matrixData[i, 1] = DeltaParameters.Transform(delta, machinePos, 1);
                 probeMotorPositions.matrixData[i, 2] = DeltaParameters.Transform(delta, machinePos, 2);
 
-                initialSumOfSquares += Math.Pow(data.testpoints[i, 2], 2);
+                initialSumOfSquares += Math.Pow(data.TestPoints[i, 2], 2);
             }
 
             // Do 1 or more Newton-Raphson iterations
@@ -60,10 +60,10 @@ namespace ReDACT
             for (;;)
             {
                 // Build a Nx7 matrix of derivatives with respect to xa, xb, yc, za, zb, zc, diagonal.
-                var derivativeMatrix = new Matrix(data.numpoints, (int)data.numfactors);
-                for (var i = 0; i < data.numpoints; ++i)
+                var derivativeMatrix = new Matrix(data.NumPoints, (int)data.NumFactors);
+                for (var i = 0; i < data.NumPoints; ++i)
                 {
-                    for (var j = 0; j < (int)data.numfactors; ++j)
+                    for (var j = 0; j < (int)data.NumFactors; ++j)
                     {
                         derivativeMatrix.matrixData[i, j] =
                             DeltaParameters.ComputeDerivative(adjusted, j, probeMotorPositions.matrixData[i, 0], probeMotorPositions.matrixData[i, 1], probeMotorPositions.matrixData[i, 2]);
@@ -72,28 +72,28 @@ namespace ReDACT
 
 
                 // Now build the normal equations for least squares fitting
-                var normalMatrix = new Matrix((int)data.numfactors, (int)data.numfactors + 1);
-                for (var i = 0; i < (int)data.numfactors; ++i)
+                var normalMatrix = new Matrix((int)data.NumFactors, (int)data.NumFactors + 1);
+                for (var i = 0; i < (int)data.NumFactors; ++i)
                 {
-                    for (var j = 0; j < (int)data.numfactors; ++j)
+                    for (var j = 0; j < (int)data.NumFactors; ++j)
                     {
                         var tmp = derivativeMatrix.matrixData[0, i] * derivativeMatrix.matrixData[0, j];
-                        for (var k = 1; k < data.numpoints; ++k)
+                        for (var k = 1; k < data.NumPoints; ++k)
                         {
                             tmp += derivativeMatrix.matrixData[k, i] * derivativeMatrix.matrixData[k, j];
                         }
                         normalMatrix.matrixData[i, j] = tmp;
                     }
-                    var temp = derivativeMatrix.matrixData[0, i] * -(data.testpoints[0, 2] + corrections[0]);
-                    for (var k = 1; k < data.numpoints; ++k)
+                    var temp = derivativeMatrix.matrixData[0, i] * -(data.TestPoints[0, 2] + corrections[0]);
+                    for (var k = 1; k < data.NumPoints; ++k)
                     {
-                        temp += derivativeMatrix.matrixData[k, i] * -(data.testpoints[k, 2] + corrections[k]);
+                        temp += derivativeMatrix.matrixData[k, i] * -(data.TestPoints[k, 2] + corrections[k]);
                     }
-                    normalMatrix.matrixData[i, (int)data.numfactors] = temp;
+                    normalMatrix.matrixData[i, (int)data.NumFactors] = temp;
                 }
 
-                double[] solution = new double[(int)data.numfactors];
-                normalMatrix.GaussJordan(ref solution, (int)data.numfactors);
+                double[] solution = new double[(int)data.NumFactors];
+                normalMatrix.GaussJordan(ref solution, (int)data.NumFactors);
 
                 /*
                 for (var i = 0; i < numFactors; ++i)
@@ -107,13 +107,13 @@ namespace ReDACT
 
 
 
-                adjusted = DeltaParameters.Adjust(adjusted, (int)data.numfactors, solution, data.normalize);
+                adjusted = DeltaParameters.Adjust(adjusted, (int)data.NumFactors, solution, data.Normalize);
 
                 // Calculate the expected probe heights using the new parameters
 
-                var expectedResiduals = new double[data.numpoints];
+                var expectedResiduals = new double[data.NumPoints];
                 var sumOfSquares = 0.0;
-                for (var i = 0; i < data.numpoints; ++i)
+                for (var i = 0; i < data.NumPoints; ++i)
                 {
                     for (var axis = 0; axis < 3; ++axis)
                     {
@@ -121,11 +121,11 @@ namespace ReDACT
                     }
                     var newZ = DeltaParameters.InverseTransform(adjusted, probeMotorPositions.matrixData[i, 0], probeMotorPositions.matrixData[i, 1], probeMotorPositions.matrixData[i, 2]);
                     corrections[i] = newZ;
-                    expectedResiduals[i] = data.testpoints[i, 2] + newZ;
+                    expectedResiduals[i] = data.TestPoints[i, 2] + newZ;
                     sumOfSquares += Math.Pow(expectedResiduals[i], 2);
                 }
 
-                expectedRmsError = Math.Sqrt(sumOfSquares / data.numpoints);
+                expectedRmsError = Math.Sqrt(sumOfSquares / data.NumPoints);
                 //DebugPrint(PrintVector("Expected probe error", expectedResiduals));
 
 
@@ -136,7 +136,7 @@ namespace ReDACT
             }
 
 
-            Console.WriteLine( "Calibrated " + data.numfactors + " factors using " + data.numpoints + " points, deviation before " + Math.Sqrt(initialSumOfSquares / data.numpoints)
+            Console.WriteLine( "Calibrated " + data.NumFactors + " factors using " + data.NumPoints + " points, deviation before " + Math.Sqrt(initialSumOfSquares / data.NumPoints)
                     + " after " + expectedRmsError);
 
             return adjusted;
@@ -150,7 +150,7 @@ namespace ReDACT
             switch (delta.firmware)
             {
                 case Firmware.RRF:
-                    m665 += " H" + Math.Round(delta.homedHeight, 2) + " B" + Math.Round(test.bedRadius, 2)
+                    m665 += " H" + Math.Round(delta.homedHeight, 2) + " B" + Math.Round(test.BedRadius, 2)
                             + " X" + Math.Round(delta.xadj, 2) + " Y" + Math.Round(delta.yadj, 2) + " Z" + Math.Round(delta.zadj, 2);
                     break;
                 case Firmware.Marlin:

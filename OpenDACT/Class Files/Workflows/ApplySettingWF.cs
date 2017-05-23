@@ -9,19 +9,21 @@ namespace OpenDACT.Class_Files.Workflow_Classes
     public class ApplySettingWF : Workflow
     {
         private string settingID = "ApplySettingWF";
-        public override string ID { get { return this.settingID; } set { return; } }
+        public new string ID { get { return this.settingID; } set { return; } }
 
+        private SerialManager serialSource;
         private EEPROM_Variable targetSetting;
 
-        public ApplySettingWF(EEPROM_Variable targetSetting)
+        public ApplySettingWF(SerialManager serialSource, EEPROM_Variable targetSetting)
         {
+            this.serialSource = serialSource;
             this.targetSetting = targetSetting;
             this.settingID += String.Format("<{0}>",targetSetting.Name);
         }
 
         protected override void OnStarted()
         {
-            GCode.SendEEPROMVariable(this.targetSetting);
+            serialSource.WriteLine(GCode.Command.SEND_EEPROM_VARIABLE(targetSetting));
         }
 
         protected override void OnMessage(string serialMessage)

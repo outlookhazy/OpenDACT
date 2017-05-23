@@ -9,12 +9,19 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ProbeWF : Workflow
     {
-        public override string ID { get { return "ProbeWF"; } set { return; } }
+        public new string ID { get { return "ProbeWF"; } set { return; } }
         public float Result { get; private set; }
+
+        private SerialManager serialSource;
+
+        public ProbeWF(SerialManager serialSource)
+        {
+            this.serialSource = serialSource;
+        }
 
         protected override void OnStarted()
         {
-            GCode.TrySend(Command.PROBE);
+            serialSource.WriteLine(GCode.Command.PROBE);
         }
 
         protected override void OnMessage(string serialMessage)
