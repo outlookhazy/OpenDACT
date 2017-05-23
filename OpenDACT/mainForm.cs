@@ -65,7 +65,7 @@ namespace OpenDACT.Class_Files
 
         private void CalibrateButton_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 //WorkflowManager.WorkflowQueue.AddLast(new ReadEEPROMWF());
                 WorkflowManager.ActivateWorkflow(new MeasureHeightsWF());
@@ -81,7 +81,7 @@ namespace OpenDACT.Class_Files
         
         private void QuickCalibrate_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 WorkflowManager.ActivateWorkflow(new FastCalibrationWF());
             }
@@ -270,7 +270,7 @@ namespace OpenDACT.Class_Files
 
         private void ReadEEPROM_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 Debug.WriteLine("Added Read EEPROM WF Item");
                 WorkflowManager.ActivateWorkflow(new ReadEEPROMWF());                
@@ -358,7 +358,7 @@ namespace OpenDACT.Class_Files
 
         private void StopBut_Click(object sender, EventArgs e)
         {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected)
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED)
             {
                 Connection.serialManager.ClearOutBuffer();
                 GCode.TrySend(GCode.Command.RESET);

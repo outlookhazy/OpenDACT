@@ -98,7 +98,7 @@
     <Compile Include="Class Files\Connection.cs" />
     <Compile Include="Class Files\LogConsole.cs" />
     <Compile Include="Class Files\Position3D.cs" />
-    <Compile Include="Class Files\SerialManager.cs" />
+    <Compile Include="Class Files\Serial\SerialManager.cs" />
     <Compile Include="Class Files\WorkflowManager.cs" />
     <Compile Include="Class Files\EEPROM.cs" />
     <Compile Include="Class Files\GCode.cs" />

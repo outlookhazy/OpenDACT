@@ -27,7 +27,7 @@ namespace OpenDACT.Class_Files
         }
 
         public static bool TrySend(String serialCommand) {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected) {
+            if (Connection.serialManager.CurrentState == ConnectionState.CONNECTED) {
                 if (UserInterface.printerLog.ConsoleLogLevel == LogConsole.LogLevel.DEBUG)
                     UserInterface.printerLog.Log(String.Format("Sending: {0}", serialCommand));
                 return Connection.serialManager.WriteLine(serialCommand);

@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files
 {
-    class SerialManager : IDisposable
+    public class SerialManager : IDisposable
     {
         private SerialPort _port;
         private string _readBuffer;
@@ -22,6 +23,7 @@ namespace OpenDACT.Class_Files
         public event SerialConnectionChangedEventHandler SerialConnectionChanged;
         public event NewSerialLineEventHandler NewSerialLine;
 
+        public bool closePending = false;
 
         public SerialManager() {
             this._readBuffer = "";
@@ -35,6 +37,7 @@ namespace OpenDACT.Class_Files
         public bool Connect(string Port, int Baud) {
             if (this.CurrentState == ConnectionState.DISCONNECTED)
             {
+                this.closePending = false;
                 try
                 {
                     this._port = new SerialPort(Port, Baud)
@@ -45,56 +48,58 @@ namespace OpenDACT.Class_Files
                     this._port.ErrorReceived += _port_ErrorReceived;
                     this._port.DataReceived += _port_DataReceived;
                     this._port.Open();
-                    this.CurrentState = ConnectionState.Connected;
+                    this.CurrentState = ConnectionState.CONNECTED;
                     this.OnConnectionStateChanged(this.CurrentState);
                     return true;
 
                 }
                 catch (Exception e)
                 {
-                    UserInterface.consoleLog.Log(e.StackTrace);
+                    Debug.WriteLine(e.StackTrace);
                 }
             }
 
             return false;
-        }
+        }        
 
-        public bool ClearOutBuffer()
+        public void ClearOutBuffer()
         {
             if (this._port != null)
+            {
                 if (this._port.IsOpen)
                 {
                     this._port.DiscardOutBuffer();
-                    return true;
                 }
-            return false;
+            }
+        }
+
+        public void ClearInBuffer()
+        {
+            if (this._port != null)
+            {
+                if (this._port.IsOpen)
+                {
+                    this._port.DiscardInBuffer();
+                }
+            }
         }
 
         public bool Disconnect()
         {
+            closePending = true;
             if(this._port != null)
             {
+                this._port.ErrorReceived -= this._port_ErrorReceived;
+                this._port.DataReceived -= this._port_DataReceived;
                 if (this._port.IsOpen)
-                {                    
-                    this._port.ErrorReceived -= this._port_ErrorReceived;
-                    this._port.DataReceived -= this._port_DataReceived;
-                    
-                    Task.Run(new Action(() => {
-                        SerialPort cljRef = this._port; //capture reference to serial port
-                        if (cljRef != null)
-                        {
-                            if (cljRef.IsOpen)
-                                try
-                                {
-                                    cljRef.Close(); //close in another thread
-                                } catch (Exception e)
-                                {
-                                    Debug.WriteLine(e);
-                                }
-                        }
-                    }));
-                }
-                this._port = null; //dispose of local reference
+                {
+                    //this.ClearOutBuffer();
+                    //this.ClearInBuffer();
+                    Debug.WriteLine("closing...");
+                    this._port.Close();
+                    Debug.WriteLine("...closed.");
+                    this._port = null; //dispose of local reference
+                }                
                 this.CurrentState = ConnectionState.DISCONNECTED;
                 this.OnConnectionStateChanged(ConnectionState.DISCONNECTED);
                 return true;
@@ -104,7 +109,7 @@ namespace OpenDACT.Class_Files
 
         public bool WriteLine(string text)
         {
-            if (this.CurrentState == ConnectionState.Connected)
+            if (this.CurrentState == ConnectionState.CONNECTED)
             {
                 this._port.WriteLine(text);
                 return true;
@@ -124,7 +129,8 @@ namespace OpenDACT.Class_Files
             lock (this._bufferlock) {
                 try
                 {
-                    this._readBuffer += _port.ReadExisting();
+                    if (!this.closePending)
+                        this._readBuffer += _port.ReadExisting();
                 } catch (Exception ex)
                 {
                     //ignore case where port is closed before data can be read
@@ -205,7 +211,7 @@ namespace OpenDACT.Class_Files
 
     public enum ConnectionState
     {
-        Connected,
+        CONNECTED,
         DISCONNECTED
     }
 
