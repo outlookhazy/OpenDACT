@@ -42,9 +42,8 @@ namespace OpenDACT.Class_Files
                     UserInterface.consoleLog.Log("Using default diagonal rod length from EEPROM");
                 }
             }
-
-            tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
-            Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
+            
+            Program.mainFormTest.SetAccuracyPoint(iterationNum, Calibration.AverageAccuracy());
             CheckAccuracy(Heights.X, Heights.XOpp, Heights.Y, Heights.YOpp, Heights.Z, Heights.ZOpp);
 
             if (calibrationState == true)
@@ -68,8 +67,7 @@ namespace OpenDACT.Class_Files
                 }
             }
 
-            tempAccuracy = (Math.Abs(Heights.X) + Math.Abs(Heights.XOpp) + Math.Abs(Heights.Y) + Math.Abs(Heights.YOpp) + Math.Abs(Heights.Z) + Math.Abs(Heights.ZOpp)) / 6;
-            Program.mainFormTest.SetAccuracyPoint(iterationNum, tempAccuracy);
+            Program.mainFormTest.SetAccuracyPoint(iterationNum, Calibration.AverageAccuracy());
             CheckAccuracy(Heights.X, Heights.XOpp, Heights.Y, Heights.YOpp, Heights.Z, Heights.ZOpp);
 
             if (calibrationState == true)
@@ -134,9 +132,32 @@ namespace OpenDACT.Class_Files
                 
             }            
         }
-        
 
-        private static void CheckAccuracy(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
+        public static float AverageAccuracy()
+        {
+            return (Convert.ToSingle(
+            (Math.Abs(Heights.X) +
+            Math.Abs(Heights.XOpp) +
+            Math.Abs(Heights.Y) +
+            Math.Abs(Heights.YOpp) +
+            Math.Abs(Heights.Z) +
+            Math.Abs(Heights.ZOpp)) / 6.0));
+        }
+        
+        public static bool PrecisionReached(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
+        {
+            float accuracy = UserVariables.accuracy;
+
+            return (Math.Abs(offset_X) <= accuracy &&
+                Math.Abs(offset_XOpp) <= accuracy &&
+                Math.Abs(offset_Y) <= accuracy &&
+                Math.Abs(offset_YOpp) <= accuracy &&
+                Math.Abs(offset_Z) <= accuracy &&
+                Math.Abs(offset_ZOpp) <= accuracy
+                );
+        }
+
+        public static void CheckAccuracy(float offset_X, float offset_XOpp, float offset_Y, float offset_YOpp, float offset_Z, float offset_ZOpp)
         {
             float accuracy = UserVariables.accuracy;
 
@@ -162,7 +183,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        private static void HRad(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static void HRad(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             float HRadSA = ((X + XOpp + Y + YOpp + Z + ZOpp) / 6);
             float HRadRatio = UserVariables.HRadRatio;
@@ -179,7 +200,7 @@ namespace OpenDACT.Class_Files
             UserInterface.consoleLog.Log("HRad:" + EEPROM.HRadius.ToString());
         }
 
-        private static void TowerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static void TowerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             int j = 0;
             float accuracy = UserVariables.calculationAccuracy;
@@ -320,7 +341,7 @@ namespace OpenDACT.Class_Files
             }
         }
 
-        private static void AlphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static void AlphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             float offsetX = EEPROM.offsetX.Value;
             float offsetY = EEPROM.offsetY.Value;
@@ -401,16 +422,16 @@ namespace OpenDACT.Class_Files
                 }
             }
         }
-/// <summary>
-/// /////////////////////////
-/// </summary>
-/// <param name="X"></param>
-/// <param name="XOpp"></param>
-/// <param name="Y"></param>
-/// <param name="YOpp"></param>
-/// <param name="Z"></param>
-/// <param name="ZOpp"></param>
-        private static void StepsPMM(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        /// <summary>
+        /// /////////////////////////
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="XOpp"></param>
+        /// <param name="Y"></param>
+        /// <param name="YOpp"></param>
+        /// <param name="Z"></param>
+        /// <param name="ZOpp"></param>
+        public static void StepsPMM(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
         {
             /*
             float diagChange = 1 / UserVariables.deltaOpp;

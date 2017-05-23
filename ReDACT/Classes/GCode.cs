@@ -6,58 +6,26 @@ using System.Threading.Tasks;
 using System.Threading;
 using OpenDACT.Class_Files.Workflow_Classes;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace OpenDACT.Class_Files
 {
     static class GCode
     {
-        public static bool isHeuristicComplete = false;
 
-        public static bool MoveToPosition(float X, float Y, float Z) {
-            return TrySend("G90 : G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        public static string MoveToPosition(float X, float Y, float Z) {
+            return ("G90 : G1 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
         }
 
-        public static bool RapidToPosition(float X, float Y, float Z) {
-            return TrySend("G90 : G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
+        public static string RapidToPosition(float X, float Y, float Z) {
+            return ("G90 : G0 Z" + Z.ToString() + " X" + X.ToString() + " Y" + Y.ToString());
         }
 
-        public static bool SendEEPROMVariable(EEPROM_Variable variable) {
+        public static string SendEEPROMVariable(EEPROM_Variable variable) {
             char typeletter = variable.Type == 3 ? 'X' : 'S';
-            return TrySend(String.Format("M206 T{0} P{1} {2}{3}", variable.Type, variable.Position, typeletter, variable.Value.ToString("F3")));
-        }
-
-        public static bool TrySend(String serialCommand) {
-            if (Connection.serialManager.CurrentState == ConnectionState.Connected) {
-                if (UserInterface.printerLog.ConsoleLogLevel == LogConsole.LogLevel.DEBUG)
-                    UserInterface.printerLog.Log(String.Format("Sending: {0}", serialCommand));
-                return Connection.serialManager.WriteLine(serialCommand);
-            }
-            else {
-                UserInterface.consoleLog.Log("Not Connected");
-                return false;
-            }
-        }
-
-        /*
-        public static void PauseTimeRadius() {
-            Thread.Sleep(Convert.ToInt32(((UserVariables.plateDiameter / 2) / UserVariables.xySpeed) * 1000));//1000 s to ms x 1.25 for multiplier
-        }
-
-        public static void PauseTimeProbe() {
-            Thread.Sleep(Convert.ToInt32(((UserVariables.probingHeight * 2) / EEPROM.zProbeSpeed.Value) * 1125));
-        }
-
-        public static void PauseTimeZMax() {
-            Thread.Sleep(Convert.ToInt32((EEPROM.zMaxLength.Value / UserVariables.xySpeed) * 1025));
-        }
-
-        public static void PauseTimeZMaxThird() {
-            Thread.Sleep(Convert.ToInt32(((EEPROM.zMaxLength.Value / 3) / UserVariables.xySpeed) * 1000));
-        }
-        */
-        
-
-        
+            return (String.Format("M206 T{0} P{1} {2}{3}", variable.Type, variable.Position, typeletter, variable.Value.ToString("F3")));
+        }        
+     
         public static float ParseZProbe(string value)
         {
             if (value.Contains("Z-probe:"))

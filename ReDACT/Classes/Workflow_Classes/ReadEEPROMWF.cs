@@ -12,25 +12,31 @@ namespace OpenDACT.Class_Files.Workflow_Classes
     {
         public override string ID { get { return "ReadEEPROMWF"; } set { return; } }
 
+        public EEPROM EEPROM;
+        private SerialManager serialSource;
+        public ReadEEPROMWF(SerialManager serialSource)
+        {
+            this.serialSource = serialSource;
+        }
+
         protected override void OnStarted()
         {
             Debug.WriteLine("ReadEEPROMWF Started");
+            EEPROM = new EEPROM();
             EEPROM.SetPending();
-            GCode.TrySend(Command.READ_EEPROM);
+            serialSource.WriteLine(Command.READ_EEPROM);
         }
 
         protected override void OnMessage(string serialMessage)
         {
             Debug.WriteLine("ReadEEPROMWF Active");
-            EEPROMFunctions.ParseEEPROM(serialMessage, out int parsedInt, out float parsedFloat);
-            if (parsedInt != 0)
-                EEPROMFunctions.SetEEPROM((EEPROM_Position)parsedInt, parsedFloat);
+            EEPROM_Value data = EEPROM.Parse(serialMessage);
+            if (data.Type != EEPROM_Position.INVALID)
+                this.EEPROM[data.Type].Value = data.Value;            
 
             if (EEPROM.ReadComplete())
-            {
-                Program.mainFormTest.SetEEPROMGUIList();
                 this.FinishOrAdvance();
-            }
+
         }
     }
 }

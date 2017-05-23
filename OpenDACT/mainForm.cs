@@ -47,6 +47,8 @@ namespace OpenDACT.Class_Files
 
             // Build the combobox of available ports.
             portsCombo.DataSource = new BindingSource(new List<string>(SerialPort.GetPortNames()), null);
+            if(portsCombo.Items.Count != 0)
+                portsCombo.SelectedIndex = portsCombo.Items.Count - 1;
             
             UserVariables.isInitiated = true;
         }
@@ -81,11 +83,7 @@ namespace OpenDACT.Class_Files
         {
             if (Connection.serialManager.CurrentState == ConnectionState.Connected)
             {
-                //WorkflowManager.WorkflowQueue.AddLast(new ReadEEPROMWF());
-                WorkflowManager.ActivateWorkflow(new MeasureHeightsWF());
-                Calibration.calibrationState = true;
-                Calibration.calibrationSelection = Calibration.CalibrationType.QUICK;
-                //WorkflowManager.WorkflowQueue.AddLast(WorkflowManager.WorkflowType.CALIBRATE);
+                WorkflowManager.ActivateWorkflow(new FastCalibrationWF());
             }
             else
             {
@@ -267,7 +265,7 @@ namespace OpenDACT.Class_Files
             EEPROM.DB.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DBText.Text, out double value); return value; }));
             EEPROM.DC.Value = Convert.ToSingle(this.Invoke((Func<double>)delegate { Double.TryParse(this.DCText.Text, out double value); return value; }));
 
-            EEPROMFunctions.SendEEPROM();
+            WorkflowManager.ActivateWorkflow(new ApplySettingsWF());
         }
 
         private void ReadEEPROM_Click(object sender, EventArgs e)
@@ -355,7 +353,7 @@ namespace OpenDACT.Class_Files
         private void CheckHeights_Click(object sender, EventArgs e)
         {
 
-            WorkflowManager.ActivateWorkflow(new ZProbeMeasureWF());
+            //WorkflowManager.ActivateWorkflow(new ZProbeMeasureWF());
         }
 
         private void StopBut_Click(object sender, EventArgs e)

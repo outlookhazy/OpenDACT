@@ -36,6 +36,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             Zopp = new ProbeAtLocationWF(new Position3D(0, -valueZ, probingHeight));
             MoveWF park = new MoveWF(new Position3D(0, 0, Convert.ToInt32(EEPROM.zMaxLength.Value / 3)));// park
 
+            this.AddWorkflowItem(new ReadEEPROMWF()); //measure heights without read will crash due to no max z length
             this.AddWorkflowItem(Center);
             this.AddWorkflowItem(X);
             this.AddWorkflowItem(Xopp);

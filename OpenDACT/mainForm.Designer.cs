@@ -31,9 +31,9 @@ namespace OpenDACT.Class_Files
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.consoleMain = new System.Windows.Forms.RichTextBox();
             this.consolePrinter = new System.Windows.Forms.RichTextBox();
             this.connectButton = new System.Windows.Forms.Button();
@@ -558,7 +558,7 @@ namespace OpenDACT.Class_Files
             this.textProbingHeight.Name = "textProbingHeight";
             this.textProbingHeight.Size = new System.Drawing.Size(100, 20);
             this.textProbingHeight.TabIndex = 152;
-            this.textProbingHeight.Text = "10";
+            this.textProbingHeight.Text = "50";
             // 
             // DBText
             // 
@@ -1375,22 +1375,22 @@ namespace OpenDACT.Class_Files
             // accuracyTime
             // 
             this.accuracyTime.BackColor = System.Drawing.Color.Transparent;
-            chartArea3.BackHatchStyle = System.Windows.Forms.DataVisualization.Charting.ChartHatchStyle.Percent60;
-            chartArea3.Name = "ChartArea1";
-            this.accuracyTime.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            this.accuracyTime.Legends.Add(legend3);
+            chartArea1.BackHatchStyle = System.Windows.Forms.DataVisualization.Charting.ChartHatchStyle.Percent60;
+            chartArea1.Name = "ChartArea1";
+            this.accuracyTime.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.accuracyTime.Legends.Add(legend1);
             this.accuracyTime.Location = new System.Drawing.Point(3, 3);
             this.accuracyTime.Name = "accuracyTime";
-            series3.BackImageTransparentColor = System.Drawing.Color.White;
-            series3.BorderColor = System.Drawing.Color.Transparent;
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.IsXValueIndexed = true;
-            series3.Legend = "Legend1";
-            series3.Name = "Accuracy";
-            this.accuracyTime.Series.Add(series3);
+            series1.BackImageTransparentColor = System.Drawing.Color.White;
+            series1.BorderColor = System.Drawing.Color.Transparent;
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.IsXValueIndexed = true;
+            series1.Legend = "Legend1";
+            series1.Name = "Accuracy";
+            this.accuracyTime.Series.Add(series1);
             this.accuracyTime.Size = new System.Drawing.Size(317, 580);
             this.accuracyTime.TabIndex = 0;
             this.accuracyTime.Text = "chart1";
@@ -2016,7 +2016,7 @@ namespace OpenDACT.Class_Files
             this.textPlateDiameter.Name = "textPlateDiameter";
             this.textPlateDiameter.Size = new System.Drawing.Size(100, 20);
             this.textPlateDiameter.TabIndex = 200;
-            this.textPlateDiameter.Text = "260";
+            this.textPlateDiameter.Text = "200";
             // 
             // label36
             // 
