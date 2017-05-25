@@ -34,6 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OxyPlot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=638079a8f0bd61e9, processorArchitecture=MSIL">
+      <HintPath>..\packages\OxyPlot.Core.1.0.0\lib\net45\OxyPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=75e952ba404cdbb0, processorArchitecture=MSIL">
+      <HintPath>..\packages\OxyPlot.Wpf.1.0.0\lib\net45\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -65,6 +71,7 @@
     <Compile Include="Classes\DeltaParameters.cs" />
     <Compile Include="Classes\EEPROM.cs" />
     <Compile Include="Classes\GCode.cs" />
+    <Compile Include="Classes\HeightMap.cs" />
     <Compile Include="Classes\Matrix.cs" />
     <Compile Include="Classes\Escher.cs" />
     <Compile Include="Classes\Position3D.cs" />
@@ -72,13 +79,14 @@
     <Compile Include="Classes\TestData.cs" />
     <Compile Include="Classes\Workflow_Classes\ApplySettingsWF.cs" />
     <Compile Include="Classes\Workflow_Classes\ApplySettingWF.cs" />
+    <Compile Include="Classes\Workflow_Classes\EscherWF.cs" />
     <Compile Include="Classes\Workflow_Classes\HomeWF.cs" />
+    <Compile Include="Classes\Workflow_Classes\MeasureHeightsWF.cs" />
     <Compile Include="Classes\Workflow_Classes\MoveWF.cs" />
     <Compile Include="Classes\Workflow_Classes\ProbeAtLocationWF.cs" />
     <Compile Include="Classes\Workflow_Classes\ProbeWF.cs" />
     <Compile Include="Classes\Workflow_Classes\ReadEEPROMWF.cs" />
     <Compile Include="Classes\Workflow_Classes\Workflow.cs" />
-    <Compile Include="Classes\Workflow_Classes\WorkflowManager.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -102,6 +110,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

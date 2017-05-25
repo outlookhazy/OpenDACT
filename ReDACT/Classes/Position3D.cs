@@ -8,11 +8,11 @@ namespace OpenDACT.Class_Files
 {
     public class Position3D
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
 
-        public Position3D(float x, float y, float z)
+        public Position3D(double x, double y, double z)
         {
             this.X = x;
             this.Y = y;
@@ -21,7 +21,7 @@ namespace OpenDACT.Class_Files
 
         public override string ToString()
         {
-            return String.Format("(X{0}, Y{1}, Z{2}", X, Y, Z);
+            return String.Format("[X{0}, Y{1}, Z{2}]", X, Y, Z);
         }
     }
 }

@@ -8,8 +8,6 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ProbeAtLocationWF : Workflow
     {
-        public new string ID { get { return "ProbeAtLocationWF"; } set { return; } }
-
         private Position3D probePoint;
         private ProbeWF probeWorkflow;
         private SerialManager serialSource;
@@ -17,6 +15,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         public ProbeAtLocationWF(SerialManager serialSource, Position3D location)
         {
+            this.ID = "ProbeAtLocationWF";
             this.serialSource = serialSource;
             this.probePoint = location;
         }

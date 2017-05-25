@@ -10,18 +10,16 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class HomeWF : Workflow
     {
-        public new string ID { get { return "HomeWF"; } set { return; } }
-
         private SerialManager serialSource;
 
         public HomeWF(SerialManager serialSource)
         {
+            this.ID = "HomeWF";
             this.serialSource = serialSource;
         }
 
         protected override void OnStarted()
         {
-            Debug.WriteLine("Home Started");
             serialSource.WriteLine(GCode.Command.HOME);
         }
 
@@ -29,7 +27,6 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             if (serialMessage.Contains("wait"))
             {
-                Debug.WriteLine("Home Done");
                 this.FinishOrAdvance();
             }
         }

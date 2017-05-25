@@ -8,16 +8,15 @@ using static OpenDACT.Class_Files.Workflow_Classes.Workflow;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-     public abstract class Workflow
+     public class Workflow
     {
-        private event WorkflowStateChangeHandler OnEvent;
+        protected event WorkflowStateChangeHandler OnEvent;
         private LinkedList<Workflow> WorkflowQueue = new LinkedList<Workflow>();
         private LinkedListNode<Workflow> WorkflowItem;
         private WorkflowStateChangeHandler _parent;
         private WorkflowState status = WorkflowState.PENDING;
         public WorkflowState Status { get { return status; } private set { status = value; } }
-        public abstract string ID { get; set; }
-        
+        public string ID { get; set; }
 
         public void AddWorkflowItem(Workflow item)
         {
@@ -63,8 +62,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected virtual void OnStarted()
         {
+            this.ID = "DefaultWF";
             this.DebugState("Default OnStarted called");
-            this.FinishOrAdvance();
         }
 
         protected virtual void OnMessage(string serialMessage)
@@ -114,7 +113,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.SendEvent(newStatus);
         }
 
-        protected void Abort()
+        public void Abort()
         {
             this.DebugState("Aborting Self");
             this.OnAborted();
@@ -154,18 +153,22 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
                 }
                 else //first item has been activated
-                {
+                {                    
+                    LinkedListNode<Workflow> finished = this.WorkflowItem; //save current for removal
+                    
                     if (this.WorkflowItem.Next != null) //queue has a next item
-                    {
+                    {                        
                         this.DebugState("Activating next Child");
-                        this.WorkflowItem = this.WorkflowItem.Next;
+                        this.WorkflowItem = this.WorkflowItem.Next;                        
                         this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
                     }
                     else
                     {
+                        this.WorkflowItem = null; //dispose of the current item
                         this.DebugState("Children are done");
                         complete = true;
                     }
+                    WorkflowQueue.Remove(finished);
                 }
             }
             else
@@ -189,9 +192,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         private void DebugState(string logmessage)
         {
-            string debugtag = ID == null ? "<anonymous>" : this.ID; 
-            if (this.ID != null)
-                Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
+            string debugtag = this.ID == null ? "<anonymous>" : this.ID; 
+            //Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
         }
     }
 

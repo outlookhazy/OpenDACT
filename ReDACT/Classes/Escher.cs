@@ -28,7 +28,7 @@ namespace ReDACT
             return newparams;
         }
 
-        public static DeltaParameters DoDeltaCalibration(DeltaParameters delta, TestData data)
+        private static DeltaParameters DoDeltaCalibration(DeltaParameters delta, TestData data)
         {
 
             // Transform the probing points to motor endpoints and store them in a matrix, so that we can do multiple iterations using the same data
@@ -95,15 +95,15 @@ namespace ReDACT
                 double[] solution = new double[(int)data.NumFactors];
                 normalMatrix.GaussJordan(ref solution, (int)data.NumFactors);
 
-                /*
-                for (var i = 0; i < numFactors; ++i)
+                
+                for (var i = 0; i < (int)data.NumFactors; ++i)
                 {
-                    if (isNaN(solution[i]))
+                    if (Double.IsNaN(solution[i]))
                     {
-                        throw "Unable to calculate corrections. Please make sure the bed probe points are all distinct.";
+                        throw new Exception("Unable to calculate corrections. Please make sure the bed probe points are all distinct.");
                     }
                 }
-                */
+                
 
 
 

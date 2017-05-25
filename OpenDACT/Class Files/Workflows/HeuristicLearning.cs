@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
+    /*
     static class HeuristicLearning
     {
         static internal bool isHeuristicComplete = false;
@@ -209,4 +210,5 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
     }
+    */
 }

@@ -37,6 +37,8 @@ namespace OpenDACT.Class_Files
             this[EEPROM_POSITION.DB] = new EEPROM_Variable(EEPROM_POSITION.DB, "DB", EEPROM_TYPE.FLOAT);
             this[EEPROM_POSITION.DC] = new EEPROM_Variable(EEPROM_POSITION.DC, "DC", EEPROM_TYPE.FLOAT);
 
+            this[EEPROM_POSITION.printableRadius] = new EEPROM_Variable(EEPROM_POSITION.printableRadius, "Max Printable Radius", EEPROM_TYPE.FLOAT);
+
         }      
 
         
@@ -111,6 +113,16 @@ namespace OpenDACT.Class_Files
             }
         }
 
+        public EEPROM Copy()
+        {
+            EEPROM copy = new EEPROM();
+            foreach (EEPROM_POSITION pos in copy.Keys)
+            {
+                copy[pos].Value = this[pos].Value;
+            }
+            return copy;
+        }
+
         public void Set(EEPROM_POSITION settingPosition, float value)
         {
             if(settingPosition == EEPROM_POSITION.StepsPerMM)
@@ -142,6 +154,7 @@ namespace OpenDACT.Class_Files
         DA = 913,
         DB = 917,
         DC = 921,
+        printableRadius = 925,
         INVALID = 0
     }
 

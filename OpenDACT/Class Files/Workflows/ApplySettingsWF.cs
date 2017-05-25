@@ -8,12 +8,12 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ApplySettingsWF : Workflow
     {
-        public new string ID { get { return "ApplySettingsWF"; } set { return; } }
         private EEPROM settings;
         private SerialManager serialSource;
 
         public ApplySettingsWF(SerialManager serialSource, EEPROM targetSettings)
         {
+            this.ID = "ApplySettingsWF";
             this.serialSource = serialSource;
             this.settings = targetSettings;
         }

@@ -14,47 +14,9 @@ namespace OpenDACT.Class_Files
         public static bool calibrationState = false;
         public static CalibrationType calibrationSelection = CalibrationType.NORMAL;
         public static int iterationNum = 0;
-        private static float tempAccuracy;
-
-        public static void Calibrate()
-        {
-            switch (Calibration.calibrationSelection)
-            {
-                case CalibrationType.NORMAL:
-                    BasicCalibration();
-                    break;
-                case CalibrationType.QUICK:
-                    FastCalibration();
-                    break;
-            }            
-            iterationNum++;
-        }
         
-        public static void FastCalibration()
-        {
-            //check if eeprom object remains after this function is called for the second time
-
-            if (iterationNum == 0)
-            {
-                if (UserVariables.diagonalRodLength.ToString() == "")
-                {
-                    UserVariables.diagonalRodLength = EEPROM.diagonalRod.Value;
-                    UserInterface.consoleLog.Log("Using default diagonal rod length from EEPROM");
-                }
-            }
-            
-            Program.mainFormTest.SetAccuracyPoint(iterationNum, Calibration.AverageAccuracy());
-            CheckAccuracy(Heights.X, Heights.XOpp, Heights.Y, Heights.YOpp, Heights.Z, Heights.ZOpp);
-
-            if (calibrationState == true)
-            {
-                TowerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                AlphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                StepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                HRad(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-            }            
-        }
-
+        
+        /*
         public static void BasicCalibration()
         {
             //check if eeprom object remains after this function is called for the second time
@@ -131,63 +93,42 @@ namespace OpenDACT.Class_Files
                 }
                 
             }            
-        }
+        }*/
 
-        
-        
-        
-
-        public static void CheckAccuracy(HeightMap Heights)
+        public static EEPROM HRad(HeightMap Heights, EEPROM sourceEEPROM)
         {
-            float accuracy = UserVariables.accuracy;
-
-            if(Heights.PrecisionReached(accuracy)){
-                if (UserVariables.probeChoice == Printer.ProbeType.FSR)
-                {
-                    EEPROM.zMaxLength.Value -= UserVariables.FSROffset;
-                    UserInterface.consoleLog.Log("Setting Z Max Length with adjustment for FSR");
-                }
-                UserInterface.consoleLog.Log("Calibration Meets Accuracy");
-                calibrationState = false;
-            }
-            else
-            {
-                //WorkflowManager.WorkflowQueue.AddLast(new MeasureHeightsWF());
-                UserInterface.consoleLog.Log("Continuing Calibration");
-            }
-        }
-
-        public static void HRad(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
-        {
-            float HRadSA = ((X + XOpp + Y + YOpp + Z + ZOpp) / 6);
+            EEPROM EEPROM = sourceEEPROM.Copy();
+            float HRadSA = ((Heights[HeightMap.Position.X].Z + Heights[HeightMap.Position.XOPP].Z + Heights[HeightMap.Position.Y].Z + Heights[HeightMap.Position.YOPP].Z + Heights[HeightMap.Position.Z].Z + Heights[HeightMap.Position.ZOPP].Z) / 6);
             float HRadRatio = UserVariables.HRadRatio;
 
-            EEPROM.HRadius.Value += (HRadSA / HRadRatio);
+            EEPROM[EEPROM_POSITION.HRadius].Value += (HRadSA / HRadRatio);
 
-            X -= HRadSA;
-            Y -= HRadSA;
-            Z -= HRadSA;
-            XOpp -= HRadSA;
-            YOpp -= HRadSA;
-            ZOpp -= HRadSA;
+            Heights[HeightMap.Position.X].Z -= HRadSA;
+            Heights[HeightMap.Position.Y].Z -= HRadSA;
+            Heights[HeightMap.Position.Z].Z -= HRadSA;
+            Heights[HeightMap.Position.XOPP].Z -= HRadSA;
+            Heights[HeightMap.Position.YOPP].Z -= HRadSA;
+            Heights[HeightMap.Position.ZOPP].Z -= HRadSA;
 
-            UserInterface.consoleLog.Log("HRad:" + EEPROM.HRadius.ToString());
+            UserInterface.consoleLog.Log("HRad:" + EEPROM[EEPROM_POSITION.HRadius].Value.ToString());
+            return EEPROM;
         }
 
-        public static void TowerOffsets(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static EEPROM TowerOffsets(HeightMap Heights, EEPROM sourceEEPROM)
         {
+            EEPROM EEPROM = sourceEEPROM.Copy();
             int j = 0;
             float accuracy = UserVariables.calculationAccuracy;
-            float tempX2 = X;
-            float tempXOpp2 = XOpp;
-            float tempY2 = Y;
-            float tempYOpp2 = YOpp;
-            float tempZ2 = Z;
-            float tempZOpp2 = ZOpp;
-            float offsetX = EEPROM.offsetX.Value;
-            float offsetY = EEPROM.offsetY.Value;
-            float offsetZ = EEPROM.offsetZ.Value;
-            float stepsPerMM = EEPROM.stepsPerMM.Value;
+            float tempX2 = Heights[HeightMap.Position.X].Z;
+            float tempXOpp2 = Heights[HeightMap.Position.XOPP].Z;
+            float tempY2 = Heights[HeightMap.Position.Y].Z;
+            float tempYOpp2 = Heights[HeightMap.Position.YOPP].Z;
+            float tempZ2 = Heights[HeightMap.Position.Z].Z;
+            float tempZOpp2 = Heights[HeightMap.Position.ZOPP].Z;
+            float offsetX = EEPROM[EEPROM_POSITION.offsetX].Value;
+            float offsetY = EEPROM[EEPROM_POSITION.offsetY].Value;
+            float offsetZ = EEPROM[EEPROM_POSITION.offsetZ].Value;
+            float stepsPerMM = EEPROM[EEPROM_POSITION.StepsPerMM].Value;
 
             float towMain = UserVariables.offsetCorrection;//0.6
             float oppMain = UserVariables.mainOppPerc;//0.5
@@ -225,12 +166,12 @@ namespace OpenDACT.Class_Files
                     tempYOpp2 -= tempZ2 * (-oppSub / towMain);
                     tempZ2 -= tempZ2 / 1;
 
-                    tempX2 = Validation.CheckZero(tempX2);
-                    tempY2 = Validation.CheckZero(tempY2);
-                    tempZ2 = Validation.CheckZero(tempZ2);
-                    tempXOpp2 = Validation.CheckZero(tempXOpp2);
-                    tempYOpp2 = Validation.CheckZero(tempYOpp2);
-                    tempZOpp2 = Validation.CheckZero(tempZOpp2);
+                    tempX2 = Util.CheckZero(tempX2);
+                    tempY2 = Util.CheckZero(tempY2);
+                    tempZ2 = Util.CheckZero(tempZ2);
+                    tempXOpp2 = Util.CheckZero(tempXOpp2);
+                    tempYOpp2 = Util.CheckZero(tempYOpp2);
+                    tempZOpp2 = Util.CheckZero(tempZOpp2);
 
                     if (Math.Abs(tempX2) <= UserVariables.accuracy && Math.Abs(tempY2) <= UserVariables.accuracy && Math.Abs(tempZ2) <= UserVariables.accuracy)
                     {
@@ -246,17 +187,17 @@ namespace OpenDACT.Class_Files
 
                         UserInterface.consoleLog.Log("Offs :" + offsetX + " " + offsetY + " " + offsetZ);
 
-                        X = tempX2;
-                        XOpp = tempXOpp2;
-                        Y = tempY2;
-                        YOpp = tempYOpp2;
-                        Z = tempZ2;
-                        ZOpp = tempZOpp2;
+                        Heights[HeightMap.Position.X].Z = tempX2;
+                        Heights[HeightMap.Position.XOPP].Z = tempXOpp2;
+                        Heights[HeightMap.Position.Y].Z = tempY2;
+                        Heights[HeightMap.Position.YOPP].Z = tempYOpp2;
+                        Heights[HeightMap.Position.Z].Z = tempZ2;
+                        Heights[HeightMap.Position.ZOPP].Z = tempZOpp2;
 
                         //round to the nearest whole number
-                        EEPROM.offsetX.Value = Convert.ToInt32(offsetX);
-                        EEPROM.offsetY.Value = Convert.ToInt32(offsetY);
-                        EEPROM.offsetZ.Value = Convert.ToInt32(offsetZ);
+                        EEPROM[EEPROM_POSITION.offsetX].Value = Convert.ToInt32(offsetX);
+                        EEPROM[EEPROM_POSITION.offsetY].Value = Convert.ToInt32(offsetY);
+                        EEPROM[EEPROM_POSITION.offsetZ].Value = Convert.ToInt32(offsetZ);
 
                         j = 100;
                     }
@@ -267,11 +208,11 @@ namespace OpenDACT.Class_Files
                         float dradCorr = tempX2 * -1.25F;
                         float HRadRatio = UserVariables.HRadRatio;
 
-                        EEPROM.HRadius.Value += dradCorr;
+                        EEPROM[EEPROM_POSITION.HRadius].Value += dradCorr;
 
-                        EEPROM.offsetX.Value = 0;
-                        EEPROM.offsetY.Value = 0;
-                        EEPROM.offsetZ.Value = 0;
+                        EEPROM[EEPROM_POSITION.offsetX].Value = 0;
+                        EEPROM[EEPROM_POSITION.offsetY].Value = 0;
+                        EEPROM[EEPROM_POSITION.offsetZ].Value = 0;
 
                         //hradsa = dradcorr
                         //solve inversely from previous method
@@ -285,7 +226,7 @@ namespace OpenDACT.Class_Files
                         tempZOpp2 -= HRadOffset;
 
                         UserInterface.consoleLog.Log("Hrad correction: " + dradCorr);
-                        UserInterface.consoleLog.Log("HRad: " + EEPROM.HRadius.ToString());
+                        UserInterface.consoleLog.Log("HRad: " + EEPROM[EEPROM_POSITION.HRadius].Value.ToString());
 
                         j = 0;
                     }
@@ -305,7 +246,7 @@ namespace OpenDACT.Class_Files
                 }
             }
 
-            if (EEPROM.offsetX.Value > 1000 || EEPROM.offsetY.Value > 1000 || EEPROM.offsetZ.Value > 1000)
+            if (EEPROM[EEPROM_POSITION.offsetX].Value > 1000 || EEPROM[EEPROM_POSITION.offsetY].Value > 1000 || EEPROM[EEPROM_POSITION.offsetZ].Value > 1000)
             {
                 UserInterface.consoleLog.Log("Tower offset calibration error, setting default values.");
                 UserInterface.consoleLog.Log("Tower offsets before damage prevention: X" + offsetX + " Y" + offsetY + " Z" + offsetZ);
@@ -313,13 +254,15 @@ namespace OpenDACT.Class_Files
                 offsetY = 0;
                 offsetZ = 0;
             }
+            return EEPROM;
         }
 
-        public static void AlphaRotation(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static EEPROM AlphaRotation(HeightMap Heights, EEPROM sourceEEPROM)
         {
-            float offsetX = EEPROM.offsetX.Value;
-            float offsetY = EEPROM.offsetY.Value;
-            float offsetZ = EEPROM.offsetZ.Value;
+            EEPROM EEPROM = sourceEEPROM.Copy();
+            float offsetX = EEPROM[EEPROM_POSITION.offsetX].Value;
+            float offsetY = EEPROM[EEPROM_POSITION.offsetY].Value;
+            float offsetZ = EEPROM[EEPROM_POSITION.offsetZ].Value;
             float accuracy = UserVariables.accuracy;
 
             //change to object
@@ -327,60 +270,60 @@ namespace OpenDACT.Class_Files
 
             int k = 0;
             while (k < 100)
-            {
+            {                
                 //X Alpha Rotation
-                if (YOpp > ZOpp)
+                if (Heights[HeightMap.Position.YOPP].Z > Heights[HeightMap.Position.ZOPP].Z)
                 {
-                    float ZYOppAvg = (YOpp - ZOpp) / 2;
-                    EEPROM.A.Value = EEPROM.A.Value + (ZYOppAvg * alphaRotationPercentage); // (0.5/((diff y0 and z0 at X + 0.5)-(diff y0 and z0 at X = 0))) * 2 = 1.75
-                    YOpp = YOpp - ZYOppAvg;
-                    ZOpp = ZOpp + ZYOppAvg;
+                    float ZYOppAvg = (Heights[HeightMap.Position.YOPP].Z - Heights[HeightMap.Position.ZOPP].Z) / 2;
+                    EEPROM[EEPROM_POSITION.A].Value = EEPROM[EEPROM_POSITION.A].Value + (ZYOppAvg * alphaRotationPercentage); // (0.5/((diff y0 and z0 at X + 0.5)-(diff y0 and z0 at X = 0))) * 2 = 1.75
+                    Heights[HeightMap.Position.YOPP].Z = Heights[HeightMap.Position.YOPP].Z - ZYOppAvg;
+                    Heights[HeightMap.Position.ZOPP].Z = Heights[HeightMap.Position.ZOPP].Z + ZYOppAvg;
                 }
-                else if (YOpp < ZOpp)
+                else if (Heights[HeightMap.Position.YOPP].Z < Heights[HeightMap.Position.ZOPP].Z)
                 {
-                    float ZYOppAvg = (ZOpp - YOpp) / 2;
+                    float ZYOppAvg = (Heights[HeightMap.Position.ZOPP].Z - Heights[HeightMap.Position.YOPP].Z) / 2;
 
-                    EEPROM.A.Value = EEPROM.A.Value - (ZYOppAvg * alphaRotationPercentage);
-                    YOpp = YOpp + ZYOppAvg;
-                    ZOpp = ZOpp - ZYOppAvg;
+                    EEPROM[EEPROM_POSITION.A].Value = EEPROM[EEPROM_POSITION.A].Value - (ZYOppAvg * alphaRotationPercentage);
+                    Heights[HeightMap.Position.YOPP].Z = Heights[HeightMap.Position.YOPP].Z + ZYOppAvg;
+                    Heights[HeightMap.Position.ZOPP].Z = Heights[HeightMap.Position.ZOPP].Z - ZYOppAvg;
                 }
 
                 //Y Alpha Rotation
-                if (ZOpp > XOpp)
+                if (Heights[HeightMap.Position.ZOPP].Z > Heights[HeightMap.Position.XOPP].Z)
                 {
-                    float XZOppAvg = (ZOpp - XOpp) / 2;
-                    EEPROM.B.Value = EEPROM.B.Value + (XZOppAvg * alphaRotationPercentage);
-                    ZOpp = ZOpp - XZOppAvg;
-                    XOpp = XOpp + XZOppAvg;
+                    float XZOppAvg = (Heights[HeightMap.Position.ZOPP].Z - Heights[HeightMap.Position.XOPP].Z) / 2;
+                    EEPROM[EEPROM_POSITION.B].Value = EEPROM[EEPROM_POSITION.B].Value + (XZOppAvg * alphaRotationPercentage);
+                    Heights[HeightMap.Position.ZOPP].Z = Heights[HeightMap.Position.ZOPP].Z - XZOppAvg;
+                    Heights[HeightMap.Position.XOPP].Z = Heights[HeightMap.Position.XOPP].Z + XZOppAvg;
                 }
-                else if (ZOpp < XOpp)
+                else if (Heights[HeightMap.Position.ZOPP].Z < Heights[HeightMap.Position.XOPP].Z)
                 {
-                    float XZOppAvg = (XOpp - ZOpp) / 2;
+                    float XZOppAvg = (Heights[HeightMap.Position.XOPP].Z - Heights[HeightMap.Position.ZOPP].Z) / 2;
 
-                    EEPROM.B.Value = EEPROM.B.Value - (XZOppAvg * alphaRotationPercentage);
-                    ZOpp = ZOpp + XZOppAvg;
-                    XOpp = XOpp - XZOppAvg;
+                    EEPROM[EEPROM_POSITION.B].Value = EEPROM[EEPROM_POSITION.B].Value - (XZOppAvg * alphaRotationPercentage);
+                    Heights[HeightMap.Position.ZOPP].Z = Heights[HeightMap.Position.ZOPP].Z + XZOppAvg;
+                    Heights[HeightMap.Position.XOPP].Z = Heights[HeightMap.Position.XOPP].Z - XZOppAvg;
                 }
                 //Z Alpha Rotation
-                if (XOpp > YOpp)
+                if (Heights[HeightMap.Position.XOPP].Z > Heights[HeightMap.Position.YOPP].Z)
                 {
-                    float YXOppAvg = (XOpp - YOpp) / 2;
-                    EEPROM.C.Value = EEPROM.C.Value + (YXOppAvg * alphaRotationPercentage);
-                    XOpp = XOpp - YXOppAvg;
-                    YOpp = YOpp + YXOppAvg;
+                    float YXOppAvg = (Heights[HeightMap.Position.XOPP].Z - Heights[HeightMap.Position.YOPP].Z) / 2;
+                    EEPROM[EEPROM_POSITION.C].Value = EEPROM[EEPROM_POSITION.C].Value + (YXOppAvg * alphaRotationPercentage);
+                    Heights[HeightMap.Position.XOPP].Z = Heights[HeightMap.Position.XOPP].Z - YXOppAvg;
+                    Heights[HeightMap.Position.YOPP].Z = Heights[HeightMap.Position.YOPP].Z + YXOppAvg;
                 }
-                else if (XOpp < YOpp)
+                else if (Heights[HeightMap.Position.XOPP].Z < Heights[HeightMap.Position.YOPP].Z)
                 {
-                    float YXOppAvg = (YOpp - XOpp) / 2;
+                    float YXOppAvg = (Heights[HeightMap.Position.YOPP].Z - Heights[HeightMap.Position.XOPP].Z) / 2;
 
-                    EEPROM.C.Value = EEPROM.C.Value - (YXOppAvg * alphaRotationPercentage);
-                    XOpp = XOpp + YXOppAvg;
-                    YOpp = YOpp - YXOppAvg;
+                    EEPROM[EEPROM_POSITION.C].Value = EEPROM[EEPROM_POSITION.C].Value - (YXOppAvg * alphaRotationPercentage);
+                    Heights[HeightMap.Position.XOPP].Z = Heights[HeightMap.Position.XOPP].Z + YXOppAvg;
+                    Heights[HeightMap.Position.YOPP].Z = Heights[HeightMap.Position.YOPP].Z - YXOppAvg;
                 }
 
                 //determine if value is close enough
-                float hTow = Math.Max(Math.Max(XOpp, YOpp), ZOpp);
-                float lTow = Math.Min(Math.Min(XOpp, YOpp), ZOpp);
+                float hTow = Math.Max(Math.Max(Heights[HeightMap.Position.XOPP].Z, Heights[HeightMap.Position.YOPP].Z), Heights[HeightMap.Position.ZOPP].Z);
+                float lTow = Math.Min(Math.Min(Heights[HeightMap.Position.XOPP].Z, Heights[HeightMap.Position.YOPP].Z), Heights[HeightMap.Position.ZOPP].Z);
                 float towDiff = hTow - lTow;
 
                 if (towDiff < UserVariables.calculationAccuracy && towDiff > -UserVariables.calculationAccuracy)
@@ -388,13 +331,14 @@ namespace OpenDACT.Class_Files
                     k = 100;
 
                     //log
-                    UserInterface.consoleLog.Log("ABC:" + EEPROM.A + " " + EEPROM.B + " " + EEPROM.C);
+                    UserInterface.consoleLog.Log("ABC:" + EEPROM[EEPROM_POSITION.A].Value + " " + EEPROM[EEPROM_POSITION.B].Value + " " + EEPROM[EEPROM_POSITION.C].Value);
                 }
                 else
                 {
                     k++;
                 }
             }
+            return EEPROM;
         }
         /// <summary>
         /// /////////////////////////
@@ -405,32 +349,35 @@ namespace OpenDACT.Class_Files
         /// <param name="YOpp"></param>
         /// <param name="Z"></param>
         /// <param name="ZOpp"></param>
-        public static void StepsPMM(ref float X, ref float XOpp, ref float Y, ref float YOpp, ref float Z, ref float ZOpp)
+        public static EEPROM StepsPMM(HeightMap Heights, EEPROM sourceEEPROM)
         {
             /*
             float diagChange = 1 / UserVariables.deltaOpp;
             float towChange = 1 / UserVariables.deltaTower;
             */
 
+            EEPROM EEPROM = sourceEEPROM.Copy();
+
             float diagChange = 1 / UserVariables.deltaOpp;
             float towChange = 1 / UserVariables.deltaTower;
 
-            float XYZ = (X + Y + Z) / 3;
-            float XYZOpp = (XOpp + YOpp + ZOpp) / 3;
+            float XYZ = (Heights[HeightMap.Position.X].Z + Heights[HeightMap.Position.Y].Z + Heights[HeightMap.Position.Z].Z) / 3;
+            float XYZOpp = (Heights[HeightMap.Position.XOPP].Z + Heights[HeightMap.Position.YOPP].Z + Heights[HeightMap.Position.ZOPP].Z) / 3;
 
-            EEPROM.stepsPerMM.Value -= (XYZ - XYZOpp) * ((diagChange + towChange) / 2);
+            EEPROM[EEPROM_POSITION.StepsPerMM].Value -= (XYZ - XYZOpp) * ((diagChange + towChange) / 2);
 
             //XYZ is increased by the offset
 
-            X += (XYZ - XYZOpp) * diagChange * 1;
-            Y += (XYZ - XYZOpp) * diagChange * 1;
-            Z += (XYZ - XYZOpp) * diagChange * 1;
-            XOpp += (XYZ - XYZOpp) * towChange * 0.75f;
-            YOpp += (XYZ - XYZOpp) * towChange * 0.75f;
-            ZOpp += (XYZ - XYZOpp) * towChange * 0.75f;
+            Heights[HeightMap.Position.X].Z += (XYZ - XYZOpp) * diagChange * 1;
+            Heights[HeightMap.Position.Y].Z += (XYZ - XYZOpp) * diagChange * 1;
+            Heights[HeightMap.Position.Z].Z += (XYZ - XYZOpp) * diagChange * 1;
+            Heights[HeightMap.Position.XOPP].Z += (XYZ - XYZOpp) * towChange * 0.75f;
+            Heights[HeightMap.Position.YOPP].Z += (XYZ - XYZOpp) * towChange * 0.75f;
+            Heights[HeightMap.Position.ZOPP].Z += (XYZ - XYZOpp) * towChange * 0.75f;
 
 
-            UserInterface.consoleLog.Log("Steps per Millimeter: " + EEPROM.stepsPerMM.ToString());
+            UserInterface.consoleLog.Log("Steps per Millimeter: " + EEPROM[EEPROM_POSITION.StepsPerMM].Value.ToString());
+            return EEPROM;
         }
 
         /*

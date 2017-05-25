@@ -8,48 +8,51 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     class FastCalibrationWF : Workflow
     {
-        public new string ID { get { return "FastCalibrationWF"; } set { return; } }
-
         private SerialManager serialSource;
         public FastCalibrationWF(SerialManager serialSource)
         {
+            this.ID = "FastCalibrationWF";
             this.serialSource = serialSource;
         }
         protected override void OnStarted()
         {
+            Program.mainFormTest.SetUserVariables();
             //this.AddWorkflowItem(new ZProbeMeasureWF());
             this.AddWorkflowItem(new HomeWF(serialSource));
             ReadEEPROMWF reader = new ReadEEPROMWF(serialSource);
             this.AddWorkflowItem(reader);
-            this.AddWorkflowItem(new MeasureHeightsWF(serialSource,reader.EEPROM));
-            this.AddWorkflowItem(new FastCalibrationEvaluateWF());
+            MeasureHeightsWF heights = new MeasureHeightsWF(serialSource, reader.EEPROM);
+            this.AddWorkflowItem(heights);
+            this.AddWorkflowItem(new FastCalibrationEvaluateWF(serialSource, heights));
         }
 
         internal class FastCalibrationEvaluateWF : Workflow
         {
-            public new string ID { get { return "FastCalibrationEvaluateWF"; } set { return; } }
-
             private HeightMap Heights;
             private EEPROM adjustedEEPROM;
             private SerialManager serialSource;
+            MeasureHeightsWF sourceHeightsWF;
 
-            FastCalibrationEvaluateWF(SerialManager serialSource, EEPROM sourceEEPROM, HeightMap Heights)
+            public FastCalibrationEvaluateWF(SerialManager serialSource, MeasureHeightsWF HeightsWF)
             {
+                this.ID = "FastCalibrationEvaluateWF";
                 this.serialSource = serialSource;
-                this.adjustedEEPROM = sourceEEPROM.Copy();
-                this.Heights = Heights;
+                this.sourceHeightsWF = HeightsWF;
             }
             protected override void OnStarted()
             {
+                this.adjustedEEPROM = sourceHeightsWF.ResultEEPROM.Copy();
+                this.Heights = sourceHeightsWF.ResultHeights;
                 //Program.mainFormTest.SetAccuracyPoint(iterationNum, Calibration.AverageAccuracy());
-                if (!(Calibration.PrecisionReached(this.Heights[Position.X].Z, this.Heights[Position.XOPP].Z, this.Heights[Position.Y].Z, this.Heights[Position.YOPP].Z, this.Heights[Position.Z].Z, this.Heights[Position.ZOPP].Z)))
+                if (!(this.Heights.PrecisionReached(UserVariables.accuracy)))
                 {
-                    Calibration.TowerOffsets(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                    Calibration.AlphaRotation(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                    Calibration.StepsPMM(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                    Calibration.HRad(ref Heights.X, ref Heights.XOpp, ref Heights.Y, ref Heights.YOpp, ref Heights.Z, ref Heights.ZOpp);
-                    Program.mainFormTest.SetEEPROMGUIList();
-                    this.AddWorkflowItem(new ApplySettingsWF());
+                    this.adjustedEEPROM = Calibration.TowerOffsets(this.Heights, this.adjustedEEPROM);
+                    this.adjustedEEPROM = Calibration.AlphaRotation(this.Heights, this.adjustedEEPROM);
+                    this.adjustedEEPROM = Calibration.StepsPMM(this.Heights, this.adjustedEEPROM);
+                    this.adjustedEEPROM = Calibration.HRad(this.Heights, this.adjustedEEPROM);
+                    this.adjustedEEPROM.AdjustZLength(UserVariables.probeChoice);
+                    Program.mainFormTest.SetEEPROMGUIList(this.adjustedEEPROM);
+                    this.AddWorkflowItem(new ApplySettingsWF(this.serialSource,this.adjustedEEPROM));
                 }
             }
         }

@@ -25,16 +25,19 @@ namespace OpenDACT.Class_Files
         {
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
+            
             InitializeComponent();
 
             serialManager = new SerialManager();
             serialManager.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
             serialManager.NewSerialLine += SerialManager_NewSerialLine;
 
-            masterWorkflow.ID = "MasterWorkflow";
+            masterWorkflow = new Workflow()
+            {
+                ID = "MasterWorkflow"
+            };
 
             // Basic set of standard baud rates.
             baudRateCombo.Items.Add("250000");
@@ -151,7 +154,7 @@ namespace OpenDACT.Class_Files
         {
             if (serialManager.CurrentState == ConnectionState.CONNECTED)
             {
-                ActivateWorkflow(new FastCalibrationWF());
+                ActivateWorkflow(new FastCalibrationWF(serialManager));
             }
             else
             {
@@ -257,12 +260,12 @@ namespace OpenDACT.Class_Files
 
         public void SetHeightsInvoke( HeightMap Heights)
         {
-            float X = Heights[Position.X].Z;
-            float XOpp = Heights[Position.XOPP].Z;
-            float Y = Heights[Position.Y].Z;
-            float YOpp = Heights[Position.YOPP].Z;
-            float Z = Heights[Position.Z].Z;
-            float ZOpp = Heights[Position.ZOPP].Z;
+            float X = Heights[HeightMap.Position.X].Z;
+            float XOpp = Heights[HeightMap.Position.XOPP].Z;
+            float Y = Heights[HeightMap.Position.Y].Z;
+            float YOpp = Heights[HeightMap.Position.YOPP].Z;
+            float Z = Heights[HeightMap.Position.Z].Z;
+            float ZOpp = Heights[HeightMap.Position.ZOPP].Z;
 
             //set base heights for advanced calibration comparison
             if (Calibration.iterationNum == 0)
@@ -450,12 +453,12 @@ namespace OpenDACT.Class_Files
 
                 HeightMap Heights = new HeightMap();
 
-                Heights[Position.X].Z = Convert.ToSingle(xManual.Text);
-                Heights[Position.XOPP].Z = Convert.ToSingle(xOppManual.Text);
-                Heights[Position.Y].Z = Convert.ToSingle(yManual.Text);
-                Heights[Position.YOPP].Z = Convert.ToSingle(yOppManual.Text);
-                Heights[Position.Z].Z = Convert.ToSingle(zManual.Text);
-                Heights[Position.ZOPP].Z = Convert.ToSingle(zOppManual.Text);
+                Heights[HeightMap.Position.X].Z = Convert.ToSingle(xManual.Text);
+                Heights[HeightMap.Position.XOPP].Z = Convert.ToSingle(xOppManual.Text);
+                Heights[HeightMap.Position.Y].Z = Convert.ToSingle(yManual.Text);
+                Heights[HeightMap.Position.YOPP].Z = Convert.ToSingle(yOppManual.Text);
+                Heights[HeightMap.Position.Z].Z = Convert.ToSingle(zManual.Text);
+                Heights[HeightMap.Position.ZOPP].Z = Convert.ToSingle(zOppManual.Text);
 
                 EEPROM manual = new EEPROM();
                 manual[EEPROM_POSITION.StepsPerMM].Value = Convert.ToSingle(spmMan.Text);
@@ -476,7 +479,7 @@ namespace OpenDACT.Class_Files
                 manual[EEPROM_POSITION.DB].Value = Convert.ToSingle(delRadBMan.Text);
                 manual[EEPROM_POSITION.DC].Value = Convert.ToSingle(delRadCMan.Text);
 
-                Calibration.BasicCalibration();
+                //Calibration.BasicCalibration();
 
                 //set eeprom vals in manual calibration
                 this.spmMan.Text = manual[EEPROM_POSITION.StepsPerMM].Value.ToString();
@@ -496,12 +499,12 @@ namespace OpenDACT.Class_Files
                 this.delRadCMan.Text = manual[EEPROM_POSITION.DC].Value.ToString();
 
                 //set expected height map
-                this.xExp.Text = Heights[Position.X].Z.ToString();
-                this.xOppExp.Text = Heights[Position.XOPP].Z.ToString();
-                this.yExp.Text = Heights[Position.Y].Z.ToString();
-                this.yOppExp.Text = Heights[Position.YOPP].Z.ToString();
-                this.zExp.Text = Heights[Position.Z].Z.ToString();
-                this.zOppExp.Text = Heights[Position.ZOPP].Z.ToString();
+                this.xExp.Text = Heights[HeightMap.Position.X].Z.ToString();
+                this.xOppExp.Text = Heights[HeightMap.Position.XOPP].Z.ToString();
+                this.yExp.Text = Heights[HeightMap.Position.Y].Z.ToString();
+                this.yOppExp.Text = Heights[HeightMap.Position.YOPP].Z.ToString();
+                this.zExp.Text = Heights[HeightMap.Position.Z].Z.ToString();
+                this.zOppExp.Text = Heights[HeightMap.Position.ZOPP].Z.ToString();
 
 
                 Calibration.calibrationState = false;

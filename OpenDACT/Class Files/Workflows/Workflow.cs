@@ -62,8 +62,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected virtual void OnStarted()
         {
+            this.ID = "DefaultWF";
             this.DebugState("Default OnStarted called");
-            this.FinishOrAdvance();
         }
 
         protected virtual void OnMessage(string serialMessage)
@@ -154,7 +154,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                 }
                 else //first item has been activated
                 {                    
-                    WorkflowQueue.Remove(this.WorkflowItem); //remove completed item from the queue
+                    LinkedListNode<Workflow> finished = this.WorkflowItem; //save current for removal
+                    
                     if (this.WorkflowItem.Next != null) //queue has a next item
                     {                        
                         this.DebugState("Activating next Child");
@@ -167,6 +168,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                         this.DebugState("Children are done");
                         complete = true;
                     }
+                    WorkflowQueue.Remove(finished);
                 }
             }
             else
@@ -190,9 +192,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         private void DebugState(string logmessage)
         {
-            string debugtag = ID == null ? "<anonymous>" : this.ID; 
-            if (this.ID != null)
-                Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
+            string debugtag = this.ID == null ? "<anonymous>" : this.ID; 
+            //Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
         }
     }
 

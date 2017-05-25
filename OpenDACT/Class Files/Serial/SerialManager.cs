@@ -133,6 +133,7 @@ namespace OpenDACT.Class_Files
                         this._readBuffer += _port.ReadExisting();
                 } catch (Exception ex)
                 {
+                    Debug.WriteLine(ex.StackTrace);
                     //ignore case where port is closed before data can be read
                 }
             }

@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class Files\Calibration.cs" />
+    <Compile Include="Class Files\HeightMap.cs" />
     <Compile Include="Class Files\LogConsole.cs" />
     <Compile Include="Class Files\Position3D.cs" />
     <Compile Include="Class Files\EEPROM.cs" />

@@ -62,8 +62,14 @@ namespace OpenDACT.Class_Files
                 string cmdY = Y == null ? "" : String.Format(" Y{0}", Y);
                 string cmdZ = Z == null ? "" : String.Format(" Z{0}", Z);
 
-                return String.Format("G1{0}{1}{2}", cmdX, cmdY, cmdZ);
+                return String.Format("G1{0}{1}{2} F12000", cmdX, cmdY, cmdZ);
             }
+
+            public static String MOVE(double? X = null, double? Y = null, double? Z = null)
+            {
+                return MOVE(Convert.ToSingle(X), Convert.ToSingle(Y), Convert.ToSingle(Z));
+            }
+
             public static String DWELL_SECONDS(int duration) { return String.Format("G4 S{0}", duration); }
             public static String DWELL_MILLISECONDS(int duration) { return String.Format("G4 P{0}", duration); }
             public static String HOME { get { return "G28"; } }

@@ -9,7 +9,6 @@ namespace OpenDACT.Class_Files.Workflow_Classes
     public class ApplySettingWF : Workflow
     {
         private string settingID = "ApplySettingWF";
-        public new string ID { get { return this.settingID; } set { return; } }
 
         private SerialManager serialSource;
         private EEPROM_Variable targetSetting;
@@ -19,6 +18,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.serialSource = serialSource;
             this.targetSetting = targetSetting;
             this.settingID += String.Format("<{0}>",targetSetting.Name);
+            this.ID = this.settingID;
         }
 
         protected override void OnStarted()

@@ -38,6 +38,16 @@ namespace OpenDACT.Class_Files
             this[EEPROM_POSITION.DC] = new EEPROM_Variable(EEPROM_POSITION.DC, "DC", EEPROM_TYPE.FLOAT);
         }
         
+        public void AdjustZLength(Printer.ProbeType probeChoice)
+        {
+            switch (probeChoice)
+            {
+                case Printer.ProbeType.FSR:
+                    this[EEPROM_POSITION.zMaxLength].Value -= UserVariables.FSROffset;
+                    break;
+            }
+        }
+
         public bool ReadComplete()
         {
             foreach(EEPROM_POSITION v in this.Keys)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,17 +10,20 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class MoveWF : Workflow
     {
-        public override string ID { get { return "MoveWF"; } set { return; } }
 
         private Position3D targetLocation;
-        public MoveWF(Position3D location)
+        private SerialManager serialSource;
+        public MoveWF(SerialManager serialSource, Position3D location)
         {
+            this.ID = "MoveWF";
+            this.serialSource = serialSource;
             this.targetLocation = location;
         }
 
         protected override void OnStarted()
         {
-            GCode.Command.MOVE(this.targetLocation.X, this.targetLocation.Y, this.targetLocation.Z);
+            string movecommand = GCode.Command.MOVE(targetLocation.X, targetLocation.Y, targetLocation.Z);
+            serialSource.WriteLine(movecommand);
         }
 
         protected override void OnMessage(string serialMessage)

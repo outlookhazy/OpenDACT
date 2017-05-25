@@ -33,13 +33,13 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         class CalculateZProbeWF : Workflow
         {
-            public new string ID { get { return "CalculateZProbeWF"; } set { return; } }
 
             ProbeWF probeSource;
             EEPROM eepromSource;
 
             internal CalculateZProbeWF(ProbeWF dataSource, EEPROM eepromSource)
             {
+                this.ID = "CalculateZProbeWF";
                 this.eepromSource = eepromSource;
                 this.probeSource = dataSource;
             }
