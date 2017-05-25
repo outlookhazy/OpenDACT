@@ -3,6 +3,7 @@ using OpenDACT.Class_Files.Workflow_Classes;
 using OxyPlot;
 using OxyPlot.Series;
 using ReDACT.Classes;
+using ReDACT.Classes.Escher;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,30 +20,27 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static ReDACT.Classes.DeltaParameters;
+using static ReDACT.Classes.Escher.DParameters;
 
 namespace ReDACT
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IWorkflowParent
     {
-        SerialManager serialManager;
+        public SerialManager SerialSource { get; set; }
         Workflow mainWorkflow;
         LineSeries ls;
         List<DataPoint> points = new List<DataPoint>();
         public MainWindow()
         {
             InitializeComponent();
-            comboBoxFirmware.ItemsSource = typeof(DeltaParameters.Firmware).GetEnumValues();
-            comboBoxFirmware.SelectedItem = DeltaParameters.Firmware.Repetier;
+            comboBoxFirmware.ItemsSource = typeof(DParameters.Firmware).GetEnumValues();
+            comboBoxFirmware.SelectedItem = DParameters.Firmware.REPETIER;
 
-            comboBoxFactors.ItemsSource = typeof(Escher.NumFactors).GetEnumValues();
-            comboBoxFactors.SelectedItem = Escher.NumFactors.SEVEN;
-
-            mainWorkflow = new Workflow();
-            
+            comboBoxFactors.ItemsSource = typeof(Escher3D.NumFactors).GetEnumValues();
+            comboBoxFactors.SelectedItem = Escher3D.NumFactors.SEVEN;
 
             comboBoxSerial.ItemsSource = SerialPort.GetPortNames();
             if(comboBoxSerial.Items.Count > 0)
@@ -56,11 +54,13 @@ namespace ReDACT
             comboBoxBaud.Items.Add("9600");
             comboBoxBaud.Text = "250000";
 
-            this.serialManager = new SerialManager();
-            this.serialManager.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
-            this.serialManager.NewSerialInLine += SerialManager_NewSerialLine;
-            this.serialManager.NewSerialOutLine += SerialManager_NewSerialOutLine;
-            
+            this.SerialSource = new SerialManager();
+            this.SerialSource.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
+            this.SerialSource.NewSerialInLine += SerialManager_NewSerialLine;
+            this.SerialSource.NewSerialOutLine += SerialManager_NewSerialOutLine;
+
+            mainWorkflow = new Workflow(this.SerialSource);
+
         }
 
         private void SerialManager_NewSerialOutLine(object sender, string data)
@@ -104,29 +104,21 @@ namespace ReDACT
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
             this.continuecount = 100;
-            TestData calibrationTestData = new TestData((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (Escher.NumFactors)comboBoxFactors.SelectedItem,true);
-            mainWorkflow.AddWorkflowItem(new EscherWF(serialManager,calibrationTestData));
-            mainWorkflow.Start(calibrationcomplete);            
+            TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
+            mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
+            mainWorkflow.Start(this);            
         }
-        int continuecount;
-        private void calibrationcomplete(object sender, WorkflowState newState)
-        {
-            this.continuecount--;
-            if(continuecount > 0)
-            {
-                TestData calibrationTestData = new TestData((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (Escher.NumFactors)comboBoxFactors.SelectedItem, true);
-                mainWorkflow.AddWorkflowItem(new EscherWF(serialManager, calibrationTestData));
-                mainWorkflow.Start(calibrationcomplete);
-            }
 
-        }
+        
+
+        
 
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (serialManager.CurrentState == ConnectionState.Connected)
-                serialManager.Disconnect();
+            if (SerialSource.CurrentState == ConnectionState.Connected)
+                SerialSource.Disconnect();
             else
-                serialManager.Connect(this.comboBoxSerial.SelectedItem.ToString(),  int.Parse(this.comboBoxBaud.Text));
+                SerialSource.Connect(this.comboBoxSerial.SelectedItem.ToString(),  int.Parse(this.comboBoxBaud.Text));
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -146,6 +138,19 @@ namespace ReDACT
 
             if (sliderNumPoints.Value < sliderNumPoints.Minimum)
                 sliderNumPoints.Value = sliderNumPoints.Minimum;
+        }
+
+        int continuecount;
+        public void ChildStateChanged(object child, WorkflowState newState)
+        {
+            return;
+            this.continuecount--;
+            if (continuecount > 0)
+            {
+                TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
+                mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
+                mainWorkflow.Start(this);
+            }
         }
     }
 }

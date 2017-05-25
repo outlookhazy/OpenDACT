@@ -8,15 +8,26 @@ using static OpenDACT.Class_Files.Workflow_Classes.Workflow;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
-     public class Workflow
+    public interface IWorkflowParent
     {
-        protected event WorkflowStateChangeHandler OnEvent;
+        void ChildStateChanged(object child, WorkflowState newState);
+        SerialManager SerialSource { get; set; }
+    }
+
+     public class Workflow : IWorkflowParent
+    {
         private LinkedList<Workflow> WorkflowQueue = new LinkedList<Workflow>();
         private LinkedListNode<Workflow> WorkflowItem;
-        private WorkflowStateChangeHandler _parent;
+        private IWorkflowParent _parent;
         private WorkflowState status = WorkflowState.PENDING;
         public WorkflowState Status { get { return status; } private set { status = value; } }
         public string ID { get; set; }
+        public SerialManager SerialSource { get; set; }
+
+        public Workflow(SerialManager serialSource = null)
+        {
+            this.SerialSource = serialSource;
+        }
 
         public void AddWorkflowItem(Workflow item)
         {
@@ -24,22 +35,14 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.WorkflowQueue.AddLast(item);
         }
 
-        public void Start()
-        {            
-            this.Start(FakeParent);
-        }
-
-        private void FakeParent(object sender, WorkflowState newState)
+        public void Start(IWorkflowParent parent)
         {
-
-        }
-
-        public void Start(WorkflowStateChangeHandler parent)
-        {
-            this.DebugState("Start begun");
             this._parent = parent;
-            this.OnEvent += parent;
+            this.SerialSource = parent.SerialSource;
+
+            this.DebugState("Start begun");
             this.UpdateStatus(WorkflowState.PENDING);
+
             this.OnStarted();
             this.UpdateStatus(WorkflowState.STARTED);
             this.DebugState("Start complete");
@@ -110,7 +113,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             this.DebugState("Status updated to " + newStatus);
             this.Status = newStatus;
-            this.SendEvent(newStatus);
+            this._parent.ChildStateChanged(this, newStatus);
         }
 
         public void Abort()
@@ -150,7 +153,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                 {
                     this.DebugState("Activating first child");
                     this.WorkflowItem = WorkflowQueue.First;
-                    this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
+                    this.WorkflowItem.Value.Start(this);
                 }
                 else //first item has been activated
                 {                    
@@ -160,7 +163,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     {                        
                         this.DebugState("Activating next Child");
                         this.WorkflowItem = this.WorkflowItem.Next;                        
-                        this.WorkflowItem.Value.Start(this.Workflow_OnChildStateChange);
+                        this.WorkflowItem.Value.Start(this);
                     }
                     else
                     {
@@ -181,19 +184,18 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             {
                 this.OnChildrenFinished();
                 this.UpdateStatus(WorkflowState.FINISHED);
-                this.OnEvent -= _parent;
             }
-        }
-
-        protected void SendEvent(WorkflowState newEvent)
-        {
-            this.OnEvent?.Invoke(this, newEvent);
         }
 
         private void DebugState(string logmessage)
         {
             string debugtag = this.ID == null ? "<anonymous>" : this.ID; 
             //Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
+        }
+
+        public void ChildStateChanged(object child, WorkflowState newState)
+        {
+            throw new NotImplementedException();
         }
     }
 

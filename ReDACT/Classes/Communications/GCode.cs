@@ -87,8 +87,13 @@ namespace OpenDACT.Class_Files
             public static String READ_EEPROM { get { return "M205"; } }
             public static String SEND_EEPROM_VARIABLE(EEPROM_Variable variable)
             {
-                char typeletter = variable.Type == EEPROM_TYPE.FLOAT ? 'X' : 'S';
-                return (String.Format("M206 T{0} P{1} {2}{3}", (int)variable.Type, variable.Position, typeletter, variable.Value.ToString("F3")));
+                switch (variable.Type)
+                {
+                    case EEPROM_TYPE.FLOAT:
+                        return (String.Format("M206 T{0} P{1} X{3}", (int)variable.Type, variable.Position, variable.Value.ToString("F3")));
+                    default:
+                        return (String.Format("M206 T{0} P{1} S{3}", (int)variable.Type, variable.Position, ((int)variable.Value).ToString()));
+                }                
             }
             public static String MEASURE_HOME_STEPS { get { return ("M251"); } }
             public static String BEEP(int frequency, int duration) { return String.Format("M300 S{0} P{1}", frequency,duration); }

@@ -10,23 +10,20 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ReadEEPROMWF : Workflow
     {
-        private SerialManager serialSource;
+        private EEPROM EEPROM;
 
-        private EEPROM _eeprom;
-        public EEPROM EEPROM { get { return _eeprom; } private set { _eeprom = value; } }
-
-        public ReadEEPROMWF(SerialManager serialSource)
+        public ReadEEPROMWF(out EEPROM EEPROM)
         {
             this.ID = "ReadEEPROMWF";
-            this.serialSource = serialSource;
-            this.EEPROM = new EEPROM();
+            EEPROM = new EEPROM();
+            this.EEPROM = EEPROM;
         }
 
         protected override void OnStarted()
         {
             Debug.WriteLine("ReadEEPROMWF Started");            
             EEPROM.SetPending();
-            serialSource.WriteLine(GCode.Command.READ_EEPROM);
+            SerialSource.WriteLine(GCode.Command.READ_EEPROM);
         }
 
         protected override void OnMessage(string serialMessage)
