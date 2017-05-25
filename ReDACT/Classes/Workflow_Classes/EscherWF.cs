@@ -26,11 +26,12 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.AddWorkflowItem(new HomeWF(serialSource));
 
             ReadEEPROMWF eepReadResult = new ReadEEPROMWF(this.serialSource);
-            this.preparation = new EscherPrepareWF(eepReadResult, this.testData);
+            this.preparation = new EscherPrepareWF(eepReadResult, this);
             this.AddWorkflowItem(eepReadResult);
             this.AddWorkflowItem(preparation);
-            this.AddWorkflowItem(new EscherMeasureHeightsWF(this.serialSource, this.testData));
-            EscherCalculateWF parameterSource = new EscherCalculateWF(preparation, this.testData);
+            EscherMeasureHeightsWF heightsSource = new EscherMeasureHeightsWF(this.serialSource, this);
+            this.AddWorkflowItem(heightsSource);
+            EscherCalculateWF parameterSource = new EscherCalculateWF(preparation, heightsSource, this);
             this.AddWorkflowItem(parameterSource);
             this.AddWorkflowItem(new EscherUpdateEEPROMWF(serialSource, parameterSource, eepReadResult));
             
@@ -82,36 +83,40 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         internal class EscherCalculateWF : Workflow
         {
             EscherPrepareWF deltaParamsSource;
-            TestData testDataSource;
+            EscherMeasureHeightsWF heightSource;
             public DeltaParameters calculatedParameters;
+            EscherWF testDataSource;
 
-            public EscherCalculateWF(EscherPrepareWF deltaParamsSource, TestData testDataSource)
+            public EscherCalculateWF(EscherPrepareWF deltaParamsSource, EscherMeasureHeightsWF heightSource, EscherWF testDataSource)
             {
                 this.deltaParamsSource = deltaParamsSource;
+                this.heightSource = heightSource;
                 this.testDataSource = testDataSource;
             }
 
             protected override void OnStarted()
             {
-                this.calculatedParameters = Escher.Calc(this.deltaParamsSource.generatedParameters, this.testDataSource);
+                testDataSource.testData.TestPoints = heightSource.Heights;
+                this.calculatedParameters = Escher.Calc(this.deltaParamsSource.generatedParameters, testDataSource.testData);
             }
         }
 
         internal class EscherMeasureHeightsWF : Workflow
         {
             SerialManager serialSource;
-            TestData pointsSource;
+            EscherWF pointsSource;
             List<ProbeAtLocationWF> actionList;
-            public EscherMeasureHeightsWF(SerialManager serialSource, TestData pointSource)
+            public double[,] Heights;
+            public EscherMeasureHeightsWF(SerialManager serialSource, EscherWF pointsSource)
             {
                 this.serialSource = serialSource;
-                this.pointsSource = pointSource;
+                this.pointsSource = pointsSource;
                 this.actionList = new List<ProbeAtLocationWF>();
             }
 
             protected override void OnStarted()
             {
-                foreach(Position3D pos in HeightMap.FromArray2D(pointsSource.TestPoints))
+                foreach(Position3D pos in HeightMap.FromArray2D(pointsSource.testData.TestPoints))
                 {
                     ProbeAtLocationWF item = new ProbeAtLocationWF(serialSource, pos);
                     actionList.Add(item);
@@ -127,7 +132,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     Position3D result = new Position3D(wf.probePoint.X, wf.probePoint.Y, wf.Result);
                     Results.Add(result);
                 }
-                this.pointsSource.TestPoints = Results.ToArray2D();
+                Results.Normalize();
+                Heights = Results.ToArray2D();
             }
         }
 
@@ -135,8 +141,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             ReadEEPROMWF eepromSource;
             public DeltaParameters generatedParameters;
-            TestData targetData;
-            public EscherPrepareWF(ReadEEPROMWF eepRomSource, TestData targetData)
+            EscherWF targetData;
+            public EscherPrepareWF(ReadEEPROMWF eepRomSource, EscherWF targetData)
             {
                 this.ID = "EscherPrepareWF";
                 this.eepromSource = eepRomSource;
@@ -146,10 +152,10 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             protected override void OnStarted()
             {
                 double bedRadius = eepromSource.EEPROM[EEPROM_POSITION.printableRadius].Value;
-                double[,] testPoints = TestData.CalcProbePoints(targetData.NumPoints, bedRadius, eepromSource.EEPROM[EEPROM_POSITION.zProbeHeight].Value +5);
-                targetData.ApplySettings(bedRadius, testPoints);
+                double[,] testPoints = TestData.CalcProbePoints(targetData.testData.NumPoints, bedRadius, eepromSource.EEPROM[EEPROM_POSITION.zProbeHeight].Value +5);
+                targetData.testData.ApplySettings(bedRadius, testPoints);
                 generatedParameters = new DeltaParameters(
-                    targetData.Firmware,
+                    targetData.testData.Firmware,
                     this.eepromSource.EEPROM[EEPROM_POSITION.StepsPerMM].Value,
                     this.eepromSource.EEPROM[EEPROM_POSITION.diagonalRod].Value,
                     this.eepromSource.EEPROM[EEPROM_POSITION.HRadius].Value,

@@ -27,14 +27,22 @@ namespace ReDACT.Classes
             return new HeightMap(fromArray2D);
         }
 
+        public void Normalize()
+        {
+            for(int i=0; i< this.Count -1; i++)
+            {
+                this[i].Z = this[Count - 1].Z - this[i].Z;
+            }            
+        }
+
         public double[,] ToArray2D()
         {
             double[,] outArray = new double[this.Count, 3];
             for(int i=0; i< this.Count; i++)
             {
-                outArray[i, 0] = this.ElementAt(0).X;
-                outArray[i, 1] = this.ElementAt(0).Y;
-                outArray[i, 2] = this.ElementAt(0).Z;
+                outArray[i, 0] = this.ElementAt(i).X;
+                outArray[i, 1] = this.ElementAt(i).Y;
+                outArray[i, 2] = this.ElementAt(i).Z;
             }
             return outArray;
         }

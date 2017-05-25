@@ -124,7 +124,7 @@ namespace ReDACT.Classes
 
         public static double ComputeDerivative(DeltaParameters target, int deriv, double ha, double hb, double hc)
         {
-            var perturb = 0.2;          // perturbation amount in mm or degrees
+            var perturb = 0.2;          // perturbation amount in mm or degrees *****ORIGINALLY .2 -cg
             var hiParams = new DeltaParameters(target.firmware, target.stepspermm, target.diagonal, target.radius, target.homedHeight, target.xstop, target.ystop, target.zstop, target.xadj, target.yadj, target.zadj);
             var loParams = new DeltaParameters(target.firmware, target.stepspermm, target.diagonal, target.radius, target.homedHeight, target.xstop, target.ystop, target.zstop, target.xadj, target.yadj, target.zadj);
             switch (deriv)

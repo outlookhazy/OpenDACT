@@ -42,6 +42,7 @@ namespace ReDACT
             comboBoxFactors.SelectedItem = Escher.NumFactors.SEVEN;
 
             mainWorkflow = new Workflow();
+            
 
             comboBoxSerial.ItemsSource = SerialPort.GetPortNames();
             if(comboBoxSerial.Items.Count > 0)
@@ -57,17 +58,27 @@ namespace ReDACT
 
             this.serialManager = new SerialManager();
             this.serialManager.SerialConnectionChanged += SerialManager_SerialConnectionChanged;
-            this.serialManager.NewSerialLine += SerialManager_NewSerialLine;
-
-            oxyPlotView.Model = new OxyPlot.PlotModel();
-            oxyPlotView.Model.Title = "Test";
+            this.serialManager.NewSerialInLine += SerialManager_NewSerialLine;
+            this.serialManager.NewSerialOutLine += SerialManager_NewSerialOutLine;
             
         }
 
-
+        private void SerialManager_NewSerialOutLine(object sender, string data)
+        {
+            textboxSerial.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                textboxSerial.Text += "=>" + data + "\n";
+                textboxSerial.ScrollToEnd();
+            }));
+        }
 
         private void SerialManager_NewSerialLine(object sender, string data)
         {
+            textboxSerial.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                textboxSerial.Text += "<=" + data + "\n";
+                textboxSerial.ScrollToEnd();
+            }));
             mainWorkflow.RouteMessage(data);
         }
 
@@ -92,9 +103,22 @@ namespace ReDACT
 
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
+            this.continuecount = 100;
             TestData calibrationTestData = new TestData((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (Escher.NumFactors)comboBoxFactors.SelectedItem,true);
             mainWorkflow.AddWorkflowItem(new EscherWF(serialManager,calibrationTestData));
-            mainWorkflow.Start();            
+            mainWorkflow.Start(calibrationcomplete);            
+        }
+        int continuecount;
+        private void calibrationcomplete(object sender, WorkflowState newState)
+        {
+            this.continuecount--;
+            if(continuecount > 0)
+            {
+                TestData calibrationTestData = new TestData((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (Escher.NumFactors)comboBoxFactors.SelectedItem, true);
+                mainWorkflow.AddWorkflowItem(new EscherWF(serialManager, calibrationTestData));
+                mainWorkflow.Start(calibrationcomplete);
+            }
+
         }
 
         private void buttonConnect_Click(object sender, RoutedEventArgs e)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace OpenDACT.Class_Files
 {
@@ -21,7 +22,8 @@ namespace OpenDACT.Class_Files
         public ConnectionState CurrentState { get; private set; }
 
         public event SerialConnectionChangedEventHandler SerialConnectionChanged;
-        public event NewSerialLineEventHandler NewSerialLine;
+        public event NewSerialLineEventHandler NewSerialInLine;
+        public event NewSerialLineEventHandler NewSerialOutLine;
 
         public bool closePending = false;
 
@@ -85,8 +87,9 @@ namespace OpenDACT.Class_Files
         public bool WriteLine(string text)
         {
             if (this.CurrentState == ConnectionState.Connected)
-            {
+            {                
                 this._port.WriteLine(text);
+                this.OnNewOutLine(text);
                 return true;
             }else
             {
@@ -158,14 +161,19 @@ namespace OpenDACT.Class_Files
             {
                 while(_readQueue.Count > 0)
                 {
-                    this.OnNewLine(_readQueue.Dequeue());
+                    this.OnNewInLine(_readQueue.Dequeue());
                 }
             }
         }
 
-        protected virtual void OnNewLine(string e)
+        protected virtual void OnNewInLine(string e)
         {            
-            NewSerialLine?.Invoke(this, String.Copy(e));
+            NewSerialInLine?.Invoke(this, String.Copy(e));
+        }
+
+        protected virtual void OnNewOutLine(string e)
+        {
+            NewSerialOutLine?.Invoke(this, String.Copy(e));
         }
 
         protected virtual void OnConnectionStateChanged(ConnectionState e)

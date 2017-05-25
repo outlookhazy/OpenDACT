@@ -18,10 +18,9 @@
         <Label Content="Firmware&#xD;&#xA;" HorizontalAlignment="Left" Margin="332,10,0,0" VerticalAlignment="Top" Height="22" FontSize="10"/>
         <Label Content="Factors" HorizontalAlignment="Left" Margin="332,37,0,0" VerticalAlignment="Top" Height="22" FontSize="10"/>
         <Label Content="Points" HorizontalAlignment="Left" Margin="332,64,0,0" VerticalAlignment="Top" Height="22" FontSize="10"/>
-        <Slider x:Name="sliderNumPoints" HorizontalAlignment="Left" Margin="387,68,0,0" VerticalAlignment="Top" Width="120" Minimum="7" Maximum="20" SmallChange="1" TickPlacement="BottomRight" Value="7" ValueChanged="Slider_ValueChanged" IsSnapToTickEnabled="True"/>
+        <Slider x:Name="sliderNumPoints" HorizontalAlignment="Left" Margin="387,68,0,0" VerticalAlignment="Top" Width="120" Minimum="7" SmallChange="1" TickPlacement="BottomRight" Value="7" ValueChanged="Slider_ValueChanged" IsSnapToTickEnabled="True"/>
         <Label x:Name="labelPointsSlider" Content="7" HorizontalAlignment="Left" Margin="432,91,0,0" VerticalAlignment="Top" Height="22" FontSize="10"/>
-
-        <oxy:PlotView x:Name="oxyPlotView" Margin="10,111,185,10"/>
+        <TextBox x:Name="textboxSerial" HorizontalAlignment="Left" Height="203" Margin="10,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="257" VerticalScrollBarVisibility="Visible"/>
 
 
 

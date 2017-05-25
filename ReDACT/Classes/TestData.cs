@@ -12,7 +12,7 @@ namespace ReDACT.Classes
     {
         public int NumPoints { get; private set; }
         public NumFactors NumFactors { get; private set; }
-        public double[,] TestPoints { get;  set; }
+        public double[,] TestPoints;
         public bool Normalize { get; private set; }
         public double BedRadius { get; private set; }
 
@@ -22,7 +22,7 @@ namespace ReDACT.Classes
         {
             if ((int)numfactors > numpoints)
                 throw new Exception("Error: need at least as many points as factors you want to calibrate");
-            this.Firmware = Firmware;
+            this.Firmware = firmware;
             this.NumPoints = numpoints;
             this.NumFactors = numfactors;
             
