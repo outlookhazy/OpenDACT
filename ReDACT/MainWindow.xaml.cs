@@ -112,6 +112,7 @@ namespace ReDACT
 
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
+            Chart.Clear();
             TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
             mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
             mainWorkflow.Start(this);
@@ -142,8 +143,7 @@ namespace ReDACT
         {
             if (labelPointsSlider == null)
                 return;
-            labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));
-            
+            labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));            
         }
 
         private void comboBoxFactors_SelectionChanged(object sender, SelectionChangedEventArgs e)

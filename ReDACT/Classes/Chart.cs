@@ -17,8 +17,11 @@ namespace ReDACT.Classes
         private LinkedList<ChartData> Data;
         private volatile bool updatePending = false;
         private double BaseScale = .1;
-        private double PointScale = 1.5;
+        private double PointScale = 2;
         private double LineScale = 1;
+        private object listlock = new object();
+        public int MaxDataPoints = 0;
+        private ulong sequenceCount = 0;
 
         public Chart(Canvas targetCanvas)
         {
@@ -28,19 +31,41 @@ namespace ReDACT.Classes
 
         public void AddData(double X, double Y)
         {
-            Data.AddLast(new ChartData(X, Y));
+            lock (listlock)
+            {
+                Data.AddLast(new ChartData(X, Y));
+            }
+            Trim();
             tryUpdate();
         }
 
         public void AddSequential(double Y)
-        {
-            Data.AddLast(new ChartData(Data.Count, Y));
+        {            
+            this.AddData(sequenceCount, Y);
+            sequenceCount++;
+            Trim();
             tryUpdate();
+        }
+
+        private void Trim()
+        {
+            if(MaxDataPoints != 0)
+            {
+                lock (listlock)
+                {
+                    while (Data.Count > MaxDataPoints)
+                        Data.RemoveFirst();
+                }
+            }
         }
 
         public void Clear()
         {
-            Data.Clear();
+            lock (listlock)
+            {
+                Data.Clear();
+                sequenceCount = 0;
+            }
             tryUpdate();
         }
 
@@ -58,60 +83,114 @@ namespace ReDACT.Classes
 
         void updateGraph()
         {
-            targetCanvas.Children.Clear();
-            if (Data.Count == 0)
-                return;
-
-            double yMin = SeriesMinY();
-            double yMax = SeriesMaxY();
-            double yRange = yMax - yMin;
-            double yPadding = .2 * yRange;
-
-            yMin -= yPadding;
-            yMax += yPadding;
-
-            double xMin = SeriesMinX();
-            double xMax = SeriesMaxX();
-            double xRange = xMax - xMin;
-            double xPadding = .2 * xRange;
-
-            xMin -= xPadding;
-            xMax += xPadding;
-
-            double ElementSizeBase = BaseScale * targetCanvas.Height;
-
-            LinkedListNode<ChartData> CurrentNode = Data.First;
-
-            while(CurrentNode.Next != null)
+            lock (listlock)
             {
-                Ellipse datapoint = new Ellipse()
-                {
-                    ToolTip = CurrentNode.Value,
-                    Width = ElementSizeBase * PointScale,
-                    Height = ElementSizeBase * PointScale,
-                    Fill = Brushes.Green
-                };
-                
-                Canvas.SetRight(datapoint, Conversion.scale(CurrentNode.Value.X, xMin, xMax, 0, targetCanvas.Width) + (datapoint.Width/2));
-                Canvas.SetBottom(datapoint, Conversion.scale(CurrentNode.Value.Y, yMin, yMax, targetCanvas.Height, 0) + (datapoint.Width / 2));
+                targetCanvas.Children.Clear();
+                if (Data.Count == 0)
+                    return;
 
-                Line dataline = new Line()
-                {
-                    ToolTip = String.Format("{0} -> {1}", CurrentNode.Value, CurrentNode.Next.Value),
-                    X1 = Conversion.scale(CurrentNode.Value.X, xMin, xMax, 0, targetCanvas.Width),
-                    X2 = Conversion.scale(CurrentNode.Next.Value.X, xMin, xMax, 0, targetCanvas.Width),
-                    Y1 = Conversion.scale(CurrentNode.Value.Y, yMin, yMax, targetCanvas.Height, 0),
-                    Y2 = Conversion.scale(CurrentNode.Next.Value.Y, yMin, yMax, targetCanvas.Height, 0),
-                    Stroke = Brushes.LimeGreen,
-                    StrokeThickness = ElementSizeBase * LineScale
-                };
-                
-                targetCanvas.Children.Add(dataline);
-                targetCanvas.Children.Add(datapoint);
+                targetCanvas.Visibility = System.Windows.Visibility.Hidden;
 
-                CurrentNode = CurrentNode.Next;
+                double yMin = SeriesMinY();
+                double yMax = SeriesMaxY();
+                double yRange = yMax - yMin;
+
+                double xMin = SeriesMinX();
+                double xMax = SeriesMaxX();
+                double xRange = xMax - xMin;
+
+                double ElementSizeBase = BaseScale * yMax;
+
+                LinkedListNode<ChartData> CurrentNode = Data.First;
+
+                TextBlock yMinText = new TextBlock();
+                yMinText.Foreground = Brushes.White;
+                yMinText.Text = yMin.ToString("F4");
+                Canvas.SetRight(yMinText, .91 * targetCanvas.Width);
+                Canvas.SetBottom(yMinText, .1 * targetCanvas.Height);
+                targetCanvas.Children.Add(yMinText);
+
+                TextBlock yMaxText = new TextBlock();
+                yMaxText.Foreground = Brushes.White;
+                yMaxText.Text = yMax.ToString("F4");
+                Canvas.SetRight(yMaxText, .91 * targetCanvas.Width);
+                Canvas.SetTop(yMaxText, .1 * targetCanvas.Height);
+                targetCanvas.Children.Add(yMaxText);
+
+                TextBlock xMinText = new TextBlock();
+                xMinText.Foreground = Brushes.White;
+                xMinText.Text = xMin.ToString("F4");
+                xMinText.RenderTransform = new RotateTransform(90);
+                Canvas.SetLeft(xMinText, .11 * targetCanvas.Width);
+                Canvas.SetTop(xMinText, .91 * targetCanvas.Height);
+                targetCanvas.Children.Add(xMinText);
+
+                TextBlock xMaxText = new TextBlock();
+                xMaxText.Foreground = Brushes.White;
+                xMaxText.Text = xMax.ToString("F4");
+                xMaxText.RenderTransform = new RotateTransform(90);
+                Canvas.SetLeft(xMaxText, .9 * targetCanvas.Width);
+                Canvas.SetTop(xMaxText, .91 * targetCanvas.Height);
+                targetCanvas.Children.Add(xMaxText);
+
+                Line xAxis = new Line()
+                {
+                    Stroke = Brushes.Red,
+                    StrokeThickness = ElementSizeBase * LineScale,
+                    X1 = .1 * targetCanvas.Width,
+                    X2 = .9 * targetCanvas.Width,
+                    Y1 = .9 * targetCanvas.Height,
+                    Y2 = .9 * targetCanvas.Height
+                };
+                targetCanvas.Children.Add(xAxis);
+
+                Line yAxis = new Line()
+                {
+                    Stroke = Brushes.Red,
+                    StrokeThickness = ElementSizeBase * LineScale,
+                    X1 = .1 * targetCanvas.Width,
+                    X2 = .1 * targetCanvas.Width,
+                    Y1 = .1 * targetCanvas.Height,
+                    Y2 = .9 * targetCanvas.Height
+                };
+                targetCanvas.Children.Add(yAxis);
+
+
+                while (CurrentNode.Next != null)
+                {
+                    Ellipse datapoint = new Ellipse()
+                    {
+                        ToolTip = CurrentNode.Value,
+                        Width = ElementSizeBase * PointScale,
+                        Height = ElementSizeBase * PointScale,
+                        Fill = Brushes.Yellow,
+                        Opacity = .8
+
+                    };
+
+                    Canvas.SetLeft(datapoint, Conversion.scale(CurrentNode.Value.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width) - (datapoint.Width / 2));
+                    Canvas.SetTop(datapoint, Conversion.scale(CurrentNode.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height) - (datapoint.Width / 2));
+
+                    Line dataline = new Line()
+                    {
+                        ToolTip = String.Format("{0} -> {1}", CurrentNode.Value, CurrentNode.Next.Value),
+                        X1 = Conversion.scale(CurrentNode.Value.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width),
+                        X2 = Conversion.scale(CurrentNode.Next.Value.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width),
+                        Y1 = Conversion.scale(CurrentNode.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height),
+                        Y2 = Conversion.scale(CurrentNode.Next.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height),
+                        Stroke = Brushes.LimeGreen,
+                        StrokeThickness = ElementSizeBase * LineScale, 
+                        Opacity = .8
+                    };
+
+                    targetCanvas.Children.Add(dataline);
+                    targetCanvas.Children.Add(datapoint);
+
+                    CurrentNode = CurrentNode.Next;
+                }
             }
-            updatePending = false;
+            targetCanvas.Visibility = System.Windows.Visibility.Visible;
+            updatePending = false;            
         }
 
         double SeriesMinY()
