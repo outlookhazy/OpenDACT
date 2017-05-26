@@ -39,7 +39,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
         public void Start(IWorkflowParent parent)
-        {            
+        {
+            this.TimeMetric.Restart();
             this._parent = parent;
             this.SerialSource = parent.SerialSource;
 
