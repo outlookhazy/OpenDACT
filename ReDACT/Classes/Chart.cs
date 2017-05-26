@@ -108,6 +108,8 @@ namespace ReDACT.Classes
                 
                 targetCanvas.Children.Add(dataline);
                 targetCanvas.Children.Add(datapoint);
+
+                CurrentNode = CurrentNode.Next;
             }
             updatePending = false;
         }

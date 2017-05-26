@@ -125,7 +125,7 @@ namespace ReDACT
             else
                 this.continuecount--;
 
-            labelIteration.Dispatcher.BeginInvoke(new Action(() => { labelIteration.Content = String.Format("({0})", newCount); }));
+            labelIteration.Dispatcher.BeginInvoke(new Action(() => { labelIteration.Content = String.Format("({0})", this.continuecount); }));
             return this.continuecount > 0;
         }
 
