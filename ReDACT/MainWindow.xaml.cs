@@ -157,10 +157,15 @@ namespace ReDACT
         }
 
         
-        public void ChildStateChanged(object child, WorkflowState newState)
+        public void ChildStateChanged(Workflow child, WorkflowState newState)
         {
             if (newState != WorkflowState.FINISHED)
                 return;
+
+            TimeSpan ellapsed = child.Ellapsed;
+            int remaining = this.continuecount - 1;
+            TimeSpan ETA = new TimeSpan(0,0,0,0, Convert.ToInt32(ellapsed.TotalMilliseconds * remaining));
+            Debug.WriteLine(String.Format("Finished in {0}, {1} iterations remain (ETA {3})",ellapsed.ToString(),remaining, ETA));
 
             Chart.AddSequential(EscherWF.Result.DeviationBefore);
             if (Continue())

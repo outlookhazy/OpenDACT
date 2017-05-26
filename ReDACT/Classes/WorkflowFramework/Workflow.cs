@@ -10,7 +10,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public interface IWorkflowParent
     {
-        void ChildStateChanged(object child, WorkflowState newState);
+        void ChildStateChanged(Workflow child, WorkflowState newState);
         SerialManager SerialSource { get; set; }
     }
 
@@ -24,6 +24,9 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         public string ID { get; set; }
         public SerialManager SerialSource { get; set; }
 
+        private Stopwatch TimeMetric = new Stopwatch();
+        public TimeSpan Ellapsed { get { return this.TimeMetric.Elapsed; } }
+
         public Workflow(SerialManager serialSource = null)
         {
             this.SerialSource = serialSource;
@@ -36,7 +39,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
         public void Start(IWorkflowParent parent)
-        {
+        {            
             this._parent = parent;
             this.SerialSource = parent.SerialSource;
 
@@ -95,9 +98,13 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
         protected void UpdateStatus(WorkflowState newStatus)
-        {
+        {            
             if (this.status == newStatus)
                 return;
+
+            if (newStatus == WorkflowState.FINISHED || newStatus == WorkflowState.ABORTED)
+                TimeMetric.Stop();
+
             this.DebugState("Status updated to " + newStatus);
             this.Status = newStatus;
             this._parent.ChildStateChanged(this, newStatus);
@@ -180,7 +187,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             //Debug.WriteLine(String.Format("(WDBG {0}): {1}", debugtag, logmessage));
         }
 
-        public void ChildStateChanged(object child, WorkflowState newState)
+        public void ChildStateChanged(Workflow child, WorkflowState newState)
         {
             switch (newState)
             {
