@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static OpenDACT.Class_Files.GCode;
+using static OpenDACT.Class_Files.Workflow_Classes.EscherWF.EscherMeasureHeightsWF;
 
 namespace OpenDACT.Class_Files.Workflow_Classes
 {
     public class ProbeWF : Workflow
     {
-        private double Result;
+        private onMeasureResult measureDone;
+        private int IDProbe;
 
-        public ProbeWF(ref double Result)
+        public ProbeWF(onMeasureResult onDone, int ProbeID = 0)
         {
-            this.Result = Result;
+            this.measureDone = onDone;
+            this.IDProbe = ProbeID;
         }
 
         protected override void OnStarted()
         {
-            this.ID = "ProbeWF";
+            this.ID = String.Format("ProbeWF<{0}>",this.IDProbe);
             SerialSource.WriteLine(GCode.Command.PROBE);
         }
 
@@ -27,12 +31,9 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             float value = GCode.ParseZProbe(serialMessage);
             if (value != 1000)
             {
-                this.Result = value;
+                this.measureDone(value, this.IDProbe);
                 this.FinishOrAdvance();
-            } else
-            {
-                this.Abort();
-            }
+            } 
         }
     }
 }

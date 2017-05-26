@@ -90,9 +90,9 @@ namespace OpenDACT.Class_Files
                 switch (variable.Type)
                 {
                     case EEPROM_TYPE.FLOAT:
-                        return (String.Format("M206 T{0} P{1} X{3}", (int)variable.Type, variable.Position, variable.Value.ToString("F3")));
+                        return (String.Format("M206 T{0} P{1} X{2}", (int)variable.Type, variable.Position, variable.Value.ToString("F3")));
                     default:
-                        return (String.Format("M206 T{0} P{1} S{3}", (int)variable.Type, variable.Position, ((int)variable.Value).ToString()));
+                        return (String.Format("M206 T{0} P{1} S{2}", (int)variable.Type, variable.Position, ((int)variable.Value).ToString()));
                 }                
             }
             public static String MEASURE_HOME_STEPS { get { return ("M251"); } }

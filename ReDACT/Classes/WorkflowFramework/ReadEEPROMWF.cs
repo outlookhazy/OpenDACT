@@ -20,8 +20,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
         protected override void OnStarted()
-        {
-            Debug.WriteLine("ReadEEPROMWF Started");            
+        {     
             EEPROM.SetPending();
             SerialSource.WriteLine(GCode.Command.READ_EEPROM);
         }
@@ -32,7 +31,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             if (parsed.Type != EEPROM_POSITION.INVALID)
                 this.EEPROM[parsed.Type].Value = parsed.Value;
 
-            if (EEPROM.ReadComplete())
+            if (EEPROM.ReadComplete() && serialMessage.Contains("wait"))
                 this.FinishOrAdvance();
         }
     }

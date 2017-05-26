@@ -48,21 +48,6 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.DebugState("Start complete");
         }
 
-        private void Workflow_OnChildStateChange(object sender, WorkflowState newState)
-        {
-            switch (newState)
-            {
-                case WorkflowState.FINISHED:
-                    this.DebugState("Child finished");
-                    this.FinishOrAdvance();
-                    break;
-                case WorkflowState.ABORTED:
-                    this.DebugState("Child aborted");
-                    this.Abort();
-                    break;
-            }
-        }
-
         protected virtual void OnStarted()
         {
             this.ID = "DefaultWF";
@@ -111,6 +96,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected void UpdateStatus(WorkflowState newStatus)
         {
+            if (this.status == newStatus)
+                return;
             this.DebugState("Status updated to " + newStatus);
             this.Status = newStatus;
             this._parent.ChildStateChanged(this, newStatus);
@@ -195,7 +182,17 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         public void ChildStateChanged(object child, WorkflowState newState)
         {
-            throw new NotImplementedException();
+            switch (newState)
+            {
+                case WorkflowState.FINISHED:
+                    this.DebugState("Child finished");
+                    this.FinishOrAdvance();
+                    break;
+                case WorkflowState.ABORTED:
+                    this.DebugState("Child aborted");
+                    this.Abort();
+                    break;
+            }
         }
     }
 

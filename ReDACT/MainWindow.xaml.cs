@@ -1,7 +1,5 @@
 ﻿using OpenDACT.Class_Files;
 using OpenDACT.Class_Files.Workflow_Classes;
-using OxyPlot;
-using OxyPlot.Series;
 using ReDACT.Classes;
 using ReDACT.Classes.Escher;
 using System;
@@ -24,15 +22,21 @@ using static ReDACT.Classes.Escher.DParameters;
 
 namespace ReDACT
 {
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window, IWorkflowParent
     {
-        public SerialManager SerialSource { get; set; }
+        
+
+
+
+    public SerialManager SerialSource { get; set; }
         Workflow mainWorkflow;
-        LineSeries ls;
-        List<DataPoint> points = new List<DataPoint>();
+
+        Chart Chart;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -61,6 +65,7 @@ namespace ReDACT
 
             mainWorkflow = new Workflow(this.SerialSource);
 
+            Chart = new Chart(dataCanvas);
         }
 
         private void SerialManager_NewSerialOutLine(object sender, string data)
@@ -106,12 +111,8 @@ namespace ReDACT
             this.continuecount = 100;
             TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
             mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
-            mainWorkflow.Start(this);            
+            mainWorkflow.Start(this);
         }
-
-        
-
-        
 
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
         {
@@ -121,11 +122,14 @@ namespace ReDACT
                 SerialSource.Connect(this.comboBoxSerial.SelectedItem.ToString(),  int.Parse(this.comboBoxBaud.Text));
         }
 
+        int count = 0;
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (labelPointsSlider == null)
                 return;
             labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));
+            Chart.Data.Add(new ChartData(count, sliderNumPoints.Value));
+            count++;
         }
 
         private void comboBoxFactors_SelectionChanged(object sender, SelectionChangedEventArgs e)

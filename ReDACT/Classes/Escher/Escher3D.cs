@@ -87,8 +87,8 @@ namespace ReDACT.Classes
                     break;
             }
 
-            Recalc(hiParams);
-            Recalc(loParams);
+            hiParams.Recalc();
+            loParams.Recalc();
 
             var zHi = Escher3D.InverseTransform((deriv == 0) ? ha + perturb : ha, (deriv == 1) ? hb + perturb : hb, (deriv == 2) ? hc + perturb : hc, hiParams);
             var zLo = Escher3D.InverseTransform((deriv == 0) ? ha - perturb : ha, (deriv == 1) ? hb - perturb : hb, (deriv == 2) ? hc - perturb : hc, loParams);
@@ -96,34 +96,7 @@ namespace ReDACT.Classes
             return (zHi - zLo) / (2 * perturb);
         }
 
-        public static void Recalc(DParameters machine)
-        {
-            machine.towerX = new double[3];
-            machine.towerY = new double[3];
-            machine.towerX[0] = (-(machine.radius * Math.Cos((30 + machine.xadj) * Escher3D.degreesToRadians)));
-            machine.towerY[0] = (-(machine.radius * Math.Sin((30 + machine.xadj) * Escher3D.degreesToRadians)));
-            machine.towerX[1] = (+(machine.radius * Math.Cos((30 - machine.yadj) * Escher3D.degreesToRadians)));
-            machine.towerY[1] = (-(machine.radius * Math.Sin((30 - machine.yadj) * Escher3D.degreesToRadians)));
-            machine.towerX[2] = (-(machine.radius * Math.Sin(machine.zadj * Escher3D.degreesToRadians)));
-            machine.towerY[2] = (+(machine.radius * Math.Cos(machine.zadj * Escher3D.degreesToRadians)));
-
-            machine.Xbc = machine.towerX[2] - machine.towerX[1];
-            machine.Xca = machine.towerX[0] - machine.towerX[2];
-            machine.Xab = machine.towerX[1] - machine.towerX[0];
-            machine.Ybc = machine.towerY[2] - machine.towerY[1];
-            machine.Yca = machine.towerY[0] - machine.towerY[2];
-            machine.Yab = machine.towerY[1] - machine.towerY[0];
-            machine.coreFa = Escher3D.fsquare(machine.towerX[0]) + Escher3D.fsquare(machine.towerY[0]);
-            machine.coreFb = Escher3D.fsquare(machine.towerX[1]) + Escher3D.fsquare(machine.towerY[1]);
-            machine.coreFc = Escher3D.fsquare(machine.towerX[2]) + Escher3D.fsquare(machine.towerY[2]);
-            machine.Q = 2 * (machine.Xca * machine.Yab - machine.Xab * machine.Yca);
-            machine.Q2 = Escher3D.fsquare(machine.Q);
-            machine.D2 = Escher3D.fsquare(machine.diagonal);
-
-            // Calculate the base carriage height when the printer is homed.
-            var tempHeight = machine.diagonal;     // any sensible height will do here, probably even zero
-            machine.homedCarriageHeight = machine.homedHeight + tempHeight - Escher3D.InverseTransform(tempHeight, tempHeight, tempHeight, machine);
-        }
+        
 
         public static void NormaliseEndstopAdjustments(DParameters machine)
         {
@@ -164,7 +137,7 @@ namespace ReDACT.Classes
                     }
                 }
 
-                Recalc(machine);
+                machine.Recalc();
             }
 
             // Adjusting the diagonal and the tower positions affects the homed carriage height.
@@ -199,12 +172,12 @@ namespace ReDACT.Classes
             return rslt;
         }
 
-        public static CalibrationResult calc(DParameters machine, TParameters data)
+        public static CalibrationResult calc(ref DParameters machine, ref TParameters data)
         {
             convertIncomingEndstops(machine);
             try
             {
-                var rslt = DoDeltaCalibration(machine, data);
+                var rslt = DoDeltaCalibration(ref machine, ref data);
                 convertOutgoingEndstops(machine);
                 Console.WriteLine(String.Format("Success! {0}", rslt));
                 return rslt;
@@ -215,7 +188,7 @@ namespace ReDACT.Classes
             }           
         }
 
-        private static CalibrationResult DoDeltaCalibration(DParameters machine, TParameters data)
+        private static CalibrationResult DoDeltaCalibration(ref DParameters machine, ref TParameters data)
         {
             if (data.numFactors != 3 && data.numFactors != 4 && data.numFactors != 6 && data.numFactors != 7)
             {

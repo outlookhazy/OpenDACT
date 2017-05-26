@@ -18,6 +18,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         protected override void OnStarted()
         {
             SerialSource.WriteLine(GCode.Command.HOME);
+            SerialSource.WriteLine(GCode.Command.WAIT_MOVES_COMPLETE);
         }
 
         protected override void OnMessage(string serialMessage)
