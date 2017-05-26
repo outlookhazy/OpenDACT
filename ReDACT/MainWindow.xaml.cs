@@ -112,10 +112,21 @@ namespace ReDACT
 
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
-            this.continuecount = 0;
             TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
             mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
             mainWorkflow.Start(this);
+            Continue(int.Parse(textBoxIterations.Text));
+        }
+
+        private bool Continue(int? newCount = null)
+        {
+            if (newCount != null)
+                this.continuecount = (int)newCount;
+            else
+                this.continuecount--;
+
+            labelIteration.Dispatcher.BeginInvoke(new Action(() => { labelIteration.Content = String.Format("({0})", newCount); }));
+            return this.continuecount > 0;
         }
 
         private void buttonConnect_Click(object sender, RoutedEventArgs e)
@@ -147,15 +158,14 @@ namespace ReDACT
                 sliderNumPoints.Value = sliderNumPoints.Minimum;
         }
 
-        int continuecount=101;
+        int continuecount;
         public void ChildStateChanged(object child, WorkflowState newState)
         {
-            if (newState != WorkflowState.FINISHED || continuecount == 101)
+            if (newState != WorkflowState.FINISHED)
                 return;
 
-            this.continuecount++;
-            Chart.Data.Add(new ChartData(continuecount, EscherWF.Result.DeviationBefore));
-            if (continuecount < 100)
+            Chart.AddSequential(EscherWF.Result.DeviationBefore);
+            if (Continue())
             {
                 Dispatcher.BeginInvoke(new Action(() => { 
                 TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);

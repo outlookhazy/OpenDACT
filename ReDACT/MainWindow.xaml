@@ -38,6 +38,13 @@
                 <Canvas Background="Black" Name="GraphDisplay"  Width="1280" Height="720" ClipToBounds="True"/>
             </Viewbox>
         </Border>
+        <GroupBox Grid.Column="2" Header="Iterations" Margin="0,0,90,0" HorizontalAlignment="Right" Grid.Row="4" VerticalAlignment="Center" Width="104">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" FlowDirection="RightToLeft">
+                <Label x:Name="labelIteration" Content="(100)" Margin="0,0,8,0" Padding="0" HorizontalAlignment="Right" FontSize="10" FontStyle="Italic" Foreground="SlateGray" VerticalAlignment="Center"/>
+                <TextBox x:Name="textBoxIterations" Text="100" TextAlignment="Center"  Width="50" />                
+            </StackPanel>
+
+        </GroupBox>
 
 
 
