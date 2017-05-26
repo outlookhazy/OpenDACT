@@ -17,6 +17,8 @@ namespace ReDACT.Classes.Escher
         internal double[] zBedProbePoints;
         internal bool normalise;
         internal Firmware firmware;
+        internal static bool overfitPrevention = true;
+        internal static Random randomSource = new Random(Guid.NewGuid().GetHashCode());
 
         internal double probeHeight;
 
@@ -33,26 +35,104 @@ namespace ReDACT.Classes.Escher
             xBedProbePoints = new double[numPoints];
             yBedProbePoints = new double[numPoints];
             zBedProbePoints = new double[numPoints];
+            double middleRadius = (2 / 3.0) * bedRadius;
+            double insideRadius = (1 / 3.0) * bedRadius;
+            int numRingPoints = numPoints - 1;
 
-            for (int i = 0; i < numPoints - 1; i++)
+            bool inside = false;
+            bool middle = false;            
+
+            if (numRingPoints > 6)
             {
-                if (i % 2 == 0)//even
-                {
-                    xBedProbePoints[i] = PointOnCircleX(bedRadius, i * (360.0 / (numPoints - 1)) - 180);
-                    yBedProbePoints[i] = PointOnCircleY(bedRadius, i * (360.0 / (numPoints - 1)) - 180);
-                } else//odd
-                {
-                    xBedProbePoints[i] = PointOnCircleX(bedRadius/2, i * (360.0 / (numPoints - 1)) - 180);
-                    yBedProbePoints[i] = PointOnCircleY(bedRadius/2, i * (360.0 / (numPoints - 1)) - 180);
-                }
-                zBedProbePoints[i] = 0;
-            }            
+                middle = true;
+                if (numRingPoints > 12)
+                    inside = true;                
+            }
 
-            xBedProbePoints[numPoints - 1] = 0;
-            yBedProbePoints[numPoints - 1] = 0;
-            zBedProbePoints[numPoints - 1] = 0;
+            int insidePoints = 0;
+            int middlePoints = 0;
+
+            if (middle)
+            {
+                if (inside)
+                {
+                    insidePoints = (int)((1 / 6.0) * numRingPoints);
+                    middlePoints = (int)((1 / 3.0) * numRingPoints);
+                }
+                else
+                {
+                    middlePoints = (int)(numRingPoints/12 + (numRingPoints % 6));
+                }
+            }
+
+
+            int index = 0;
+
+            int outsidePoints = numRingPoints - insidePoints - middlePoints;
+            double[,] outerRing = calcPoints(bedRadius, outsidePoints);
+            for (int i = 0; i < outsidePoints; i++)
+            {
+                xBedProbePoints[index] = outerRing[i, 0];
+                yBedProbePoints[index] = outerRing[i, 1];
+                zBedProbePoints[index] = 0;
+                index++;
+            }
+
+            if (middle)
+            {
+                double[,] middleRing = calcPoints(middleRadius, middlePoints, 45);
+                for (int i = 0; i < middlePoints; i++)
+                {
+                    xBedProbePoints[index] = middleRing[i, 0];
+                    yBedProbePoints[index] = middleRing[i, 1];
+                    zBedProbePoints[index] = 0;
+                    index++;
+                }
+            }
+
+            if (inside)
+            {
+                double[,] innerRing = calcPoints(insideRadius, insidePoints);
+                for (int i = 0; i < insidePoints; i++)
+                {
+                    xBedProbePoints[index] = innerRing[i, 0];
+                    yBedProbePoints[index] = innerRing[i, 1];
+                    zBedProbePoints[index] = 0;
+                    index++;
+                }
+            }
+
+            //center
+            xBedProbePoints[index] = 0;
+            yBedProbePoints[index] = 0;
+            zBedProbePoints[index] = 0;
+
+            Console.WriteLine("#,X,Y,Z");
+            for(int i=0; i<numPoints; i++)
+            {
+                Console.WriteLine(String.Format("{0},{1},{2},{3}", i, xBedProbePoints[i], yBedProbePoints[i], zBedProbePoints[i]));
+            }
 
             Debug.WriteLine("Done");
+        }
+
+        public static double[,] calcPoints(double radius, int number, double offsetDegrees = 0)
+        {
+            double[,] points = new double[number,2];
+            double degreesPerPoint = 360 / number;
+
+            if (overfitPrevention)
+            {
+                offsetDegrees += randomSource.NextDouble() * 360.0;
+            }
+
+            for (int i = 0; i < number; i++)
+            {
+                double degrees = (i * degreesPerPoint) + offsetDegrees;
+                points[i,0] = PointOnCircleX(radius, degrees);
+                points[i,1] = PointOnCircleY(radius, degrees);
+            }
+            return points;
         }
 
         public static double PointOnCircleX(double radius, double angleInDegrees)
@@ -69,7 +149,7 @@ namespace ReDACT.Classes.Escher
             return y;
         }
 
-        public void calcProbePointsX(double bedRadius)
+        public void calcProbePointsOriginal(double bedRadius)
         {
             xBedProbePoints = new double[numPoints];
             yBedProbePoints = new double[numPoints];
@@ -118,11 +198,11 @@ namespace ReDACT.Classes.Escher
             }
         }
 
-        internal void NormalizeProbePoints()
+        internal void NormalizeProbePoints(double? withValue = null)
         {
             int count = this.zBedProbePoints.Length;
 
-            double zeroHeight = this.zBedProbePoints[count - 1];
+            double zeroHeight = (withValue == null) ? this.zBedProbePoints[count - 1] : (double)withValue;
 
             for(int i=0; i<count; i++)
             {
