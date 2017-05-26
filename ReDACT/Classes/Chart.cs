@@ -47,9 +47,13 @@ namespace ReDACT.Classes
         void tryUpdate()
         {
             if (!updatePending)
-                targetCanvas.Dispatcher.Invoke((Action)(() => {
+            {
+                updatePending = true;
+                targetCanvas.Dispatcher.Invoke((Action)(() =>
+                {
                     updateGraph();
                 }));
+            }
         }
 
         void updateGraph()
@@ -105,6 +109,7 @@ namespace ReDACT.Classes
                 targetCanvas.Children.Add(dataline);
                 targetCanvas.Children.Add(datapoint);
             }
+            updatePending = false;
         }
 
         double SeriesMinY()

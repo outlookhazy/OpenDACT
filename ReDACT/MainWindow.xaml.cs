@@ -149,10 +149,7 @@ namespace ReDACT
         private void comboBoxFactors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int selected = (int)comboBoxFactors.SelectedItem;
-            if (selected > 3)
-                sliderNumPoints.Minimum = selected;
-            else
-                sliderNumPoints.Minimum = 4;
+            sliderNumPoints.Minimum = selected + 1;
 
             if (sliderNumPoints.Value < sliderNumPoints.Minimum)
                 sliderNumPoints.Value = sliderNumPoints.Minimum;
