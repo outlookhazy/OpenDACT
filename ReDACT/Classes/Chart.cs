@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,8 +44,6 @@ namespace ReDACT.Classes
         {            
             this.AddData(sequenceCount, Y);
             sequenceCount++;
-            Trim();
-            tryUpdate();
         }
 
         private void Trim()
@@ -78,6 +77,9 @@ namespace ReDACT.Classes
                 {
                     updateGraph();
                 }));
+            } else
+            {
+                Debug.WriteLine("Unable to update chart, existing update pending");
             }
         }
 
@@ -87,7 +89,10 @@ namespace ReDACT.Classes
             {
                 targetCanvas.Children.Clear();
                 if (Data.Count == 0)
+                {
+                    updatePending = false;
                     return;
+                }
 
                 targetCanvas.Visibility = System.Windows.Visibility.Hidden;
 

@@ -119,6 +119,7 @@ namespace ReDACT
             Continue(int.Parse(textBoxIterations.Text));
         }
 
+        int continuecount;
         private bool Continue(int? newCount = null)
         {
             if (newCount != null)
@@ -155,7 +156,7 @@ namespace ReDACT
                 sliderNumPoints.Value = sliderNumPoints.Minimum;
         }
 
-        int continuecount;
+        
         public void ChildStateChanged(object child, WorkflowState newState)
         {
             if (newState != WorkflowState.FINISHED)

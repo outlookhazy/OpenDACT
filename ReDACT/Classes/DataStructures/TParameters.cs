@@ -106,14 +106,6 @@ namespace ReDACT.Classes.Escher
             xBedProbePoints[index] = 0;
             yBedProbePoints[index] = 0;
             zBedProbePoints[index] = 0;
-
-            Console.WriteLine("#,X,Y,Z");
-            for(int i=0; i<numPoints; i++)
-            {
-                Console.WriteLine(String.Format("{0},{1},{2},{3}", i, xBedProbePoints[i], yBedProbePoints[i], zBedProbePoints[i]));
-            }
-
-            Debug.WriteLine("Done");
         }
 
         public static double[,] calcPoints(double radius, int number, double offsetDegrees = 0)
