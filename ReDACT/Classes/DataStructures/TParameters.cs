@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,47 @@ namespace ReDACT.Classes.Escher
         }
 
         public void calcProbePoints(double bedRadius)
+        {
+            xBedProbePoints = new double[numPoints];
+            yBedProbePoints = new double[numPoints];
+            zBedProbePoints = new double[numPoints];
+
+            for (int i = 0; i < numPoints - 1; i++)
+            {
+                if (i % 2 == 0)//even
+                {
+                    xBedProbePoints[i] = PointOnCircleX(bedRadius, i * (360.0 / (numPoints - 1)) - 180);
+                    yBedProbePoints[i] = PointOnCircleY(bedRadius, i * (360.0 / (numPoints - 1)) - 180);
+                } else//odd
+                {
+                    xBedProbePoints[i] = PointOnCircleX(bedRadius/2, i * (360.0 / (numPoints - 1)) - 180);
+                    yBedProbePoints[i] = PointOnCircleY(bedRadius/2, i * (360.0 / (numPoints - 1)) - 180);
+                }
+                zBedProbePoints[i] = 0;
+            }            
+
+            xBedProbePoints[numPoints - 1] = 0;
+            yBedProbePoints[numPoints - 1] = 0;
+            zBedProbePoints[numPoints - 1] = 0;
+
+            Debug.WriteLine("Done");
+        }
+
+        public static double PointOnCircleX(double radius, double angleInDegrees)
+        {
+            // Convert from degrees to radians via multiplication by PI/180        
+            double x = (double)(radius * Math.Cos(angleInDegrees * Math.PI / 180F));
+            return x;
+        }
+
+        public static double PointOnCircleY(double radius, double angleInDegrees)
+        {
+            // Convert from degrees to radians via multiplication by PI/180        
+            double y = (double)(radius * Math.Sin(angleInDegrees * Math.PI / 180F));
+            return y;
+        }
+
+        public void calcProbePointsX(double bedRadius)
         {
             xBedProbePoints = new double[numPoints];
             yBedProbePoints = new double[numPoints];

@@ -15,7 +15,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         static TParameters testData;
         static DParameters deltaParameters;
         static EEPROM EEPROM;
-        static CalibrationResult Result;
+        public static CalibrationResult Result;
 
         public EscherWF(TParameters testData)
         {

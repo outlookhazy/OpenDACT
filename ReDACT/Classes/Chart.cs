@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReDACT.Classes.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,38 +24,58 @@ namespace ReDACT.Classes
             this.Data.CollectionChanged += Data_CollectionChanged;
         }
 
-        public void Draw()
+        void updateGraph()
         {
-            targetCanvas.Background = Brushes.Teal;
-            targetCanvas.Children.Clear();
-            
+            targetCanvas.Dispatcher.Invoke((Action)(() => {
+                DateTime updatestart = DateTime.Now;
 
-            if (Data.Count < 2)
-                return;
-            Console.WriteLine(String.Format("Drawing {0} points", Data.Count));
-            for(int i=0; i< Data.Count-1; i++)
+                targetCanvas.Children.Clear();
+
+                for (int i = 0; i < Data.Count - 1; i++)
+                {                   
+                    if (i > 0)
+                    {
+                        Line e = new Line()
+                        {
+                            ToolTip = String.Format("{0} -> {1}", Data.ElementAt(i - 1), Data.ElementAt(i)),
+                            X1 = Conversion.scale(Data.ElementAt(i - 1).X, 0, Data.Count - 1, 0, targetCanvas.Width),
+                            X2 = Conversion.scale(Data.ElementAt(i).X, 0, Data.Count - 1, 0, targetCanvas.Width),
+                            Y1 = Conversion.scale(Data.ElementAt(i - 1).Y, SeriesMin(), SeriesMax(), targetCanvas.Height, 0),
+                            Y2 = Conversion.scale(Data.ElementAt(i).Y, SeriesMin(), SeriesMax(), targetCanvas.Height, 0),
+                            Stroke = Brushes.LimeGreen,
+                            StrokeThickness = 5
+                        };
+                        targetCanvas.Children.Add(e);
+                    }
+                }
+            }));
+        }
+
+        double SeriesMin()
+        {
+            double min = Data.ElementAt(0).Y;
+            foreach(ChartData d in Data)
             {
-                Console.WriteLine(String.Format("{0} to {1}", Data.ElementAt(i), Data.ElementAt(i + 1)));
-
-                Line dataLine = new Line();
-                dataLine.Y1 = Data.ElementAt(i).X;
-                dataLine.X1 = Data.ElementAt(i).Y;
-                dataLine.Y2 = Data.ElementAt(i+1).X;
-                dataLine.X2 = Data.ElementAt(i+1).Y;
-
-                dataLine.Stroke = Brushes.Red;
-                dataLine.Width = 5;
-
-                //Canvas.SetLeft(dataLine, dataLine.X1);
-                //Canvas.SetBottom(dataLine, 50);
-
-                targetCanvas.Children.Add(dataLine);
+                if (d.Y < min)
+                    min = d.Y;
             }
+            return min;
+        }
+
+        double SeriesMax()
+        {
+            double max = Data.ElementAt(0).Y;
+            foreach (ChartData d in Data)
+            {
+                if (d.Y > max)
+                    max = d.Y;
+            }
+            return max;
         }
 
         private void Data_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Draw();
+            this.updateGraph();
         }
     }
 

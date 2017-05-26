@@ -56,7 +56,7 @@ namespace ReDACT.Classes
 
         public static double ComputeDerivative(int deriv, double ha, double hb, double hc, DParameters machine)
         {
-            var perturb = 0.2;          // perturbation amount in mm or degrees
+            var perturb = 0.001;          // perturbation amount in mm or degrees
             var hiParams = new DParameters(machine.diagonal, machine.radius, machine.homedHeight, machine.xstop, machine.ystop, machine.zstop, machine.xadj, machine.yadj, machine.zadj);
             var loParams = new DParameters(machine.diagonal, machine.radius, machine.homedHeight, machine.xstop, machine.ystop, machine.zstop, machine.xadj, machine.yadj, machine.zadj);
             switch (deriv)
@@ -321,7 +321,7 @@ namespace ReDACT.Classes
                 // Decide whether to do another iteration Two is slightly better than one, but three doesn't improve things.
                 // Alternatively, we could stop when the expected RMS error is only slightly worse than the RMS of the residuals.
                 ++iteration;
-                if (iteration == 2) { break; }
+                if (iteration == 100) { break; }
             }
             CalibrationResult result = new CalibrationResult(data.numFactors, data.numPoints, initialSumOfSquares, expectedRmsError);
             return result;

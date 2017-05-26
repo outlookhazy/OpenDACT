@@ -65,14 +65,16 @@ namespace ReDACT
 
             mainWorkflow = new Workflow(this.SerialSource);
 
-            Chart = new Chart(dataCanvas);
+            Chart = new Chart(GraphDisplay);
         }
 
         private void SerialManager_NewSerialOutLine(object sender, string data)
         {
             textboxSerial.Dispatcher.BeginInvoke(new Action(() =>
             {
-                textboxSerial.Text += "=>" + data + "\n";
+                textboxSerial.AppendText("=>" + data + "\n");
+                if (textboxSerial.Text.Length > 10000)
+                    textboxSerial.Text = textboxSerial.Text.Substring(1000);
                 textboxSerial.ScrollToEnd();
             }));
         }
@@ -81,7 +83,9 @@ namespace ReDACT
         {
             textboxSerial.Dispatcher.BeginInvoke(new Action(() =>
             {
-                textboxSerial.Text += "<=" + data + "\n";
+                textboxSerial.AppendText("<=" + data + "\n");
+                if (textboxSerial.Text.Length > 10000)
+                    textboxSerial.Text = textboxSerial.Text.Substring(1000);
                 textboxSerial.ScrollToEnd();
             }));
             mainWorkflow.RouteMessage(data);
@@ -108,7 +112,7 @@ namespace ReDACT
 
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
-            this.continuecount = 100;
+            this.continuecount = 0;
             TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
             mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
             mainWorkflow.Start(this);
@@ -122,14 +126,13 @@ namespace ReDACT
                 SerialSource.Connect(this.comboBoxSerial.SelectedItem.ToString(),  int.Parse(this.comboBoxBaud.Text));
         }
 
-        int count = 0;
+        
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (labelPointsSlider == null)
                 return;
             labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));
-            Chart.Data.Add(new ChartData(count, sliderNumPoints.Value));
-            count++;
+            
         }
 
         private void comboBoxFactors_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -144,16 +147,21 @@ namespace ReDACT
                 sliderNumPoints.Value = sliderNumPoints.Minimum;
         }
 
-        int continuecount;
+        int continuecount=101;
         public void ChildStateChanged(object child, WorkflowState newState)
         {
-            return;
-            this.continuecount--;
-            if (continuecount > 0)
+            if (newState != WorkflowState.FINISHED || continuecount == 101)
+                return;
+
+            this.continuecount++;
+            Chart.Data.Add(new ChartData(continuecount, EscherWF.Result.DeviationBefore));
+            if (continuecount < 100)
             {
+                Dispatcher.BeginInvoke(new Action(() => { 
                 TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
                 mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
                 mainWorkflow.Start(this);
+                }));
             }
         }
     }

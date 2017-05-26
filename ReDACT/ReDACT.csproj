@@ -63,6 +63,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\Chart.cs" />
+    <Compile Include="Classes\DataStructures\Conversion.cs" />
     <Compile Include="Classes\DataStructures\EEPROM.cs" />
     <Compile Include="Classes\DataStructures\CalibrationResult.cs" />
     <Compile Include="Classes\DataStructures\DParameters.cs" />
