@@ -17,7 +17,7 @@ namespace ReDACT.Classes
         private Canvas targetCanvas;
         private LinkedList<ChartData> Data;
         private volatile bool updatePending = false;
-        private double BaseScale = .1;
+        private double BaseScale = .15;
         private double PointScale = 2;
         private double LineScale = 1;
         private object listlock = new object();
