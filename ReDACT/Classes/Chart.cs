@@ -17,8 +17,8 @@ namespace ReDACT.Classes
         private Canvas targetCanvas;
         private LinkedList<ChartData> Data;
         private volatile bool updatePending = false;
-        private double BaseScale = .15;
-        private double PointScale = 2;
+        private double BaseScale = .01;
+        private double PointScale = 1.5;
         private double LineScale = 1;
         private object listlock = new object();
         public int MaxDataPoints = 0;
@@ -88,8 +88,13 @@ namespace ReDACT.Classes
             lock (listlock)
             {
                 targetCanvas.Children.Clear();
-                if (Data.Count == 0)
+                if (Data.Count <2 )
                 {
+                    TextBlock waiting = new TextBlock();
+                    waiting.Foreground = Brushes.White;
+                    waiting.Text = "2 Datapoints require for graph.";
+                    Canvas.SetBottom(waiting, 0);
+
                     updatePending = false;
                     return;
                 }
@@ -97,14 +102,12 @@ namespace ReDACT.Classes
                 targetCanvas.Visibility = System.Windows.Visibility.Hidden;
 
                 double yMin = SeriesMinY();
-                double yMax = SeriesMaxY();
-                double yRange = yMax - yMin;
+                double yMax = SeriesMaxY();                
 
                 double xMin = SeriesMinX();
-                double xMax = SeriesMaxX();
-                double xRange = xMax - xMin;
+                double xMax = SeriesMaxX();                
 
-                double ElementSizeBase = BaseScale * yMax;
+                double ElementSizeBase = BaseScale * Math.Min(targetCanvas.Width, targetCanvas.Height);
 
                 LinkedListNode<ChartData> CurrentNode = Data.First;
 
@@ -138,31 +141,72 @@ namespace ReDACT.Classes
                 Canvas.SetTop(xMaxText, .91 * targetCanvas.Height);
                 targetCanvas.Children.Add(xMaxText);
 
-                Line xAxis = new Line()
-                {
-                    Stroke = Brushes.Red,
-                    StrokeThickness = ElementSizeBase * LineScale,
-                    X1 = .1 * targetCanvas.Width,
-                    X2 = .9 * targetCanvas.Width,
-                    Y1 = .9 * targetCanvas.Height,
-                    Y2 = .9 * targetCanvas.Height
-                };
+                Line xAxis = new Line();
+
+                xAxis.Stroke = Brushes.Red;
+                xAxis.StrokeThickness = ElementSizeBase * LineScale;
+                xAxis.X1 = .1 * targetCanvas.Width;
+                xAxis.X2 = .9 * targetCanvas.Width;
+                xAxis.Y1 = .9 * targetCanvas.Height;
+                xAxis.Y2 = .9 * targetCanvas.Height;
+                xAxis.StrokeStartLineCap = PenLineCap.Round;
+                xAxis.StrokeEndLineCap = PenLineCap.Round;
+
                 targetCanvas.Children.Add(xAxis);
 
-                Line yAxis = new Line()
-                {
-                    Stroke = Brushes.Red,
-                    StrokeThickness = ElementSizeBase * LineScale,
-                    X1 = .1 * targetCanvas.Width,
-                    X2 = .1 * targetCanvas.Width,
-                    Y1 = .1 * targetCanvas.Height,
-                    Y2 = .9 * targetCanvas.Height
-                };
+                Line yAxis = new Line();
+                yAxis.Stroke = Brushes.Red;
+                yAxis.StrokeThickness = ElementSizeBase * LineScale;
+                yAxis.X1 = .1 * targetCanvas.Width;
+                yAxis.X2 = .1 * targetCanvas.Width;
+                yAxis.Y1 = .1 * targetCanvas.Height;
+                yAxis.Y2 = .9 * targetCanvas.Height;
+                yAxis.StrokeStartLineCap = PenLineCap.Round;
+                yAxis.StrokeEndLineCap = PenLineCap.Round;
+
                 targetCanvas.Children.Add(yAxis);
 
+                Polyline p = new Polyline()
+                {
+                    Stroke = Brushes.LimeGreen,
+                    StrokeThickness = ElementSizeBase * LineScale,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    Opacity = .8,
+                    StrokeLineJoin = PenLineJoin.Round
+                };
 
+                List<Ellipse> elist = new List<Ellipse>();                
+
+                foreach (ChartData node in Data)
+                {
+                    p.Points.Add(new System.Windows.Point(
+                        Conversion.scale(node.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width),
+                        Conversion.scale(node.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height)));
+
+                    Ellipse pe = new Ellipse()
+                    {
+                        ToolTip = CurrentNode.Value,
+                        Width = ElementSizeBase * PointScale,
+                        Height = ElementSizeBase * PointScale,
+                        Fill = Brushes.Yellow,
+                        Opacity = .8
+                    };
+
+                    Canvas.SetLeft(pe, Conversion.scale(node.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width) - (pe.Width / 2));
+                    Canvas.SetTop(pe, Conversion.scale(node.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height) - (pe.Width / 2));
+                    elist.Add(pe);
+                }
+
+                targetCanvas.Children.Add(p);
+                foreach (Ellipse e in elist)
+                    targetCanvas.Children.Add(e);
+
+
+                /*
                 while (CurrentNode.Next != null)
                 {
+                    
                     Ellipse datapoint = new Ellipse()
                     {
                         ToolTip = CurrentNode.Value,
@@ -172,10 +216,11 @@ namespace ReDACT.Classes
                         Opacity = .8
 
                     };
+                    
 
                     Canvas.SetLeft(datapoint, Conversion.scale(CurrentNode.Value.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width) - (datapoint.Width / 2));
                     Canvas.SetTop(datapoint, Conversion.scale(CurrentNode.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height) - (datapoint.Width / 2));
-
+                    
                     Line dataline = new Line()
                     {
                         ToolTip = String.Format("{0} -> {1}", CurrentNode.Value, CurrentNode.Next.Value),
@@ -184,15 +229,17 @@ namespace ReDACT.Classes
                         Y1 = Conversion.scale(CurrentNode.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height),
                         Y2 = Conversion.scale(CurrentNode.Next.Value.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height),
                         Stroke = Brushes.LimeGreen,
-                        StrokeThickness = ElementSizeBase * LineScale, 
+                        StrokeThickness = ElementSizeBase * LineScale,
+                        StrokeStartLineCap = PenLineCap.Round,
+                        StrokeEndLineCap = PenLineCap.Round,
                         Opacity = .8
                     };
-
+                    
                     targetCanvas.Children.Add(dataline);
                     targetCanvas.Children.Add(datapoint);
 
                     CurrentNode = CurrentNode.Next;
-                }
+                }*/
             }
             targetCanvas.Visibility = System.Windows.Visibility.Visible;
             updatePending = false;            
