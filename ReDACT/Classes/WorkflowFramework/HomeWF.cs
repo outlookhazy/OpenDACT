@@ -23,7 +23,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected override void OnMessage(string serialMessage)
         {
-            if (serialMessage.Contains("wait"))
+            if (serialMessage.Contains("ok"))
             {
                 this.FinishOrAdvance();
             }

@@ -99,12 +99,14 @@ namespace ReDACT
                     this.buttonConnect.Dispatcher.BeginInvoke(new Action(() => {
                         this.buttonConnect.Content = "Disconnect";
                         this.buttonCalibrate.IsEnabled = true;
+                        this.buttonESTOP.IsEnabled = true;
                         }));                    
                     break;
                 case ConnectionState.DISCONNECTED:
                     this.buttonConnect.Dispatcher.BeginInvoke(new Action(() => {
                         this.buttonConnect.Content = "Connect";
                         this.buttonCalibrate.IsEnabled = false;
+                        this.buttonESTOP.IsEnabled = false;
                     }));
                     break;
             }
@@ -112,7 +114,8 @@ namespace ReDACT
 
         private void ButtonCalibrate_Click(object sender, RoutedEventArgs e)
         {
-            Chart.Clear();
+            //Chart.Clear();
+            Chart.Update();
             TParameters calibrationTestData = new TParameters((Firmware)comboBoxFirmware.SelectedItem, (int)sliderNumPoints.Value, (int)comboBoxFactors.SelectedItem, true);
             mainWorkflow.AddWorkflowItem(new EscherWF(calibrationTestData));
             mainWorkflow.Start(this);
@@ -144,7 +147,12 @@ namespace ReDACT
         {
             if (labelPointsSlider == null)
                 return;
-            labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));            
+            labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));
+
+            /* //useful for testing
+            if(Chart != null)
+                Chart.AddSequential(sliderNumPoints.Value);
+                */
         }
 
         private void comboBoxFactors_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -176,6 +184,22 @@ namespace ReDACT
                 mainWorkflow.Start(this);
                 }));
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            mainWorkflow.Abort();
+            SerialSource.WriteLine(GCode.Command.ESTOP);
+        }
+
+        private void buttonClear_Click(object sender, RoutedEventArgs e)
+        {
+            Chart.Clear();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Chart.Clear();
         }
     }
 }

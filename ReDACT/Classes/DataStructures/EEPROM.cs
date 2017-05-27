@@ -17,9 +17,15 @@ namespace OpenDACT.Class_Files
 
         public EEPROM()
         {
-            this[EEPROM_POSITION.StepsPerMM] = new EEPROM_Variable(EEPROM_POSITION.StepsPerMM,"stepsPerMM", EEPROM_TYPE.FLOAT);
+            this[EEPROM_POSITION.StepsPerMM_Z] = new EEPROM_Variable(EEPROM_POSITION.StepsPerMM_Z,"stepsPerMM_Z", EEPROM_TYPE.FLOAT);
+            this[EEPROM_POSITION.maxFeedrate] = new EEPROM_Variable(EEPROM_POSITION.maxFeedrate, "maxFeedrate", EEPROM_TYPE.FLOAT);
+
+            this[EEPROM_POSITION.xMaxLength] = new EEPROM_Variable(EEPROM_POSITION.xMaxLength, "xMaxLength", EEPROM_TYPE.FLOAT);
+            this[EEPROM_POSITION.yMaxLength] = new EEPROM_Variable(EEPROM_POSITION.yMaxLength, "yMaxLength", EEPROM_TYPE.FLOAT);
             this[EEPROM_POSITION.zMaxLength] = new EEPROM_Variable(EEPROM_POSITION.zMaxLength, "zMaxLength", EEPROM_TYPE.FLOAT);
+
             this[EEPROM_POSITION.zProbeHeight] = new EEPROM_Variable(EEPROM_POSITION.zProbeHeight, "zProbeHeight", EEPROM_TYPE.FLOAT);
+            this[EEPROM_POSITION.zProbeBedDistance] = new EEPROM_Variable(EEPROM_POSITION.zProbeBedDistance, "zProbeBedDistance", EEPROM_TYPE.FLOAT);
             this[EEPROM_POSITION.zProbeSpeed] = new EEPROM_Variable(EEPROM_POSITION.zProbeSpeed, "zProbeSpeed", EEPROM_TYPE.FLOAT);
 
             this[EEPROM_POSITION.diagonalRod] = new EEPROM_Variable(EEPROM_POSITION.diagonalRod, "diagonalRod", EEPROM_TYPE.FLOAT);
@@ -48,7 +54,9 @@ namespace OpenDACT.Class_Files
             foreach(EEPROM_POSITION v in this.Keys)
             {
                 if (this[v].Pending)
+                {
                     return false;
+                }
             }
             return true;
         }
@@ -125,7 +133,7 @@ namespace OpenDACT.Class_Files
 
         public void Set(EEPROM_POSITION settingPosition, float value)
         {
-            if(settingPosition == EEPROM_POSITION.StepsPerMM)
+            if(settingPosition == EEPROM_POSITION.StepsPerMM_Z)
                 this.tempSPM = value;
 
             this[settingPosition].Value = value;            
@@ -139,7 +147,12 @@ namespace OpenDACT.Class_Files
     }
 
     public enum EEPROM_POSITION:int {
-        StepsPerMM = 11,
+        StepsPerMM_X = 3,
+        StepsPerMM_Y = 7,
+        StepsPerMM_Z = 11,
+        maxFeedrate = 23,
+        xMaxLength = 145,
+        yMaxLength = 149,
         zMaxLength = 153,
         zProbeHeight = 808,
         zProbeSpeed = 812,
@@ -155,6 +168,7 @@ namespace OpenDACT.Class_Files
         DB = 917,
         DC = 921,
         printableRadius = 925,
+        zProbeBedDistance = 929,
         INVALID = 0
     }
 

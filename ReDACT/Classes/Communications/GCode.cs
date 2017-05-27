@@ -56,18 +56,19 @@ namespace OpenDACT.Class_Files
 
                 return String.Format("G0{0}{1}{2}", cmdX, cmdY, cmdZ);
             }
-            public static String MOVE(float? X = null, float? Y = null, float? Z = null)
+            public static String MOVE(float? X = null, float? Y = null, float? Z = null, float? F = null)
             {
                 string cmdX = X == null ? "" : String.Format(" X{0}", X);
                 string cmdY = Y == null ? "" : String.Format(" Y{0}", Y);
                 string cmdZ = Z == null ? "" : String.Format(" Z{0}", Z);
+                string cmdF = F == null ? "" : String.Format(" F{0}", F);
 
-                return String.Format("G1{0}{1}{2} F12000", cmdX, cmdY, cmdZ);
+                return String.Format("G1{0}{1}{2}{3}", cmdX, cmdY, cmdZ, cmdF);
             }
 
-            public static String MOVE(double? X = null, double? Y = null, double? Z = null)
+            public static String MOVE(double? X = null, double? Y = null, double? Z = null, double? F = null)
             {
-                return MOVE(Convert.ToSingle(X), Convert.ToSingle(Y), Convert.ToSingle(Z));
+                return MOVE(Convert.ToSingle(X), Convert.ToSingle(Y), Convert.ToSingle(Z), Convert.ToSingle(F));
             }
 
             public static String DWELL_SECONDS(int duration) { return String.Format("G4 S{0}", duration); }

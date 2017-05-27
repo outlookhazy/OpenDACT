@@ -18,11 +18,10 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         }
 
         protected override void OnStarted()
-        {
-            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.StepsPerMM]));
-            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.zMaxLength]));
-            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.zProbeHeight]));
-            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.zProbeSpeed]));
+        {            
+            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.xMaxLength]));
+            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.yMaxLength]));
+            this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.zMaxLength]));            
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.diagonalRod]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.HRadius]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.offsetX]));

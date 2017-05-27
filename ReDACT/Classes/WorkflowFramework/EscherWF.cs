@@ -35,6 +35,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.AddWorkflowItem(new EscherCalculateWF());
 
             this.AddWorkflowItem(new EscherUpdateEEPROMWF());
+
+            this.AddWorkflowItem(new HomeWF());
         }
 
         internal class EscherUpdateEEPROMWF : Workflow
@@ -48,9 +50,11 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             {
                 EEPROM original = EscherWF.EEPROM.Copy();
 
-                EscherWF.EEPROM[EEPROM_POSITION.StepsPerMM].Value = Convert.ToSingle(EscherWF.deltaParameters.stepspermm);
+                EscherWF.EEPROM[EEPROM_POSITION.StepsPerMM_Z].Value = Convert.ToSingle(EscherWF.deltaParameters.stepspermm);
                 EscherWF.EEPROM[EEPROM_POSITION.diagonalRod].Value = Convert.ToSingle(EscherWF.deltaParameters.diagonal);
                 EscherWF.EEPROM[EEPROM_POSITION.HRadius].Value = Convert.ToSingle(EscherWF.deltaParameters.radius);
+                EscherWF.EEPROM[EEPROM_POSITION.xMaxLength].Value = Convert.ToSingle(EscherWF.deltaParameters.homedHeight);
+                EscherWF.EEPROM[EEPROM_POSITION.yMaxLength].Value = Convert.ToSingle(EscherWF.deltaParameters.homedHeight);
                 EscherWF.EEPROM[EEPROM_POSITION.zMaxLength].Value = Convert.ToSingle(EscherWF.deltaParameters.homedHeight);
                 EscherWF.EEPROM[EEPROM_POSITION.offsetX].Value = Convert.ToSingle(EscherWF.deltaParameters.xstop);
                 EscherWF.EEPROM[EEPROM_POSITION.offsetY].Value = Convert.ToSingle(EscherWF.deltaParameters.ystop);
@@ -61,7 +65,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
                 foreach (EEPROM_POSITION p in typeof(EEPROM_POSITION).GetEnumValues())
                 {
-                    if (p != EEPROM_POSITION.INVALID)
+                    if (original.ContainsKey(p))
                     {
                         if (original[p].Value != EscherWF.EEPROM[p].Value)
                             Debug.WriteLine(String.Format("{0} changed from {1} to {2}", original[p].Name, original[p].Value, EscherWF.EEPROM[p].Value));
@@ -105,6 +109,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                         EscherWF.testData.xBedProbePoints[i],
                         EscherWF.testData.yBedProbePoints[i],
                         EscherWF.testData.probeHeight,
+                        EscherWF.EEPROM[EEPROM_POSITION.maxFeedrate].Value*60,
                         measureDone,
                         i));
                 }
@@ -119,7 +124,10 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
             protected override void OnChildrenFinished()
             {
-                EscherWF.testData.NormalizeProbePoints();
+                EscherWF.testData.NormalizeProbePoints(
+                    EEPROM[EEPROM_POSITION.zProbeBedDistance].Value 
+                    + EEPROM[EEPROM_POSITION.zProbeHeight].Value
+                    - .14);
             }
         }
 
@@ -133,7 +141,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             protected override void OnStarted()
             {
                 //(double diagonal, double radius, double homedHeight, double xstop, double ystop, double zstop, double xadj, double yadj, double zadj)
-                EscherWF.testData.probeHeight = EEPROM[EEPROM_POSITION.zProbeHeight].Value + 11;
+                EscherWF.testData.probeHeight = EEPROM[EEPROM_POSITION.zProbeHeight].Value + EEPROM[EEPROM_POSITION.zProbeBedDistance].Value;
                 EscherWF.testData.calcProbePoints(EEPROM[EEPROM_POSITION.printableRadius].Value);
                 EscherWF.deltaParameters = new DParameters(
                     EEPROM[EEPROM_POSITION.diagonalRod].Value,
@@ -147,28 +155,10 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     EEPROM[EEPROM_POSITION.C].Value - 90)
                 {
                     firmware = EscherWF.testData.firmware,
-                    stepspermm = EEPROM[EEPROM_POSITION.StepsPerMM].Value
+                    stepspermm = EEPROM[EEPROM_POSITION.StepsPerMM_Z].Value
                 };
                 EscherWF.deltaParameters.Recalc(); ;
             }
-        }
-
-        internal class EscherEvalueateWF : Workflow
-        {
-
-            private SerialManager serialSource;
-            MeasureHeightsWF sourceHeightsWF;
-
-            public EscherEvalueateWF(SerialManager serialSource, MeasureHeightsWF HeightsWF)
-            {
-                this.ID = "EscherEvalueateWF";
-                this.serialSource = serialSource;
-                this.sourceHeightsWF = HeightsWF;
-            }
-            protected override void OnStarted()
-            {
-
-            }
-        }
+        }        
     }
 }

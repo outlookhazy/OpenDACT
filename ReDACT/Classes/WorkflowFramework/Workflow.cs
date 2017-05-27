@@ -108,7 +108,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
             this.DebugState("Status updated to " + newStatus);
             this.Status = newStatus;
-            this._parent.ChildStateChanged(this, newStatus);
+            if(this._parent != null)
+                this._parent.ChildStateChanged(this, newStatus);
         }
 
         public void Abort()

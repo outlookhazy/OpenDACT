@@ -1,4 +1,5 @@
-﻿using ReDACT.Classes.DataStructures;
+﻿using MathNet.Numerics;
+using ReDACT.Classes.DataStructures;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,7 +38,7 @@ namespace ReDACT.Classes
                 Data.AddLast(new ChartData(X, Y));
             }
             Trim();
-            tryUpdate();
+            Update();
         }
 
         public void AddSequential(double Y)
@@ -65,10 +66,10 @@ namespace ReDACT.Classes
                 Data.Clear();
                 sequenceCount = 0;
             }
-            tryUpdate();
+            Update();
         }
 
-        void tryUpdate()
+        public void Update()
         {
             if (!updatePending)
             {
@@ -88,12 +89,15 @@ namespace ReDACT.Classes
             lock (listlock)
             {
                 targetCanvas.Children.Clear();
-                if (Data.Count <2 )
+                if (Data.Count < 2)
                 {
                     TextBlock waiting = new TextBlock();
                     waiting.Foreground = Brushes.White;
-                    waiting.Text = "2 Datapoints require for graph.";
+                    waiting.Text = "2 data points required for graph.";
+                    waiting.FontSize = 40;
                     Canvas.SetBottom(waiting, 0);
+                    Canvas.SetRight(waiting, 0);
+                    targetCanvas.Children.Add(waiting);
 
                     updatePending = false;
                     return;
@@ -102,10 +106,10 @@ namespace ReDACT.Classes
                 targetCanvas.Visibility = System.Windows.Visibility.Hidden;
 
                 double yMin = SeriesMinY();
-                double yMax = SeriesMaxY();                
+                double yMax = SeriesMaxY();
 
                 double xMin = SeriesMinX();
-                double xMax = SeriesMaxX();                
+                double xMax = SeriesMaxX();
 
                 double ElementSizeBase = BaseScale * Math.Min(targetCanvas.Width, targetCanvas.Height);
 
@@ -166,6 +170,23 @@ namespace ReDACT.Classes
 
                 targetCanvas.Children.Add(yAxis);
 
+
+                Line trendline = new Line();
+                trendline.Opacity = .75;
+                trendline.StrokeDashArray = new DoubleCollection(new double[] { 1, 1 });
+                trendline.Stroke = Brushes.Orange;
+                trendline.StrokeThickness = ElementSizeBase * LineScale*.75;
+                trendline.X1 = .1 * targetCanvas.Width;
+                trendline.X2 = .9 * targetCanvas.Width;
+                //trendline.Y1 = .9 * targetCanvas.Height;
+                //trendline.Y2 = .9 * targetCanvas.Height;
+                trendline.StrokeStartLineCap = PenLineCap.Round;
+                trendline.StrokeEndLineCap = PenLineCap.Round;
+
+
+                
+
+
                 Polyline p = new Polyline()
                 {
                     Stroke = Brushes.LimeGreen,
@@ -176,17 +197,24 @@ namespace ReDACT.Classes
                     StrokeLineJoin = PenLineJoin.Round
                 };
 
-                List<Ellipse> elist = new List<Ellipse>();                
+                List<Ellipse> elist = new List<Ellipse>();
 
-                foreach (ChartData node in Data)
+                double[] trendDataX = new double[Data.Count];
+                double[] trendDataY = new double[Data.Count];
+
+                for(int i=0; i< Data.Count; i++)
                 {
+                    ChartData node = Data.ElementAt(i);
+                    trendDataX[i] = node.X;
+                    trendDataY[i] = node.Y;
+
                     p.Points.Add(new System.Windows.Point(
                         Conversion.scale(node.X, xMin, xMax, .1 * targetCanvas.Width, .9 * targetCanvas.Width),
                         Conversion.scale(node.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height)));
 
                     Ellipse pe = new Ellipse()
                     {
-                        ToolTip = CurrentNode.Value,
+                        ToolTip = node,
                         Width = ElementSizeBase * PointScale,
                         Height = ElementSizeBase * PointScale,
                         Fill = Brushes.Yellow,
@@ -197,6 +225,23 @@ namespace ReDACT.Classes
                     Canvas.SetTop(pe, Conversion.scale(node.Y, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height) - (pe.Width / 2));
                     elist.Add(pe);
                 }
+
+
+
+                Tuple<double, double> trend = Fit.Line(trendDataX,trendDataY);
+                double y1 = trend.Item1 + (trend.Item2 * trendDataX[0]);
+                double y2 = trend.Item1 + (trend.Item2 * trendDataX[Data.Count - 1]);
+                trendline.Y1 = Conversion.scale(y1, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height);
+                trendline.Y2 = Conversion.scale(y2, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height);
+
+                TextBlock slopeText = new TextBlock();
+                slopeText.Foreground = trendline.Stroke;
+                slopeText.Text = trend.Item2.ToString("F4");
+                Canvas.SetLeft(slopeText, .9 * targetCanvas.Width + ElementSizeBase);
+                Canvas.SetTop(slopeText, Conversion.scale(y2, yMin, yMax, .9 * targetCanvas.Height, .1 * targetCanvas.Height) - ElementSizeBase);      
+
+                targetCanvas.Children.Add(trendline);
+                targetCanvas.Children.Add(slopeText);
 
                 targetCanvas.Children.Add(p);
                 foreach (Ellipse e in elist)
