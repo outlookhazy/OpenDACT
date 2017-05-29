@@ -35,7 +35,7 @@ namespace ReDACT.Classes.Escher
             xBedProbePoints = new double[numPoints];
             yBedProbePoints = new double[numPoints];
             zBedProbePoints = new double[numPoints];
-            double outsideRadius = bedRadius*.75;
+            double outsideRadius = bedRadius*.8;
             double middleRadius = (2 / 3.0) * outsideRadius;
             double insideRadius = (1 / 3.0) * outsideRadius;
             int numRingPoints = numPoints - 1;

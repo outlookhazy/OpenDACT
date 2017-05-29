@@ -29,7 +29,7 @@ namespace ReDACT.Classes
         {
             if (i != j)
             {
-                for (var k = 0; k < numCols; ++k)
+                for (int k = 0; k < numCols; ++k)
                 {
                     double temp = this.data[i][k];
                     this.data[i][k] = this.data[j][k];
@@ -40,13 +40,13 @@ namespace ReDACT.Classes
 
         public void GaussJordan(out double[] solution, int numRows)
         {
-            for (var i = 0; i < numRows; ++i)
+            for (int i = 0; i < numRows; ++i)
             {
                 // Swap the rows around for stable Gauss-Jordan elimination
-                var vmax = Math.Abs(this.data[i][i]);
-                for (var j = i + 1; j < numRows; ++j)
+                double vmax = Math.Abs(this.data[i][i]);
+                for (int j = i + 1; j < numRows; ++j)
                 {
-                    var rmax = Math.Abs(this.data[j][i]);
+                    double rmax = Math.Abs(this.data[j][i]);
                     if (rmax > vmax)
                     {
                         this.SwapRows(i, j, numRows + 1);
@@ -55,22 +55,22 @@ namespace ReDACT.Classes
                 }
 
                 // Use row i to eliminate the ith element from previous and subsequent rows
-                var v = this.data[i][i];
-                for (var j = 0; j < i; ++j)
+                double v = this.data[i][i];
+                for (int j = 0; j < i; ++j)
                 {
-                    var factor = this.data[j][i] / v;
+                    double factor = this.data[j][i] / v;
                     this.data[j][i] = 0.0;
-                    for (var k = i + 1; k <= numRows; ++k)
+                    for (int k = i + 1; k <= numRows; ++k)
                     {
                         this.data[j][k] -= this.data[i][k] * factor;
                     }
                 }
 
-                for (var j = i + 1; j < numRows; ++j)
+                for (int j = i + 1; j < numRows; ++j)
                 {
-                    var factor = this.data[j][i] / v;
+                    double factor = this.data[j][i] / v;
                     this.data[j][i] = 0.0;
-                    for (var k = i + 1; k <= numRows; ++k)
+                    for (int k = i + 1; k <= numRows; ++k)
                     {
                         this.data[j][k] -= this.data[i][k] * factor;
                     }
@@ -78,7 +78,7 @@ namespace ReDACT.Classes
             }
 
             solution = new double[numRows];
-            for (var i = 0; i < numRows; ++i)
+            for (int i = 0; i < numRows; ++i)
             {
                 solution[i] = (this.data[i][numRows] / this.data[i][i]);
             }

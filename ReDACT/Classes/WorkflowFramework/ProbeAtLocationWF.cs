@@ -30,6 +30,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
         protected override void OnStarted()
         {
+            SerialSource.WriteLine(GCode.Command.DISPLAY_MESSAGE(String.Format("Probing point #{0}",this.IDProbe)));
             AddWorkflowItem(new MoveWF(this.X, this.Y, this.Z, this.F));
             AddWorkflowItem(new ProbeWF(measureDone, IDProbe));
         }

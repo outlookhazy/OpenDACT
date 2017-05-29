@@ -44,7 +44,7 @@ namespace ReDACT
             comboBoxFirmware.SelectedItem = DParameters.Firmware.REPETIER;
 
             comboBoxFactors.ItemsSource = typeof(Escher3D.NumFactors).GetEnumValues();
-            comboBoxFactors.SelectedItem = Escher3D.NumFactors.SEVEN;
+            comboBoxFactors.SelectedItem = Escher3D.NumFactors.SIX;
 
             comboBoxSerial.ItemsSource = SerialPort.GetPortNames();
             if(comboBoxSerial.Items.Count > 0)

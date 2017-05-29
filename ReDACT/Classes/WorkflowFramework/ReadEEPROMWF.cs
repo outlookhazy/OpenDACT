@@ -31,7 +31,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             if (parsed.Type != EEPROM_POSITION.INVALID)
                 this.EEPROM[parsed.Type].Value = parsed.Value;
 
-            if (EEPROM.ReadComplete() && serialMessage.Contains("wait"))
+            if (EEPROM.ReadComplete() && (serialMessage.Contains("wait") || serialMessage.Contains("ok")))
                 this.FinishOrAdvance();
         }
     }
