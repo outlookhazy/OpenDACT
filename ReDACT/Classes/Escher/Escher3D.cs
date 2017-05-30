@@ -320,7 +320,8 @@ namespace ReDACT.Classes
 
                     expectedRmsError = Math.Sqrt(sumOfSquares / data.numPoints);
 
-                    Debug.WriteLine(String.Format("Iteration {0} RMS:\t{1}", iteration, expectedRmsError));
+                    if(debug)
+                        Debug.WriteLine(String.Format("Iteration {0} RMS:\t{1}", iteration, expectedRmsError));
 
                     if (debug)
                         DebugPrint(PrintVector("Expected probe error", expectedResiduals));

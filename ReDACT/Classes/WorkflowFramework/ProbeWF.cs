@@ -24,6 +24,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             this.ID = String.Format("ProbeWF<{0}>",this.IDProbe);
             SerialSource.WriteLine(GCode.Command.PROBE);
+            SerialSource.WriteLine(GCode.Command.DISPLAY_MESSAGE(String.Format("Probing point #{0}", this.IDProbe)));
         }
 
         protected override void OnMessage(string serialMessage)

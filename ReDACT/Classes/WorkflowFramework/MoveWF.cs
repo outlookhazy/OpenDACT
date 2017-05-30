@@ -24,6 +24,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
         {
             string movecommand = GCode.Command.MOVE(this.X, this.Y, this.Z, this.F);
             SerialSource.WriteLine(movecommand);
+            SerialSource.WriteLine(GCode.Command.DISPLAY_MESSAGE(String.Format("Moving to [{0}, {1}, {2}]", this.X, this.Y, this.Z)));
         }
 
         protected override void OnMessage(string serialMessage)

@@ -10,15 +10,22 @@ namespace OpenDACT.Class_Files.Workflow_Classes
     public class ApplySettingsWF : Workflow
     {
         private EEPROM settings;
+        List<EEPROM_POSITION> changedSettings;
 
-        public ApplySettingsWF(ref EEPROM targetSettings)
+        public ApplySettingsWF(ref EEPROM targetSettings, List<EEPROM_POSITION> changedSettings)
         {
             this.ID = "ApplySettingsWF";
             this.settings = targetSettings;
+            this.changedSettings = changedSettings;
         }
 
         protected override void OnStarted()
         {            
+            foreach(EEPROM_POSITION pos in changedSettings)
+            {
+                this.AddWorkflowItem(new ApplySettingWF(settings[pos]));
+            }
+            /*
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.xMaxLength]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.yMaxLength]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.zMaxLength]));            
@@ -33,6 +40,7 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.DA]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.DB]));
             this.AddWorkflowItem(new ApplySettingWF(settings[EEPROM_POSITION.DC]));
+            */
         }
 
         protected override void OnChildrenFinished()

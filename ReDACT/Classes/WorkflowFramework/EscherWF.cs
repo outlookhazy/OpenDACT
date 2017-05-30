@@ -36,7 +36,20 @@ namespace OpenDACT.Class_Files.Workflow_Classes
 
             this.AddWorkflowItem(new EscherUpdateEEPROMWF());
 
-            this.AddWorkflowItem(new HomeWF());
+            this.AddWorkflowItem(new EscherParkWF());
+        }
+
+        internal class EscherParkWF : Workflow
+        {
+            public EscherParkWF()
+            {
+                this.ID = "EscherParkWF";
+            }
+
+            protected override void OnStarted()
+            {
+                SerialSource.WriteLine(GCode.Command.MOVE(0, 0, deltaParameters.homedHeight * .75, EEPROM[EEPROM_POSITION.maxFeedrate].Value * 60));
+            }
         }
 
         internal class EscherUpdateEEPROMWF : Workflow
@@ -49,6 +62,8 @@ namespace OpenDACT.Class_Files.Workflow_Classes
             protected override void OnStarted()
             {
                 EEPROM original = EscherWF.EEPROM.Copy();
+
+                List<EEPROM_POSITION> changedSettings = new List<EEPROM_POSITION>();
 
                 EscherWF.EEPROM[EEPROM_POSITION.StepsPerMM_Z].Value = Convert.ToSingle(EscherWF.deltaParameters.stepspermm);
                 EscherWF.EEPROM[EEPROM_POSITION.diagonalRod].Value = Convert.ToSingle(EscherWF.deltaParameters.diagonal);
@@ -68,14 +83,17 @@ namespace OpenDACT.Class_Files.Workflow_Classes
                     if (original.ContainsKey(p))
                     {
                         if (original[p].Value != EscherWF.EEPROM[p].Value)
+                        {
+                            changedSettings.Add(p);
                             Debug.WriteLine(String.Format("{0} changed from {1} to {2}", original[p].Name, original[p].Value, EscherWF.EEPROM[p].Value));
+                        }
                         else
                             Debug.WriteLine(String.Format("\t{0} unchanged", original[p].Name));
                     }
                 }
 
                 if (EscherWF.Result.Success)
-                    this.AddWorkflowItem(new ApplySettingsWF(ref EscherWF.EEPROM));
+                    this.AddWorkflowItem(new ApplySettingsWF(ref EscherWF.EEPROM, changedSettings));
                 else
                     Debug.WriteLine("Aborting EEPROM Update");
             }
