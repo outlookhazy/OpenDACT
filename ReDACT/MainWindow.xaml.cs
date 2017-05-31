@@ -149,7 +149,7 @@ namespace ReDACT
                 return;
             labelPointsSlider.Dispatcher.BeginInvoke(new Action(() => { labelPointsSlider.Content = sliderNumPoints.Value.ToString(); }));
 
-            /* //useful for testing
+             /* //useful for testing
             if(Chart != null)
                 Chart.AddSequential(sliderNumPoints.Value);
                 */

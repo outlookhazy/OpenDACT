@@ -70,6 +70,9 @@
     <Compile Include="Classes\DataStructures\EEPROM.cs" />
     <Compile Include="Classes\DataStructures\CalibrationResult.cs" />
     <Compile Include="Classes\DataStructures\DParameters.cs" />
+    <Compile Include="Classes\Data\DataSet.cs" />
+    <Compile Include="Classes\Data\DataSetElement.cs" />
+    <Compile Include="Classes\Data\Stats.cs" />
     <Compile Include="Classes\Escher\Escher3D.cs" />
     <Compile Include="Classes\DataStructures\TParameters.cs" />
     <Compile Include="Classes\Communications\GCode.cs" />
