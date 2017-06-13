@@ -1,0 +1,291 @@
+# This file serves as documentation for config parameters. One may
+# copy and edit this file to configure a new cartesian style
+# printer. For delta style printers, see the "example-delta.cfg"
+# file. For corexy/h-bot style printers, see the "example-corexy.cfg"
+# file.
+
+# DO NOT COPY THIS FILE WITHOUT CAREFULLY READING AND UPDATING IT
+# FIRST. Incorrectly configured parameters may cause damage.
+
+# A note on pin names: pins may be configured with a hardware name
+# (such as "PA4") or with an Arduino alias name (such as "ar29" or
+# "analog3"). In order to use Arduino names, the pin_map variable in
+# the mcu section must be present and have a value of "arduino".
+# Pin names may be preceded by an '!' to indicate that a reverse
+# polarity should be used (eg, trigger on low instead of high). Input
+# pins may be preceded by a '^' to indicate that a hardware pull-up
+# resistor should be enabled for the pin.
+
+# The stepper_a section describes the stepper controlling the front
+# left tower (at 210 degrees). This section also controls the homing
+# parameters (homing_speed, homing_retract_dist) for all towers.
+[stepper_a]
+step_pin: ar54
+dir_pin: !ar55
+enable_pin: !ar38
+step_distance: 0.0125
+endstop_pin: ^ar2
+homing_speed: 50.0
+position_endstop: <TEMPLATE_XEND>
+angle: <TEMPLATE_XANGLE>
+
+# The stepper_b section describes the stepper controlling the front
+# right tower (at 330 degrees)
+[stepper_b]
+step_pin: ar60
+dir_pin: !ar61
+enable_pin: !ar56
+step_distance: 0.0125
+endstop_pin: ^ar15
+position_endstop: <TEMPLATE_YEND>
+angle: <TEMPLATE_YANGLE>
+
+# The stepper_c section describes the stepper controlling the rear
+# tower (at 90 degrees)
+[stepper_c]
+step_pin: ar46
+dir_pin: !ar48
+enable_pin: !ar62
+step_distance: 0.0125
+endstop_pin: ^ar19
+position_endstop: <TEMPLATE_ZEND>
+angle: <TEMPLATE_ZANGLE>
+
+# The extruder section is used to describe both the stepper
+# controlling the printer extruder and the heater parameters for the
+# nozzle. The stepper configuration has the same settings as the
+# stepper_x section and the heater configuration has the same settings
+# as the heater_bed section
+[extruder]
+step_pin: ar26
+dir_pin: !ar28
+enable_pin: !ar24
+step_distance: 0.0104166666666667
+
+nozzle_diameter: 0.400
+#   Diameter of the nozzle orifice (in mm). This parameter must be
+#   provided.
+
+filament_diameter: 1.750
+#   Diameter of the raw filament (in mm) as it enters the
+#   extruder. This parameter must be provided.
+
+#max_extrude_cross_section:
+#   Maximum area of the cross section of an extrusion line (in
+#   mm^2). If a move requests an extrusion rate that would exceed this
+#   value it will cause an error to be returned. The default is: 4.0 *
+#   nozzle_diameter^2
+
+#max_extrude_only_distance: 50.0
+#   Maximum length (in mm of raw filament) that an extrude only move
+#   may be. If an extrude only move requests a distance greater than
+#   this value it will cause an error to be returned. The default is
+#   50mm.
+
+#max_extrude_only_velocity:
+#   Maximum velocity (in mm/s) of the extruder motor for extrude only
+#   moves. If this is not specified then it is calculated to match the
+#   limit an XY printing move with a max_extrude_cross_section
+#   extrusion would have.
+
+#max_extrude_only_accel:
+#   Maximum acceleration (in mm/s^2) of the extruder motor for extrude
+#   only moves. If this is not specified then it is calculated to
+#   match the limit an XY printing move with a
+#   max_extrude_cross_section extrusion would have.
+
+#pressure_advance: 0.0
+#   The amount of raw filament to push into the extruder during
+#   extruder acceleration. An equal amount of filament is retracted
+#   during deceleration. It is measured in millimeters per
+#   millimeter/second. The default is 0, which disables pressure
+#   advance.
+
+#pressure_advance_lookahead_time: 0.010
+#   A time (in seconds) to "look ahead" at future extrusion moves when
+#   calculating pressure advance. This is used to reduce the
+#   application of pressure advance during cornering moves that would
+#   otherwise cause retraction followed immediately by pressure
+#   buildup. This setting only applies if pressure_advance is
+#   non-zero. The default is 0.010 (10 milliseconds).
+#
+# The remaining variables describe the extruder heater
+
+heater_pin: ar10
+#   PWM output pin controlling the heater. This parameter must be
+#   provided.
+
+#max_power: 1.0
+#   The maximum power (expressed as a value from 0.0 to 1.0) that the
+#   heater_pin may be set to. The value 1.0 allows the pin to be set
+#   fully enabled for extended periods, while a value of 0.5 would
+#   allow the pin to be enabled for no more than half the time. This
+#   setting may be used to limit the total power output (over extended
+#   periods) to the heater. The default is 1.0.
+
+sensor_type: ATC Semitec 104GT-2
+#   Type of sensor - this may be "EPCOS 100K B57560G104F", "ATC
+#   Semitec 104GT-2", or "AD595". This parameter must be provided.
+
+sensor_pin: analog13
+#   Analog input pin connected to the sensor. This parameter must be
+#   provided.
+
+#pullup_resistor: 4700
+#   The resistance (in ohms) of the pullup attached to the
+#   thermistor. This parameter is only valid when the sensor is a
+#   thermistor. The default is 4700 ohms.
+
+#adc_voltage: 5.0
+#   The ADC comparison voltage. This parameter is only valid when the
+#   sensor is an AD595. The default is 5 volts.
+
+min_temp: 0
+max_temp: 250
+
+min_extrude_temp: 170
+
+control: pid
+pid_Kp: 19.4644
+pid_Ki: 1.9735
+pid_Kd: 47.9942
+
+#pid_deriv_time: 2.0
+#   A time value (in seconds) over which the derivative in the pid
+#   will be smoothed to reduce the impact of measurement noise. The
+#   default is 2 seconds.
+
+#pid_integral_max:
+#   The maximum "windup" the integral term may accumulate. The default
+#   is to use the same value as max_power.
+
+
+# The heater_bed section describes a heated bed (if present - omit
+# section if not present).
+[heater_bed]
+
+heater_pin: ar8
+sensor_pin: analog14
+
+sensor_type: EPCOS 100K B57560G104F
+
+min_temp: 0
+max_temp: 110
+
+control: pid
+pid_Kp: 414.985
+pid_Ki: 149.895
+pid_Kd: 287.222
+
+# Extruder print fan (omit section if fan not present)
+[fan]
+
+pin: ar9
+#   PWM output pin controlling the fan. This parameter must be
+#   provided.
+
+#hard_pwm: 0
+#   Set this value to force hardware PWM instead of software PWM. Set
+#   to 1 to force a hardware PWM at the fastest rate; set to a higher
+#   number to force hardware PWM with the given cycle time in clock
+#   ticks. The default is 0 which enables software PWM with a cycle
+#   time of 10ms.
+
+kick_start_time: 0.200
+#   Time (in seconds) to run the fan at full speed when first enabling
+#   it (helps get the fan spinning). The default is 0.100 seconds.
+
+# Micro-controller information
+[mcu]
+
+serial: /dev/ttyUSB0
+#   The serial port to connect to the MCU. The default is /dev/ttyS0
+
+baud: 250000
+#   The baud rate to use. The default is 250000.
+
+pin_map: arduino
+#   This option may be used to enable Arduino pin name aliases. The
+#   default is to not enable the aliases.
+
+restart_method: arduino
+#   This controls the mechanism the host will use to reset the
+#   micro-controller. The choices are 'arduino', 'rpi_usb', and
+#   'command'. The 'arduino' method (toggle DTR; set baud to 1200) is
+#   common on Arduino boards and clones. The 'rpi_usb' method is
+#   useful on Raspberry Pi boards with micro-controllers powered over
+#   USB - it briefly disables power to all USB ports to accomplish a
+#   micro-controller reset. The 'command' method involves sending a
+#   Klipper command to the micro-controller so that it can reset
+#   itself. The default is 'arduino'.
+
+custom:
+#   This option may be used to specify a set of custom
+#   micro-controller commands to be sent at the start of the
+#   connection. It may be used to configure the initial settings of
+#   LEDs, to configure micro-stepping pins, to configure a digipot,
+#   etc.
+
+#turn on transition fan
+	set_digital_out pin=ar44 value=1
+
+
+# The printer section controls high level printer settings
+[printer]
+
+kinematics: delta
+#   This option must be "delta" for linear delta printers.
+
+max_velocity: 200
+#   Maximum velocity (in mm/s) of the toolhead relative to the
+#   print. This limits the velocity of the toolhead relative to the
+#   print - at the extreme end of the print envelope the delta axis
+#   steppers themselves may briefly exceed this speed by up to 3
+#   times. This parameter must be specified.
+
+max_accel: 1500
+#   Maximum acceleration (in mm/s^2) of the toolhead relative to the
+#   print. This limits the acceleration of the toolhead relative to
+#   the print - at the extreme end of the print envelope the delta
+#   axis steppers may briefly exceed this acceleration by up to 3
+#   times. This parameter must be specified.
+
+#max_accel_to_decel:
+#   A pseudo acceleration (in mm/s^2) controlling how fast the
+#   toolhead may go from acceleration to deceleration. It is used to
+#   reduce the top speed of short zig-zag moves (and thus reduce
+#   printer vibration from these moves). The default is half of
+#   max_accel.
+
+max_z_velocity: 200
+#   For delta printers this limits the maximum velocity (in mm/s) of
+#   moves with z axis movement. This setting can be used to reduce the
+#   maximum speed of up/down moves (which require a higher step rate
+#   than other moves on a delta printer). The default is to use
+#   max_velocity for max_z_velocity.
+
+motor_off_time: 600
+#   Time (in seconds) of idle time before the printer will try to
+#   disable active motors. The default is 600 seconds.
+
+#junction_deviation: 0.02
+#   Distance (in mm) used to control the internal approximated
+#   centripetal velocity cornering algorithm. A larger number will
+#   permit higher "cornering speeds" at the junction of two moves. The
+#   default is 0.02mm.
+
+delta_arm_length: <TEMPLATE_ROD>
+#   Length (in mm) of the diagonal rods that connect the linear axes
+#   to the print head. This parameter must be provided.
+
+delta_radius: <TEMPLATE_RADIUS>
+#   Radius (in mm) of the horizontal circle formed by the three linear
+#   axis towers. This parameter may also be calculated as:
+#    delta_radius = smooth_rod_offset - effector_offset - carriage_offset
+#   This parameter must be provided.
+
+
+[probe]
+pin: ^!ar18
+speed: 2.0
+max_distance: 20.0

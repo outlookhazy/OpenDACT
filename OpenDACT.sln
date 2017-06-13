@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDACT", "OpenDACT\OpenDA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReDACT", "ReDACT\ReDACT.csproj", "{5AB390CE-40DE-445F-9E81-0E3531F8371B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klipper Calibration Tool", "Klipper Calibration Tool\Klipper Calibration Tool.csproj", "{A5DAE55E-7D74-44C6-A418-65E3CE69365E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5AB390CE-40DE-445F-9E81-0E3531F8371B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AB390CE-40DE-445F-9E81-0E3531F8371B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AB390CE-40DE-445F-9E81-0E3531F8371B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5DAE55E-7D74-44C6-A418-65E3CE69365E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5DAE55E-7D74-44C6-A418-65E3CE69365E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5DAE55E-7D74-44C6-A418-65E3CE69365E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5DAE55E-7D74-44C6-A418-65E3CE69365E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

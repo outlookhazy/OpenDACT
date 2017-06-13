@@ -1,0 +1,207 @@
+﻿<Window x:Class="Klipper_Calibration_Tool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Klipper_Calibration_Tool"
+        mc:Ignorable="d"
+        Title="Klipper Calibration Tool" Height="514.167" Width="672.467" Loaded="Window_Loaded">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <GroupBox Header="Initial Settings" HorizontalAlignment="Left" >
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Label Content="Diagonal Rod"/>
+                            <TextBox x:Name="TextBoxInitialRod" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="271.500" Width="80"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Label Content="Delta Radius"/>
+                            <TextBox x:Name="TextBoxInitialRadius" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="135.054" Width="80"/>
+                        </StackPanel>
+                        <GroupBox Header="Endstop Heights">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/>
+                                    <TextBox x:Name="TextBoxInitialXEnd" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="288.216" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Y"/>
+                                    <TextBox x:Name="TextBoxInitialYEnd" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="288.0535" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Z"/>
+                                    <TextBox x:Name="TextBoxInitialZEnd" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="287.666" Width="80"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Angles">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/>
+                                    <TextBox x:Name="TextBoxInitialXAngle" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="210.738" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Y"/>
+                                    <TextBox x:Name="TextBoxInitialYAngle" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="331.402" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Z"/>
+                                    <TextBox x:Name="TextBoxInitialZangle" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="90" Width="80"/>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                        </GroupBox>
+                        <GroupBox Header="Z Probe Height" HorizontalAlignment="Right">
+                            <TextBox Name="textboxzprobeheight" Text="19.0000" Height="23"/>
+                        </GroupBox>
+                        <GroupBox  Header="Move Clearance" HorizontalAlignment="Right">
+                            <TextBox x:Name="TextBoxMoveHeight" Text="10"/>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+                
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <GroupBox Header="Measurements">
+                    <StackPanel Orientation="Vertical">
+                        <GroupBox Header="Print Radius" HorizontalAlignment="Left">
+                            <TextBox Name="TextBoxDeltaRadius" Text="100" Width="80"/>
+                        </GroupBox>
+                        <GroupBox Header="1">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint1" Text="0" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint1" Text="100" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint1" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint1" Content="Go" Width="30" Click="ButtonPoint1_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="2">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint2" Text="86.603" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint2" Text="50" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint2" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint2" Content="Go" Width="30" Click="ButtonPoint2_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="3">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint3" Text="86.603" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint3" Text="-50" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint3" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint3" Content="Go" Width="30" Click="ButtonPoint3_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="4">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint4" Text="0" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint4" Text="-100" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint4" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint4" Content="Go" Width="30" Click="ButtonPoint4_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="5">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint5" Text="-86.603" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint5" Text="-50" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint5" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint5" Content="Go" Width="30" Click="ButtonPoint5_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="6">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint6" Text="-86.603" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint6" Text="50" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint6" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint6" Content="Go" Width="30" Click="ButtonPoint6_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="7">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X:"/>
+                                <TextBox x:Name="TextBoxXPoint7" Text="0" Height="18" Width="50"/>
+                                <Label Content="Y:"/>
+                                <TextBox x:Name="TextBoxYPoint7" Text="0" Height="18" Width="50"/>
+                                <Label Content="Z:"/>
+                                <TextBox x:Name="TextBoxZPoint7" Text="0" Height="18" Width="50"/>
+                                <Button x:Name="ButtonPoint7" Content="Go" Width="30" Click="ButtonPoint7_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+                <Button Content="Calculate" Width="75" Click="Button_Click"/>
+
+            </StackPanel>
+            <StackPanel>
+                <GroupBox Header="Calculated Settings" HorizontalAlignment="Left" >
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Label Content="Diagonal Rod"/>
+                            <TextBox x:Name="TextBoxCalculatedRod" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="271.500" Width="80"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Label Content="Delta Radius"/>
+                            <TextBox x:Name="TextBoxCalculatedRadius" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="135.054" Width="80"/>
+                        </StackPanel>
+                        <GroupBox Header="Endstop Heights">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/>
+                                    <TextBox x:Name="TextBoxCalculatedEndX" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="288.216" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Y"/>
+                                    <TextBox x:Name="TextBoxCalculatedEndY" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="288.216" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Z"/>
+                                    <TextBox x:Name="TextBoxCalculatedEndZ" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="288.216" Width="80"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Angles">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/>
+                                    <TextBox x:Name="TextBoxCalculatedAngleX" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="210" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Y"/>
+                                    <TextBox x:Name="TextBoxCalculatedAngleY" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="330" Width="80"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Z"/>
+                                    <TextBox x:Name="TextBoxCalculatedAngleZ" HorizontalAlignment="Right" Height="23"  TextWrapping="Wrap" Text="90" Width="80"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+                <Button x:Name="buttonApply" IsEnabled="False" Content="Apply" Width="75" Click="Button_Apply_Click"/>
+                <Button x:Name="buttonHome" Content="Home" Width="75" Click="Button_Click_1"/>
+
+            </StackPanel>
+        </StackPanel>
+        <Label x:Name="labelresult" VerticalAlignment="Stretch" HorizontalAlignment="Center" Content=""/>
+    </StackPanel>
+</Window>
