@@ -1,109 +1,134 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Klipper_Calibration_Tool.Classes;
 using Klipper_Calibration_Tool.Classes.DataStructures;
 using Klipper_Calibration_Tool.Classes.Escher;
+using Klipper_Calibration_Tool.Classes.UI;
 using Klipper_Calibration_Tool.Properties;
 using Renci.SshNet;
 
 namespace Klipper_Calibration_Tool
 {
-    public partial class MainWindow
+    public partial class MainWindow : INotifyPropertyChanged
     {
-        int _currentpoint;
+        private int _currentpoint;
 
-        static string _decimalformat = "F8";
+        private const string Decimalformat = "F8";
+
+        #region Properties
+        //backing values
+        private double _currentRadius;
+        private double _currentRod;
+        private double _currentEndStopX;
+        private double _currentEndStopY;
+        private double _currentEndStopZ;
+        private double _currentAngleX;
+        private double _currentAngleY;
+        private double _currentAngleZ;
+
+        public double CurrentRadius {
+            get => _currentRadius;
+            set => SetAndNotify(ref _currentRadius, value);
+        }
+
+        public double CurrentRod {
+            get => _currentRod;
+            set => SetAndNotify(ref _currentRod, value);
+        }
+
+        public double CurrentEndStopX {
+            get => _currentEndStopX;
+            set => SetAndNotify(ref _currentEndStopX, value);
+        }
+
+        public double CurrentEndStopY {
+            get => _currentEndStopY;
+            set => SetAndNotify(ref _currentEndStopY, value);
+        }
+
+        public double CurrentEndStopZ {
+            get => _currentEndStopZ;
+            set => SetAndNotify(ref _currentEndStopZ, value);
+        }
+
+        public double CurrentAngleX {
+            get => _currentAngleX;
+            set => SetAndNotify(ref _currentAngleX, value);
+        }
+
+        public double CurrentAngleY {
+            get => _currentAngleY;
+            set => SetAndNotify(ref _currentAngleY, value);
+        }
+
+        public double CurrentAngleZ {
+            get => _currentAngleZ;
+            set => SetAndNotify(ref _currentAngleZ, value);
+        }
+
+        public double ZProbeHeight {
+            get => Settings.Default.ProbeZ;
+            set {
+                Settings.Default.ProbeZ = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public double MoveHeight {
+            get => Settings.Default.MoveHeight;
+            set {
+                Settings.Default.MoveHeight = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public double ZProbeMoveHeight => ZProbeHeight + MoveHeight;
+
+        public double PrintRadius {
+            get => Settings.Default.PrintRadius;
+            set {
+                Settings.Default.PrintRadius = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public BindPoint[] Point { get; } = {
+            new BindPoint(),
+            new BindPoint(),
+            new BindPoint(),
+            new BindPoint(),
+            new BindPoint(),
+            new BindPoint(),
+            new BindPoint()
+        };
+
+
+
+        #endregion
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             PseudoSerial.Init();
-
-        }
-
-        private void LoadSettings()
-        {
-            LoadSetting(TextBoxInitialRadius, Settings.Default.Radius);
-            LoadSetting(TextBoxInitialRod, Settings.Default.Rod);
-            LoadSetting(TextBoxInitialXEnd, Settings.Default.EndX);
-            LoadSetting(TextBoxInitialYEnd, Settings.Default.EndY);
-            LoadSetting(TextBoxInitialZEnd, Settings.Default.EndZ);
-            LoadSetting(TextBoxInitialXAngle, Settings.Default.AngleX);
-            LoadSetting(TextBoxInitialYAngle, Settings.Default.AngleY);
-            LoadSetting(TextBoxInitialZangle, Settings.Default.AngleZ);
-            LoadSetting(Textboxzprobeheight, Settings.Default.ProbeZ);
-            LoadSetting(TextBoxMoveHeight, Settings.Default.MoveHeight);
-            LoadSetting(TextBoxDeltaRadius, Settings.Default.PrintRadius);
-        }
-
-        private void SaveSettings()
-        {
-            Settings.Default.Radius = TextBoxInitialRadius.Text;
-            Settings.Default.Rod = TextBoxInitialRod.Text;
-            Settings.Default.EndX = TextBoxInitialXEnd.Text;
-            Settings.Default.EndY = TextBoxInitialYEnd.Text;
-            Settings.Default.EndZ = TextBoxInitialZEnd.Text;
-            Settings.Default.AngleX = TextBoxInitialXAngle.Text;
-            Settings.Default.AngleY = TextBoxInitialYAngle.Text;
-            Settings.Default.AngleZ = TextBoxInitialZangle.Text;
-            Settings.Default.ProbeZ = Textboxzprobeheight.Text;
-            Settings.Default.MoveHeight = TextBoxMoveHeight.Text;
-            Settings.Default.PrintRadius = TextBoxDeltaRadius.Text;
-
-            Settings.Default.Save();
-        }
-
-        private void LoadSetting(TextBox box, string value)
-        {
-            if (value.Length != 0)
-                box.Text = value;
         }
 
         private void PseudoSerial_MessageReceived(string message)
         {
-            if (IsPositionMessage(message) && _currentpoint != 0)
-            {
-                double z = ParseZ(message);
-                switch (_currentpoint)
-                {
-                    case 1:
-                        InvokeTextUpdate(TextBoxZPoint1, z.ToString("F3"));
-                        break;
-                    case 2:
-                        InvokeTextUpdate(TextBoxZPoint2, z.ToString("F3"));
-                        break;
-                    case 3:
-                        InvokeTextUpdate(TextBoxZPoint3, z.ToString("F3"));
-                        break;
-                    case 4:
-                        InvokeTextUpdate(TextBoxZPoint4, z.ToString("F3"));
-                        break;
-                    case 5:
-                        InvokeTextUpdate(TextBoxZPoint5, z.ToString("F3"));
-                        break;
-                    case 6:
-                        InvokeTextUpdate(TextBoxZPoint6, z.ToString("F3"));
-                        break;
-                    case 7:
-                        InvokeTextUpdate(TextBoxZPoint7, z.ToString("F3"));
-                        break;
-                }
-                _currentpoint = 0;
-            }
+            if (!IsPositionMessage(message) || _currentpoint == -1) return;
+
+            double z = ParseZ(message);
+            Point[_currentpoint].Z = z;
+
+            _currentpoint = -1;
         }
 
-        private void InvokeTextUpdate(TextBox target, string text)
-        {
-            target.Dispatcher.Invoke(() =>
-            {
-                target.Text = text;
-            });
-        }
-
-        private bool IsPositionMessage(string message)
+        private static bool IsPositionMessage(string message)
         {
             return message.Split(' ').Length == 8 && !message.Contains("!!");
         }
@@ -117,66 +142,31 @@ namespace Klipper_Calibration_Tool
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            double rod = double.Parse(TextBoxInitialRod.Text);
-            double radius = double.Parse(TextBoxInitialRadius.Text);
-            double hx = double.Parse(TextBoxInitialXEnd.Text);
-            double hy = double.Parse(TextBoxInitialYEnd.Text);
-            double hz = double.Parse(TextBoxInitialZEnd.Text);
-            double height = hx;
-            if (hy < height)
-                height = hy;
-            if (hz < height)
-                height = hz;
-            double offHx = hx - height;
-            double offHy = hy - height;
-            double offHz = hz - height;
+            double height = CurrentEndStopX;
+            if (CurrentEndStopY < height)
+                height = CurrentEndStopY;
+            if (CurrentEndStopZ < height)
+                height = CurrentEndStopZ;
+            double offHx = CurrentEndStopX - height;
+            double offHy = CurrentEndStopY - height;
+            double offHz = CurrentEndStopZ - height;
 
-            Debug.WriteLine("Initial height:{0}", height);
-            Debug.WriteLine("Initial offsets: X:{0}, Y:{1}, Z:{2}", offHx, offHy, offHz);
+            Debug.WriteLine($"Initial height:{height}");
+            Debug.WriteLine($"Initial offsets: X:{offHx}, Y:{offHy}, Z:{offHz}");
 
-            double offAx = double.Parse(TextBoxInitialXAngle.Text) - 210;
-            double offAy = double.Parse(TextBoxInitialYAngle.Text) - 330;
-            double offAz = double.Parse(TextBoxInitialZangle.Text) - 90;
+            double offAx = CurrentAngleX - 210;
+            double offAy = CurrentAngleY - 330;
+            double offAz = CurrentAngleZ - 90;
 
-            DParameters deltaP = new DParameters(rod, radius, height, offHx, offHy, offHz, offAx, offAy, offAz);
+            DParameters deltaP = new DParameters(CurrentRod, CurrentRadius, height, offHx, offHy, offHz, offAx, offAy, offAz);
 
             Parameters deltaT = new Parameters(DParameters.FirmwareType.Klipper, 7, 6, true)
             {
-                XBedProbePoints = new[]
-            {
-                double.Parse(TextBoxXPoint1.Text),
-                double.Parse(TextBoxXPoint2.Text),
-                double.Parse(TextBoxXPoint3.Text),
-                double.Parse(TextBoxXPoint4.Text),
-                double.Parse(TextBoxXPoint5.Text),
-                double.Parse(TextBoxXPoint6.Text),
-                double.Parse(TextBoxXPoint7.Text)
-            },
+                XBedProbePoints = Point.Select(value => value.X).ToArray(),
+                YBedProbePoints = Point.Select(value => value.Y).ToArray(),
+                ZBedProbePoints = Point.Select(value => value.Z - ZProbeHeight).ToArray()
+            }; //valid params 3 4 6 7
 
-                YBedProbePoints = new[]
-            {
-                double.Parse(TextBoxYPoint1.Text),
-                double.Parse(TextBoxYPoint2.Text),
-                double.Parse(TextBoxYPoint3.Text),
-                double.Parse(TextBoxYPoint4.Text),
-                double.Parse(TextBoxYPoint5.Text),
-                double.Parse(TextBoxYPoint6.Text),
-                double.Parse(TextBoxYPoint7.Text)
-            }
-            };//valid params 3 4 6 7
-
-
-            double zeroheight = double.Parse(Textboxzprobeheight.Text);
-            deltaT.ZBedProbePoints = new[]
-            {
-                double.Parse(TextBoxZPoint1.Text) - zeroheight,
-                double.Parse(TextBoxZPoint2.Text) - zeroheight,
-                double.Parse(TextBoxZPoint3.Text) - zeroheight,
-                double.Parse(TextBoxZPoint4.Text) - zeroheight,
-                double.Parse(TextBoxZPoint5.Text) - zeroheight,
-                double.Parse(TextBoxZPoint6.Text) - zeroheight,
-                double.Parse(TextBoxZPoint7.Text) - zeroheight
-            };
 
             CalibrationResult cr = Escher3D.Calc(ref deltaP, ref deltaT);
             Labelresult.Content = cr.ToString();
@@ -188,18 +178,18 @@ namespace Klipper_Calibration_Tool
             double newZStop = newheight + deltaP.Zstop;
 
             Debug.WriteLine("Calculated height:{0}", newheight);
-            Debug.WriteLine("Initial offsets: X:{0}, Y:{1}, Z:{2}", offHx, offHy, offHz);
+            Debug.WriteLine($"Initial offsets: X:{offHx}, Y:{offHy}, Z:{offHz}");
 
-            TextBoxCalculatedRadius.Text = deltaP.Radius.ToString(_decimalformat);
-            TextBoxCalculatedRod.Text = deltaP.Diagonal.ToString(_decimalformat);
+            TextBoxCalculatedRadius.Text = deltaP.Radius.ToString(Decimalformat);
+            TextBoxCalculatedRod.Text = deltaP.Diagonal.ToString(Decimalformat);
 
-            TextBoxCalculatedEndX.Text = newXStop.ToString(_decimalformat);
-            TextBoxCalculatedEndY.Text = newYStop.ToString(_decimalformat);
-            TextBoxCalculatedEndZ.Text = newZStop.ToString(_decimalformat);
+            TextBoxCalculatedEndX.Text = newXStop.ToString(Decimalformat);
+            TextBoxCalculatedEndY.Text = newYStop.ToString(Decimalformat);
+            TextBoxCalculatedEndZ.Text = newZStop.ToString(Decimalformat);
 
-            TextBoxCalculatedAngleX.Text = (210 + deltaP.Xadj).ToString(_decimalformat);
-            TextBoxCalculatedAngleY.Text = (330 + deltaP.Yadj).ToString(_decimalformat);
-            TextBoxCalculatedAngleZ.Text = (90 + deltaP.Zadj).ToString(_decimalformat);
+            TextBoxCalculatedAngleX.Text = (210 + deltaP.Xadj).ToString(Decimalformat);
+            TextBoxCalculatedAngleY.Text = (330 + deltaP.Yadj).ToString(Decimalformat);
+            TextBoxCalculatedAngleZ.Text = (90 + deltaP.Zadj).ToString(Decimalformat);
 
             ButtonApply.IsEnabled = true;
         }
@@ -241,25 +231,8 @@ namespace Klipper_Calibration_Tool
         {
             Apply();
 
-            TextBoxInitialRadius.Text = TextBoxCalculatedRadius.Text;
-
-            TextBoxInitialRod.Text = TextBoxCalculatedRod.Text;
-
-            TextBoxInitialXEnd.Text = TextBoxCalculatedEndX.Text;
-
-            TextBoxInitialYEnd.Text = TextBoxCalculatedEndY.Text;
-
-            TextBoxInitialZEnd.Text = TextBoxCalculatedEndZ.Text;
-
-            TextBoxInitialXAngle.Text = TextBoxCalculatedAngleX.Text;
-
-            TextBoxInitialYAngle.Text = TextBoxCalculatedAngleY.Text;
-
-            TextBoxInitialZangle.Text = TextBoxCalculatedAngleZ.Text;
-
             Clear();
 
-            SaveSettings();
             ButtonApply.IsEnabled = false;
             ButtonHome.IsEnabled = false;
             Task.Delay(10000).ContinueWith(t =>
@@ -282,125 +255,79 @@ namespace Klipper_Calibration_Tool
             TextBoxCalculatedAngleY.Text = "";
             TextBoxCalculatedAngleZ.Text = "";
 
-            TextBoxZPoint1.Text = "";
-            TextBoxZPoint2.Text = "";
-            TextBoxZPoint3.Text = "";
-            TextBoxZPoint4.Text = "";
-            TextBoxZPoint5.Text = "";
-            TextBoxZPoint6.Text = "";
-            TextBoxZPoint7.Text = "";
+            foreach (BindPoint p in Point)
+            {
+                p.Z = 0;
+            }
         }
 
         private void ButtonPoint1_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 1;
-            SendMove(
-                double.Parse(TextBoxXPoint1.Text),
-                double.Parse(TextBoxYPoint1.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 0;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint1.Text),
-                double.Parse(TextBoxYPoint1.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void ButtonPoint2_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 2;
-            SendMove(
-                double.Parse(TextBoxXPoint2.Text),
-                double.Parse(TextBoxYPoint2.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 1;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint2.Text),
-                double.Parse(TextBoxYPoint2.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void ButtonPoint3_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 3;
-            SendMove(
-                double.Parse(TextBoxXPoint3.Text),
-                double.Parse(TextBoxYPoint3.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 2;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint3.Text),
-                double.Parse(TextBoxYPoint3.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void ButtonPoint4_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 4;
-            SendMove(
-                double.Parse(TextBoxXPoint4.Text),
-                double.Parse(TextBoxYPoint4.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 3;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint4.Text),
-                double.Parse(TextBoxYPoint4.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void ButtonPoint5_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 5;
-            SendMove(
-                double.Parse(TextBoxXPoint5.Text),
-                double.Parse(TextBoxYPoint5.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 4;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint5.Text),
-                double.Parse(TextBoxYPoint5.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
-
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void ButtonPoint6_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 6;
-            SendMove(
-                double.Parse(TextBoxXPoint6.Text),
-                double.Parse(TextBoxYPoint6.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 5;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint6.Text),
-                double.Parse(TextBoxYPoint6.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
         private void ButtonPoint7_Click(object sender, RoutedEventArgs e)
         {
-            _currentpoint = 7;
-            SendMove(
-                double.Parse(TextBoxXPoint7.Text),
-                double.Parse(TextBoxYPoint7.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            _currentpoint = 6;
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
             PseudoSerial.WriteLine("m400", 1);
             PseudoSerial.WriteLine("probe", 1);
             PseudoSerial.WriteLine("m114", 2);
-            SendMove(
-                double.Parse(TextBoxXPoint7.Text),
-                double.Parse(TextBoxYPoint7.Text),
-                 double.Parse(Textboxzprobeheight.Text) + double.Parse(TextBoxMoveHeight.Text));
+            SendMove(Point[_currentpoint].X, Point[_currentpoint].Y, ZProbeMoveHeight);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -410,36 +337,28 @@ namespace Klipper_Calibration_Tool
 
         private void SendMove(double x, double y, double z, double f = 8000)
         {
-            PseudoSerial.WriteLine(string.Format("G1 X{0} Y{1} Z{2} F{3}", x, y, z, f), 1);
+            PseudoSerial.WriteLine($"G1 X{x} Y{y} Z{z} F{f}", 1);
         }
 
         private void TextBoxDeltaRadius_TextChanged(object sender, TextChangedEventArgs e)
         {
-            double printradius = double.Parse(TextBoxDeltaRadius.Text);
+            double printradius = CurrentRadius;
             double[,] points = Parameters.CalcPoints(printradius, 6);
-            TextBoxXPoint1.Text = points[0, 0].ToString("F3");
-            TextBoxYPoint1.Text = points[0, 1].ToString("F3");
-            TextBoxXPoint2.Text = points[1, 0].ToString("F3");
-            TextBoxYPoint2.Text = points[1, 1].ToString("F3");
-            TextBoxXPoint3.Text = points[2, 0].ToString("F3");
-            TextBoxYPoint3.Text = points[2, 1].ToString("F3");
-            TextBoxXPoint4.Text = points[3, 0].ToString("F3");
-            TextBoxYPoint4.Text = points[3, 1].ToString("F3");
-            TextBoxXPoint5.Text = points[4, 0].ToString("F3");
-            TextBoxYPoint5.Text = points[4, 1].ToString("F3");
-            TextBoxXPoint6.Text = points[5, 0].ToString("F3");
-            TextBoxYPoint6.Text = points[5, 1].ToString("F3");
-            TextBoxXPoint7.Text = "0.000";
-            TextBoxYPoint7.Text = "0.000";
+            for (int i = 0; i < 6; i++)
+            {
+                Point[i].X = points[i, 0];
+                Point[i].Y = points[i, 1];
+            }
+
+            Point[6].X = 0;
+            Point[6].Y = 0;
 
             Clear();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            TextBoxDeltaRadius.TextChanged += TextBoxDeltaRadius_TextChanged;
             PseudoSerial.MessageReceived += PseudoSerial_MessageReceived;
-            LoadSettings();
             Clear();
         }
     }

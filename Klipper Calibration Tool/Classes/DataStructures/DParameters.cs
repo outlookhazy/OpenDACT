@@ -32,8 +32,6 @@ namespace Klipper_Calibration_Tool.Classes.DataStructures
         internal FirmwareType Firmware;
         internal double Stepspermm;
 
-        public DParameters() { }
-
         public DParameters(double diagonal, double radius, double homedHeight, double xstop, double ystop, double zstop, double xadj, double yadj, double zadj)
         {
             Diagonal = diagonal;

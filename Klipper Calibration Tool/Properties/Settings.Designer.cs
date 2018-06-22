@@ -8,19 +8,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.CodeDom.Compiler;
-using System.Configuration;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-
 namespace Klipper_Calibration_Tool.Properties {
     
     
-    [CompilerGenerated()]
-    [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
-    internal sealed partial class Settings : ApplicationSettingsBase {
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.7.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(Synchronized(new Settings())));
+        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
         public static Settings Default {
             get {
@@ -28,132 +23,36 @@ namespace Klipper_Calibration_Tool.Properties {
             }
         }
         
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string Rod {
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("19")]
+        public double ProbeZ {
             get {
-                return ((string)(this["Rod"]));
-            }
-            set {
-                this["Rod"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string Radius {
-            get {
-                return ((string)(this["Radius"]));
-            }
-            set {
-                this["Radius"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string EndX {
-            get {
-                return ((string)(this["EndX"]));
-            }
-            set {
-                this["EndX"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string EndY {
-            get {
-                return ((string)(this["EndY"]));
-            }
-            set {
-                this["EndY"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string EndZ {
-            get {
-                return ((string)(this["EndZ"]));
-            }
-            set {
-                this["EndZ"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string AngleX {
-            get {
-                return ((string)(this["AngleX"]));
-            }
-            set {
-                this["AngleX"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string AngleY {
-            get {
-                return ((string)(this["AngleY"]));
-            }
-            set {
-                this["AngleY"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string AngleZ {
-            get {
-                return ((string)(this["AngleZ"]));
-            }
-            set {
-                this["AngleZ"] = value;
-            }
-        }
-        
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string ProbeZ {
-            get {
-                return ((string)(this["ProbeZ"]));
+                return ((double)(this["ProbeZ"]));
             }
             set {
                 this["ProbeZ"] = value;
             }
         }
         
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("")]
-        public string MoveHeight {
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public double MoveHeight {
             get {
-                return ((string)(this["MoveHeight"]));
+                return ((double)(this["MoveHeight"]));
             }
             set {
                 this["MoveHeight"] = value;
             }
         }
         
-        [UserScopedSetting()]
-        [DebuggerNonUserCode()]
-        [DefaultSettingValue("100")]
-        public string PrintRadius {
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double PrintRadius {
             get {
-                return ((string)(this["PrintRadius"]));
+                return ((double)(this["PrintRadius"]));
             }
             set {
                 this["PrintRadius"] = value;

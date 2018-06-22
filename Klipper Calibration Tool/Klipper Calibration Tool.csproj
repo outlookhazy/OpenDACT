@@ -70,8 +70,11 @@
     <Compile Include="Classes\DataStructures\DParameters.cs" />
     <Compile Include="Classes\DataStructures\ReMatrix.cs" />
     <Compile Include="Classes\DataStructures\TParameters.cs" />
+    <Compile Include="Classes\DataStructures\ViewModelBase.cs" />
     <Compile Include="Classes\Escher\Escher3D.cs" />
     <Compile Include="Classes\PseudoSerial.cs" />
+    <Compile Include="Classes\UI\BindPoint.cs" />
+    <Compile Include="Classes\UI\ViewWindow.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
