@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Klipper_Calibration_Tool.Classes.Escher;
 
-namespace ReDACT.Classes.Escher
+namespace Klipper_Calibration_Tool.Classes.DataStructures
 {
     public class DParameters
     {
         internal double D2;
-        internal double[] towerX;
-        internal double[] towerY;
-        internal double coreFa;
-        internal double coreFb;
-        internal double coreFc;
+        internal double[] TowerX;
+        internal double[] TowerY;
+        internal double CoreFa;
+        internal double CoreFb;
+        internal double CoreFc;
         internal double Xbc;
         internal double Ybc;
         internal double Xca;
@@ -22,71 +19,71 @@ namespace ReDACT.Classes.Escher
         internal double Yca;
         internal double Q2;
         internal double Q;
-        internal double radius;
-        internal double xadj;
-        internal double yadj;
-        internal double zadj;
-        internal double diagonal;
-        internal double homedCarriageHeight;
-        internal double homedHeight;
-        internal double xstop;
-        internal double ystop;
-        internal double zstop;
-        internal Firmware firmware;
-        internal double stepspermm;
+        internal double Radius;
+        internal double Xadj;
+        internal double Yadj;
+        internal double Zadj;
+        internal double Diagonal;
+        internal double HomedCarriageHeight;
+        internal double HomedHeight;
+        internal double Xstop;
+        internal double Ystop;
+        internal double Zstop;
+        internal FirmwareType Firmware;
+        internal double Stepspermm;
 
         public DParameters() { }
 
         public DParameters(double diagonal, double radius, double homedHeight, double xstop, double ystop, double zstop, double xadj, double yadj, double zadj)
         {
-            this.diagonal = diagonal;
-            this.radius = radius;
-            this.homedHeight = homedHeight;
-            this.xstop = xstop;
-            this.ystop = ystop;
-            this.zstop = zstop;
-            this.xadj = xadj;
-            this.yadj = yadj;
-            this.zadj = zadj;
+            Diagonal = diagonal;
+            Radius = radius;
+            HomedHeight = homedHeight;
+            Xstop = xstop;
+            Ystop = ystop;
+            Zstop = zstop;
+            Xadj = xadj;
+            Yadj = yadj;
+            Zadj = zadj;
             Recalc();
         }
 
         public void Recalc()
         {
-            this.towerX = new double[3];
-            this.towerY = new double[3];
-            this.towerX[0] = (-(this.radius * Math.Cos((30 + this.xadj) * Escher3D.degreesToRadians)));
-            this.towerY[0] = (-(this.radius * Math.Sin((30 + this.xadj) * Escher3D.degreesToRadians)));
-            this.towerX[1] = (+(this.radius * Math.Cos((30 - this.yadj) * Escher3D.degreesToRadians)));
-            this.towerY[1] = (-(this.radius * Math.Sin((30 - this.yadj) * Escher3D.degreesToRadians)));
-            this.towerX[2] = (-(this.radius * Math.Sin(this.zadj * Escher3D.degreesToRadians)));
-            this.towerY[2] = (+(this.radius * Math.Cos(this.zadj * Escher3D.degreesToRadians)));
+            TowerX = new double[3];
+            TowerY = new double[3];
+            TowerX[0] = -(Radius * Math.Cos((30 + Xadj) * Escher3D.DegreesToRadians));
+            TowerY[0] = -(Radius * Math.Sin((30 + Xadj) * Escher3D.DegreesToRadians));
+            TowerX[1] = +(Radius * Math.Cos((30 - Yadj) * Escher3D.DegreesToRadians));
+            TowerY[1] = -(Radius * Math.Sin((30 - Yadj) * Escher3D.DegreesToRadians));
+            TowerX[2] = -(Radius * Math.Sin(Zadj * Escher3D.DegreesToRadians));
+            TowerY[2] = +(Radius * Math.Cos(Zadj * Escher3D.DegreesToRadians));
 
-            this.Xbc = this.towerX[2] - this.towerX[1];
-            this.Xca = this.towerX[0] - this.towerX[2];
-            this.Xab = this.towerX[1] - this.towerX[0];
-            this.Ybc = this.towerY[2] - this.towerY[1];
-            this.Yca = this.towerY[0] - this.towerY[2];
-            this.Yab = this.towerY[1] - this.towerY[0];
-            this.coreFa = Escher3D.fsquare(this.towerX[0]) + Escher3D.fsquare(this.towerY[0]);
-            this.coreFb = Escher3D.fsquare(this.towerX[1]) + Escher3D.fsquare(this.towerY[1]);
-            this.coreFc = Escher3D.fsquare(this.towerX[2]) + Escher3D.fsquare(this.towerY[2]);
-            this.Q = 2 * (this.Xca * this.Yab - this.Xab * this.Yca);
-            this.Q2 = Escher3D.fsquare(this.Q);
-            this.D2 = Escher3D.fsquare(this.diagonal);
+            Xbc = TowerX[2] - TowerX[1];
+            Xca = TowerX[0] - TowerX[2];
+            Xab = TowerX[1] - TowerX[0];
+            Ybc = TowerY[2] - TowerY[1];
+            Yca = TowerY[0] - TowerY[2];
+            Yab = TowerY[1] - TowerY[0];
+            CoreFa = Escher3D.Fsquare(TowerX[0]) + Escher3D.Fsquare(TowerY[0]);
+            CoreFb = Escher3D.Fsquare(TowerX[1]) + Escher3D.Fsquare(TowerY[1]);
+            CoreFc = Escher3D.Fsquare(TowerX[2]) + Escher3D.Fsquare(TowerY[2]);
+            Q = 2 * (Xca * Yab - Xab * Yca);
+            Q2 = Escher3D.Fsquare(Q);
+            D2 = Escher3D.Fsquare(Diagonal);
 
             // Calculate the base carriage height when the printer is homed.
-            var tempHeight = this.diagonal;     // any sensible height will do here, probably even zero
-            this.homedCarriageHeight = this.homedHeight + tempHeight - Escher3D.InverseTransform(tempHeight, tempHeight, tempHeight, this);
+            double tempHeight = Diagonal;     // any sensible height will do here, probably even zero
+            HomedCarriageHeight = HomedHeight + tempHeight - Escher3D.InverseTransform(tempHeight, tempHeight, tempHeight, this);
         }
 
-        public enum Firmware
+        public enum FirmwareType
         {
-            KLIPPER,
-            MARLIN,
-            MARLINRC,
-            REPETIER,
-            RRF
+            Klipper,
+            Marlin,
+            Marlinrc,
+            Repetier,
+            Rrf
         }
     }
 }

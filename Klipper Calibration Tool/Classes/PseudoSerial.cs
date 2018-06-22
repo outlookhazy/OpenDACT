@@ -1,39 +1,36 @@
-﻿using Renci.SshNet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Renci.SshNet;
 
 namespace Klipper_Calibration_Tool.Classes
 {
     public delegate void MessageReceivedHandler(string message);
 
-    static class PseudoSerial
+    internal static class PseudoSerial
     {
-        static SshClient client;
-        static ShellStream ss;
+        private static SshClient _client;
+        private static ShellStream _ss;
 
-        static Queue<Tuple<string, int>> messageQueue = new Queue<Tuple<string,int>>();
+        private static readonly Queue<Tuple<string, int>> MessageQueue = new Queue<Tuple<string, int>>();
 
-        volatile static int waitingresponse = 0;
+        static volatile int _waitingresponse;
 
         public static event MessageReceivedHandler MessageReceived;
 
         private static void OnMessage(string message)
         {
-            if (MessageReceived != null)
-                MessageReceived(message);
+            MessageReceived?.Invoke(message);
         }
 
         public static void Init()
         {
-            client = new SshClient("192.168.76.239", "pi", "raspberry");
-            client.Connect();
-            ss = client.CreateShellStream("fakeshell", 80, 200, 50, 100, 80000);
-            Task readTask = new Task(new Action(() => { ReadThread(); }));
+            _client = new SshClient("192.168.76.239", "pi", "raspberry");
+            _client.Connect();
+            _ss = _client.CreateShellStream("fakeshell", 80, 200, 50, 100, 80000);
+            Task readTask = new Task(ReadThread);
             readTask.Start();
         }
 
@@ -41,48 +38,48 @@ namespace Klipper_Calibration_Tool.Classes
         {
             Console.WriteLine("connecting");
 
-            while (!ss.ReadLine().Contains("$")) {
-                ss.WriteLine("\n");
+            while (!_ss.ReadLine().Contains("$"))
+            {
+                _ss.WriteLine("\n");
                 Thread.Sleep(500);
             }
             Console.WriteLine("connected, starting printer stream");
-            ss.WriteLine("cat /tmp/printer");
+            _ss.WriteLine("cat /tmp/printer");
             while (true)
             {
-                string line = ss.ReadLine();
-                waitingresponse--;
+                string line = _ss.ReadLine();
+                _waitingresponse--;
                 Debug.WriteLine(line);
                 OnMessage(line);
-                
             }
         }
 
         public static void WriteLine(string text, int responselength)
         {
-            messageQueue.Enqueue(new Tuple<string, int>(text, responselength));
-            if(! queueactive)
-                ProcessQueue();                       
+            MessageQueue.Enqueue(new Tuple<string, int>(text, responselength));
+            if (!Queueactive)
+                ProcessQueue();
         }
-        public static volatile bool queueactive = false;
+        public static volatile bool Queueactive;
         private static void ProcessQueue()
         {
-            queueactive = true;
+            Queueactive = true;
 
-            if (waitingresponse > 0)
+            if (_waitingresponse > 0)
             {
                 Task.Delay(100).ContinueWith(t => { ProcessQueue(); });
                 return;
             }
 
-            Tuple<string, int> nextmessage = messageQueue.Dequeue();
-            waitingresponse = nextmessage.Item2;
+            Tuple<string, int> nextmessage = MessageQueue.Dequeue();
+            _waitingresponse = nextmessage.Item2;
             Debug.WriteLine("Sending " + nextmessage.Item1);
-            client.RunCommand(String.Format("echo {0} > /tmp/printer", nextmessage.Item1));
+            _client.RunCommand($"echo {nextmessage.Item1} > /tmp/printer");
 
-            if (messageQueue.Count > 0)
+            if (MessageQueue.Count > 0)
                 Task.Delay(100).ContinueWith(t => { ProcessQueue(); });
             else
-                queueactive = false;
+                Queueactive = false;
         }
     }
 }

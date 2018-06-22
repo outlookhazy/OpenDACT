@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Klipper_Calibration_Tool"
         mc:Ignorable="d"
         Title="Klipper Calibration Tool" Height="514.167" Width="672.467" Loaded="Window_Loaded">
     <StackPanel Orientation="Vertical">
@@ -54,7 +53,7 @@
                             
                         </GroupBox>
                         <GroupBox Header="Z Probe Height" HorizontalAlignment="Right">
-                            <TextBox Name="textboxzprobeheight" Text="19.0000" Height="23"/>
+                            <TextBox Name="Textboxzprobeheight" Text="19.0000" Height="23"/>
                         </GroupBox>
                         <GroupBox  Header="Move Clearance" HorizontalAlignment="Right">
                             <TextBox x:Name="TextBoxMoveHeight" Text="10"/>
@@ -197,11 +196,11 @@
                         </GroupBox>
                     </StackPanel>
                 </GroupBox>
-                <Button x:Name="buttonApply" IsEnabled="False" Content="Apply" Width="75" Click="Button_Apply_Click"/>
-                <Button x:Name="buttonHome" Content="Home" Width="75" Click="Button_Click_1"/>
+                <Button x:Name="ButtonApply" IsEnabled="False" Content="Apply" Width="75" Click="Button_Apply_Click"/>
+                <Button x:Name="ButtonHome" Content="Home" Width="75" Click="Button_Click_1"/>
 
             </StackPanel>
         </StackPanel>
-        <Label x:Name="labelresult" VerticalAlignment="Stretch" HorizontalAlignment="Center" Content=""/>
+        <Label x:Name="Labelresult" VerticalAlignment="Stretch" HorizontalAlignment="Center" Content=""/>
     </StackPanel>
 </Window>

@@ -1,53 +1,49 @@
-﻿using ReDACT.Classes.Escher;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ReDACT.Classes.Escher.DParameters;
+﻿using System;
+using Klipper_Calibration_Tool.Classes.DataStructures;
 
-namespace ReDACT.Classes
+namespace Klipper_Calibration_Tool.Classes.Escher
 {
     public static class Escher3D
     {
-        static bool debug = false;
-        static string _debug;
-        static string EscherDebug { get { return _debug; } set { Escher3D._debug = value; Debug.WriteLine(value); } }
-        public const double degreesToRadians = Math.PI / 180.0;
+        private static string _debug;
+        public static string EscherDebug {
+            get => _debug;
+            set { _debug = value; System.Diagnostics.Debug.WriteLine(value); }
+        }
+        public const double DegreesToRadians = Math.PI / 180.0;
 
-        public static double fsquare(double value)
+        public static double Fsquare(double value)
         {
             return Math.Pow(value, 2.0);
-        }    
-        
-        public static double Transform(double[] machinePos, int axis, ref DParameters machine)
-        {
-            return machinePos[2] + Math.Sqrt(machine.D2 - fsquare(machinePos[0] - machine.towerX[axis]) - fsquare(machinePos[1] - machine.towerY[axis]));
         }
 
-        public static double InverseTransform(double Ha, double Hb, double Hc, DParameters machine)
+        public static double Transform(double[] machinePos, int axis, ref DParameters machine)
         {
-            double Fa = machine.coreFa + fsquare(Ha);
-            double Fb = machine.coreFb + fsquare(Hb);
-            double Fc = machine.coreFc + fsquare(Hc);
+            return machinePos[2] + Math.Sqrt(machine.D2 - Fsquare(machinePos[0] - machine.TowerX[axis]) - Fsquare(machinePos[1] - machine.TowerY[axis]));
+        }
+
+        public static double InverseTransform(double ha, double hb, double hc, DParameters machine)
+        {
+            double fa = machine.CoreFa + Fsquare(ha);
+            double fb = machine.CoreFb + Fsquare(hb);
+            double fc = machine.CoreFc + Fsquare(hc);
 
             // Setup PQRSU such that x = -(S - uz)/P, y = (P - Rz)/Q
-            double P = (machine.Xbc * Fa) + (machine.Xca * Fb) + (machine.Xab * Fc);
-            double S = (machine.Ybc * Fa) + (machine.Yca * Fb) + (machine.Yab * Fc);
+            double p = machine.Xbc * fa + machine.Xca * fb + machine.Xab * fc;
+            double s = machine.Ybc * fa + machine.Yca * fb + machine.Yab * fc;
 
-            double R = 2.0 * ((machine.Xbc * Ha) + (machine.Xca * Hb) + (machine.Xab * Hc));
-            double U = 2.0 * ((machine.Ybc * Ha) + (machine.Yca * Hb) + (machine.Yab * Hc));
+            double r = 2.0 * (machine.Xbc * ha + machine.Xca * hb + machine.Xab * hc);
+            double u = 2.0 * (machine.Ybc * ha + machine.Yca * hb + machine.Yab * hc);
 
-            double R2 = fsquare(R);
-            double U2 = fsquare(U);
+            double r2 = Fsquare(r);
+            double u2 = Fsquare(u);
 
-            double A = U2 + R2 + machine.Q2;
-            double minusHalfB = S * U + P * R + Ha * machine.Q2 + machine.towerX[0] * U * machine.Q - machine.towerY[0] * R * machine.Q;
-            double C = fsquare(S + machine.towerX[0] * machine.Q) + fsquare(P - machine.towerY[0] * machine.Q) + (fsquare(Ha) - machine.D2) * machine.Q2;
+            double a = u2 + r2 + machine.Q2;
+            double minusHalfB = s * u + p * r + ha * machine.Q2 + machine.TowerX[0] * u * machine.Q - machine.TowerY[0] * r * machine.Q;
+            double c = Fsquare(s + machine.TowerX[0] * machine.Q) + Fsquare(p - machine.TowerY[0] * machine.Q) + (Fsquare(ha) - machine.D2) * machine.Q2;
 
-            double rslt = (minusHalfB - Math.Sqrt(fsquare(minusHalfB) - A * C)) / A;
-            if (Double.IsNaN(rslt))
+            double rslt = (minusHalfB - Math.Sqrt(Fsquare(minusHalfB) - a * c)) / a;
+            if (double.IsNaN(rslt))
             {
                 throw new Exception("At least one probe point is not reachable. Please correct your delta radius, diagonal rod length, or probe coordniates.");
             }
@@ -56,9 +52,9 @@ namespace ReDACT.Classes
 
         public static double ComputeDerivative(int deriv, double ha, double hb, double hc, DParameters machine)
         {
-            double perturb = 0.001;          // perturbation amount in mm or degrees
-            DParameters hiParams = new DParameters(machine.diagonal, machine.radius, machine.homedHeight, machine.xstop, machine.ystop, machine.zstop, machine.xadj, machine.yadj, machine.zadj);
-            DParameters loParams = new DParameters(machine.diagonal, machine.radius, machine.homedHeight, machine.xstop, machine.ystop, machine.zstop, machine.xadj, machine.yadj, machine.zadj);
+            const double perturb = 0.001; // perturbation amount in mm or degrees
+            DParameters hiParams = new DParameters(machine.Diagonal, machine.Radius, machine.HomedHeight, machine.Xstop, machine.Ystop, machine.Zstop, machine.Xadj, machine.Yadj, machine.Zadj);
+            DParameters loParams = new DParameters(machine.Diagonal, machine.Radius, machine.HomedHeight, machine.Xstop, machine.Ystop, machine.Zstop, machine.Xadj, machine.Yadj, machine.Zadj);
             switch (deriv)
             {
                 case 0:
@@ -67,56 +63,56 @@ namespace ReDACT.Classes
                     break;
 
                 case 3:
-                    hiParams.radius += perturb;
-                    loParams.radius -= perturb;
+                    hiParams.Radius += perturb;
+                    loParams.Radius -= perturb;
                     break;
 
                 case 4:
-                    hiParams.xadj += perturb;
-                    loParams.xadj -= perturb;
+                    hiParams.Xadj += perturb;
+                    loParams.Xadj -= perturb;
                     break;
 
                 case 5:
-                    hiParams.yadj += perturb;
-                    loParams.yadj -= perturb;
+                    hiParams.Yadj += perturb;
+                    loParams.Yadj -= perturb;
                     break;
 
                 case 6:
-                    hiParams.diagonal += perturb;
-                    loParams.diagonal -= perturb;
+                    hiParams.Diagonal += perturb;
+                    loParams.Diagonal -= perturb;
                     break;
             }
 
             hiParams.Recalc();
             loParams.Recalc();
 
-            double zHi = Escher3D.InverseTransform((deriv == 0) ? ha + perturb : ha, (deriv == 1) ? hb + perturb : hb, (deriv == 2) ? hc + perturb : hc, hiParams);
-            double zLo = Escher3D.InverseTransform((deriv == 0) ? ha - perturb : ha, (deriv == 1) ? hb - perturb : hb, (deriv == 2) ? hc - perturb : hc, loParams);
+            double zHi = InverseTransform(deriv == 0 ? ha + perturb : ha, deriv == 1 ? hb + perturb : hb, deriv == 2 ? hc + perturb : hc, hiParams);
+            double zLo = InverseTransform(deriv == 0 ? ha - perturb : ha, deriv == 1 ? hb - perturb : hb, deriv == 2 ? hc - perturb : hc, loParams);
 
             return (zHi - zLo) / (2.0 * perturb);
         }
 
-        
+
 
         public static void NormaliseEndstopAdjustments(DParameters machine)
         {
-            double eav = (machine.firmware == Firmware.MARLIN || machine.firmware == Firmware.MARLINRC || machine.firmware == Firmware.REPETIER || machine.firmware == Firmware.KLIPPER) ? Math.Min(machine.xstop, Math.Min(machine.ystop, machine.zstop))
-                : (machine.xstop + machine.ystop + machine.zstop) / 3.0;
-            machine.xstop -= eav;
-            machine.ystop -= eav;
-            machine.zstop -= eav;
-            machine.homedHeight += eav;
-            machine.homedCarriageHeight += eav;				// no need for a full recalc, this is sufficient
+            double eav = machine.Firmware == DParameters.FirmwareType.Marlin || machine.Firmware == DParameters.FirmwareType.Marlinrc || machine.Firmware == DParameters.FirmwareType.Repetier || machine.Firmware == DParameters.FirmwareType.Klipper ? Math.Min(machine.Xstop, Math.Min(machine.Ystop, machine.Zstop))
+                : (machine.Xstop + machine.Ystop + machine.Zstop) / 3.0;
+            machine.Xstop -= eav;
+            machine.Ystop -= eav;
+            machine.Zstop -= eav;
+            machine.HomedHeight += eav;
+            machine.HomedCarriageHeight += eav;				// no need for a full recalc, this is sufficient
         }
 
         public static void Adjust(int numFactors, double[] v, bool norm, DParameters machine)
         {
-            double oldCarriageHeightA = machine.homedCarriageHeight + machine.xstop; // save for later
+            double oldCarriageHeightA = machine.HomedCarriageHeight + machine.Xstop; // save for later
 
             // Update endstop adjustments
-            machine.xstop += v[0];
-            machine.ystop += v[1];
-            machine.zstop += v[2];
+            machine.Xstop += v[0];
+            machine.Ystop += v[1];
+            machine.Zstop += v[2];
             if (norm)
             {
                 NormaliseEndstopAdjustments(machine);
@@ -124,16 +120,16 @@ namespace ReDACT.Classes
 
             if (numFactors >= 4)
             {
-                machine.radius += v[3];
+                machine.Radius += v[3];
 
                 if (numFactors >= 6)
                 {
-                    machine.xadj += v[4];
-                    machine.yadj += v[5];
+                    machine.Xadj += v[4];
+                    machine.Yadj += v[5];
 
                     if (numFactors == 7)
                     {
-                        machine.diagonal += v[6];
+                        machine.Diagonal += v[6];
                     }
                 }
 
@@ -142,19 +138,19 @@ namespace ReDACT.Classes
 
             // Adjusting the diagonal and the tower positions affects the homed carriage height.
             // We need to adjust homedHeight to allow for this, to get the change that was requested in the endstop corrections.
-            double heightError = machine.homedCarriageHeight + machine.xstop - oldCarriageHeightA - v[0];
-            machine.homedHeight -= heightError;
-            machine.homedCarriageHeight -= heightError;
+            double heightError = machine.HomedCarriageHeight + machine.Xstop - oldCarriageHeightA - v[0];
+            machine.HomedHeight -= heightError;
+            machine.HomedCarriageHeight -= heightError;
         }
 
         public static void ClearDebug()
         {
-            Escher3D.EscherDebug = "";
+            EscherDebug = "";
         }
 
         public static void DebugPrint(string s)
         {
-            Escher3D.EscherDebug = s;
+            EscherDebug = s;
         }
 
         public static string PrintVector(string label, double[] v)
@@ -172,106 +168,105 @@ namespace ReDACT.Classes
             return rslt;
         }
 
-        public static CalibrationResult calc(ref DParameters machine, ref TParameters data)
+        public static CalibrationResult Calc(ref DParameters machine, ref Parameters data)
         {
-            convertIncomingEndstops(machine);
+            ConvertIncomingEndstops(machine);
             try
             {
                 CalibrationResult rslt = DoDeltaCalibration(ref machine, ref data);
-                convertOutgoingEndstops(machine);
-                Console.WriteLine(String.Format("Success! {0}", rslt));
+                ConvertOutgoingEndstops(machine);
+                Console.WriteLine("Success! {0}", rslt);
                 return rslt;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                Console.WriteLine(String.Format("Fail!\n" + e.StackTrace));
-                return new CalibrationResult(data.numFactors, data.numPoints, double.NaN, double.NaN);
-            }           
+                Console.WriteLine(string.Format("Fail!\n" + e.StackTrace));
+                return new CalibrationResult(data.NumFactors, data.NumPoints, double.NaN, double.NaN);
+            }
         }
 
-        private static CalibrationResult DoDeltaCalibration(ref DParameters machine, ref TParameters data)
+        private static CalibrationResult DoDeltaCalibration(ref DParameters machine, ref Parameters data)
         {
-            if (data.numFactors != 3 && data.numFactors != 4 && data.numFactors != 6 && data.numFactors != 7)
+            if (data.NumFactors != 3 && data.NumFactors != 4 && data.NumFactors != 6 && data.NumFactors != 7)
             {
-                
-                throw new Exception("Error: " + data.numFactors + " factors requested but only 3, 4, 6 and 7 supported");
+
+                throw new Exception("Error: " + data.NumFactors + " factors requested but only 3, 4, 6 and 7 supported");
             }
-            if (data.numFactors > data.numPoints)
+            if (data.NumFactors > data.NumPoints)
             {
                 throw new Exception("Error: need at least as many points as factors you want to calibrate");
             }
 
-            if (debug)
-                ClearDebug();
+            ClearDebug();
 
             // Transform the probing points to motor endpoints and store them in a matrix, so that we can do multiple iterations using the same data
-            ReMatrix probeMotorPositions = new ReMatrix(data.numPoints, 3);
-            double[] corrections = new double[data.numPoints];
+            ReMatrix probeMotorPositions = new ReMatrix(data.NumPoints, 3);
+            double[] corrections = new double[data.NumPoints];
             double initialSumOfSquares = 0.0;
-            for (int i = 0; i < data.numPoints; ++i)
+            for (int i = 0; i < data.NumPoints; ++i)
             {
                 corrections[i] = 0.0;
                 double[] machinePos = new double[3];
-                double xp = data.xBedProbePoints[i];
-                double yp = data.yBedProbePoints[i];
+                double xp = data.XBedProbePoints[i];
+                double yp = data.YBedProbePoints[i];
                 machinePos[0] = xp;
                 machinePos[1] = yp;
                 machinePos[2] = 0.0;
 
-                probeMotorPositions.data[i][0] = Escher3D.Transform(machinePos, 0, ref machine);
-                probeMotorPositions.data[i][1] = Escher3D.Transform(machinePos, 1, ref machine);
-                probeMotorPositions.data[i][2] = Escher3D.Transform(machinePos, 2, ref machine);
+                probeMotorPositions.Data[i][0] = Transform(machinePos, 0, ref machine);
+                probeMotorPositions.Data[i][1] = Transform(machinePos, 1, ref machine);
+                probeMotorPositions.Data[i][2] = Transform(machinePos, 2, ref machine);
 
-                initialSumOfSquares += fsquare(data.zBedProbePoints[i]);
+                initialSumOfSquares += Fsquare(data.ZBedProbePoints[i]);
             }
 
-            if (debug)
-                DebugPrint(probeMotorPositions.Print("Motor positions:"));
+            DebugPrint(probeMotorPositions.Print("Motor positions:"));
 
             // Do 1 or more Newton-Raphson iterations
             double expectedRmsError = 0.0;
             for (int iteration = 0; iteration < 3; iteration++)
             {
                 // Build a Nx7 matrix of derivatives with respect to xa, xb, yc, za, zb, zc, diagonal.
-                ReMatrix derivativeMatrix = new ReMatrix(data.numPoints, data.numFactors);
-                for (int i = 0; i < data.numPoints; ++i)
+                ReMatrix derivativeMatrix = new ReMatrix(data.NumPoints, data.NumFactors);
+                for (int i = 0; i < data.NumPoints; ++i)
                 {
-                    for (int j = 0; j < data.numFactors; ++j)
+                    for (int j = 0; j < data.NumFactors; ++j)
                     {
-                        derivativeMatrix.data[i][j] =
-                            Escher3D.ComputeDerivative(j, probeMotorPositions.data[i][0], probeMotorPositions.data[i][1], probeMotorPositions.data[i][2],machine);
+                        derivativeMatrix.Data[i][j] =
+                            ComputeDerivative(j, probeMotorPositions.Data[i][0], probeMotorPositions.Data[i][1], probeMotorPositions.Data[i][2], machine);
                     }
                 }
 
-                if (debug)
-                    DebugPrint(derivativeMatrix.Print("Derivative matrix:"));
+
+                DebugPrint(derivativeMatrix.Print("Derivative matrix:"));
 
                 // Now build the normal equations for least squares fitting
-                ReMatrix normalMatrix = new ReMatrix(data.numFactors, data.numFactors + 1);
-                for (int i = 0; i < data.numFactors; ++i)
+                ReMatrix normalMatrix = new ReMatrix(data.NumFactors, data.NumFactors + 1);
+                for (int i = 0; i < data.NumFactors; ++i)
                 {
-                    for (int j = 0; j < data.numFactors; ++j)
+                    for (int j = 0; j < data.NumFactors; ++j)
                     {
-                        double temp2 = derivativeMatrix.data[0][i] * derivativeMatrix.data[0][j];
-                        for (int k = 1; k < data.numPoints; ++k)
+                        double temp2 = derivativeMatrix.Data[0][i] * derivativeMatrix.Data[0][j];
+                        for (int k = 1; k < data.NumPoints; ++k)
                         {
-                            temp2 += derivativeMatrix.data[k][i] * derivativeMatrix.data[k][j];
+                            temp2 += derivativeMatrix.Data[k][i] * derivativeMatrix.Data[k][j];
                         }
-                        normalMatrix.data[i][j] = temp2;
+                        normalMatrix.Data[i][j] = temp2;
                     }
-                    double temp = derivativeMatrix.data[0][i] * -(data.zBedProbePoints[0] + corrections[0]);
-                    for (int k = 1; k < data.numPoints; ++k)
+                    double temp = derivativeMatrix.Data[0][i] * -(data.ZBedProbePoints[0] + corrections[0]);
+                    for (int k = 1; k < data.NumPoints; ++k)
                     {
-                        temp += derivativeMatrix.data[k][i] * -(data.zBedProbePoints[k] + corrections[k]);
+                        temp += derivativeMatrix.Data[k][i] * -(data.ZBedProbePoints[k] + corrections[k]);
                     }
-                    normalMatrix.data[i][data.numFactors] = temp;
+                    normalMatrix.Data[i][data.NumFactors] = temp;
                 }
 
-                if (debug)
-                    DebugPrint(normalMatrix.Print("Normal matrix:"));
 
-                normalMatrix.GaussJordan(out double[] solution, data.numFactors);
+                DebugPrint(normalMatrix.Print("Normal matrix:"));
 
-                for (int i = 0; i < data.numFactors; ++i)
+                normalMatrix.GaussJordan(out double[] solution, data.NumFactors);
+
+                for (int i = 0; i < data.NumFactors; ++i)
                 {
                     if (double.IsNaN(solution[i]))
                     {
@@ -279,87 +274,86 @@ namespace ReDACT.Classes
                     }
                 }
 
-                if(debug)
-                    DebugPrint(normalMatrix.Print("Solved matrix:"));
 
-                if (debug)
+                DebugPrint(normalMatrix.Print("Solved matrix:"));
+
+
+                DebugPrint(PrintVector("Solution", solution));
+
+                // Calculate and display the residuals
+                double[] residuals = new double[data.NumPoints];
+                for (int i = 0; i < data.NumPoints; ++i)
                 {
-                    DebugPrint(PrintVector("Solution", solution));
-
-                    // Calculate and display the residuals
-                    var residuals = new double[data.numPoints];
-                    for (int i = 0; i < data.numPoints; ++i)
+                    double r = data.ZBedProbePoints[i];
+                    for (int j = 0; j < data.NumFactors; ++j)
                     {
-                        var r = data.zBedProbePoints[i];
-                        for (int j = 0; j < data.numFactors; ++j)
-                        {
-                            r += solution[j] * derivativeMatrix.data[i][j];
-                        }
-                        residuals[i] = r;
+                        r += solution[j] * derivativeMatrix.Data[i][j];
                     }
-                    DebugPrint(PrintVector("Residuals", residuals));
+                    residuals[i] = r;
                 }
+                DebugPrint(PrintVector("Residuals", residuals));
 
-                Escher3D.Adjust(data.numFactors, solution, data.normalise, machine);
+
+                Adjust(data.NumFactors, solution, data.Normalise, machine);
 
                 // Calculate the expected probe heights using the new parameters
                 {
-                    double[] expectedResiduals = new double[data.numPoints];
+                    double[] expectedResiduals = new double[data.NumPoints];
                     double sumOfSquares = 0.0;
-                    for (int i = 0; i < data.numPoints; ++i)
+                    for (int i = 0; i < data.NumPoints; ++i)
                     {
-                        for (var axis = 0; axis < 3; ++axis)
+                        for (int axis = 0; axis < 3; ++axis)
                         {
-                            probeMotorPositions.data[i][axis] += solution[axis];
+                            probeMotorPositions.Data[i][axis] += solution[axis];
                         }
-                        double newZ = Escher3D.InverseTransform(probeMotorPositions.data[i][0], probeMotorPositions.data[i][1], probeMotorPositions.data[i][2],machine);
+                        double newZ = InverseTransform(probeMotorPositions.Data[i][0], probeMotorPositions.Data[i][1], probeMotorPositions.Data[i][2], machine);
                         corrections[i] = newZ;
-                        expectedResiduals[i] = data.zBedProbePoints[i] + newZ;
-                        sumOfSquares += fsquare(expectedResiduals[i]);
+                        expectedResiduals[i] = data.ZBedProbePoints[i] + newZ;
+                        sumOfSquares += Fsquare(expectedResiduals[i]);
                     }
 
-                    expectedRmsError = Math.Sqrt(sumOfSquares / data.numPoints);
+                    expectedRmsError = Math.Sqrt(sumOfSquares / data.NumPoints);
 
-                    if(debug)
-                        Debug.WriteLine(String.Format("Iteration {0} RMS:\t{1}", iteration, expectedRmsError));
 
-                    if (debug)
-                        DebugPrint(PrintVector("Expected probe error", expectedResiduals));
+                    System.Diagnostics.Debug.WriteLine("Iteration {0} RMS:\t{1}", iteration, expectedRmsError);
+
+
+                    DebugPrint(PrintVector("Expected probe error", expectedResiduals));
                 }
 
                 // Decide whether to do another iteration Two is slightly better than one, but three doesn't improve things.
                 // Alternatively, we could stop when the expected RMS error is only slightly worse than the RMS of the residuals.
             }
-            CalibrationResult result = new CalibrationResult(data.numFactors, data.numPoints, initialSumOfSquares, expectedRmsError);
+            CalibrationResult result = new CalibrationResult(data.NumFactors, data.NumPoints, initialSumOfSquares, expectedRmsError);
             return result;
         }
 
-        public static void convertIncomingEndstops(DParameters machine)
+        public static void ConvertIncomingEndstops(DParameters machine)
         {
-            double endstopFactor = (machine.firmware == Firmware.RRF || machine.firmware == Firmware.KLIPPER) ? 1.0
-                        : (machine.firmware == Firmware.REPETIER) ? 1.0 / machine.stepspermm
+            double endstopFactor = machine.Firmware == DParameters.FirmwareType.Rrf || machine.Firmware == DParameters.FirmwareType.Klipper ? 1.0
+                        : machine.Firmware == DParameters.FirmwareType.Repetier ? 1.0 / machine.Stepspermm
                             : -1.0;
-            machine.xstop *= endstopFactor;
-            machine.ystop *= endstopFactor;
-            machine.zstop *= endstopFactor;
+            machine.Xstop *= endstopFactor;
+            machine.Ystop *= endstopFactor;
+            machine.Zstop *= endstopFactor;
         }
 
-        public static void convertOutgoingEndstops(DParameters machine)
+        public static void ConvertOutgoingEndstops(DParameters machine)
         {
-            double endstopFactor = (machine.firmware == Firmware.RRF || machine.firmware == Firmware.KLIPPER) ? 1.0
-                        : (machine.firmware == Firmware.REPETIER) ? machine.stepspermm
+            double endstopFactor = machine.Firmware == DParameters.FirmwareType.Rrf || machine.Firmware == DParameters.FirmwareType.Klipper ? 1.0
+                        : machine.Firmware == DParameters.FirmwareType.Repetier ? machine.Stepspermm
                             : -1.0;
-            machine.xstop *= endstopFactor;
-            machine.ystop *= endstopFactor;
-            machine.zstop *= endstopFactor;
+            machine.Xstop *= endstopFactor;
+            machine.Ystop *= endstopFactor;
+            machine.Zstop *= endstopFactor;
         }
 
         public enum NumFactors
         {
-            THREE=3,
-            FOUR=4,
-            SIX=6,
-            SEVEN=7
+            Three = 3,
+            Four = 4,
+            Six = 6,
+            Seven = 7
         }
-    }    
+    }
 }

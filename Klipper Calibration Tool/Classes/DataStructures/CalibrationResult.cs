@@ -1,32 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ReDACT.Classes.Escher
+namespace Klipper_Calibration_Tool.Classes.DataStructures
 {
     public class CalibrationResult
     {
-        public bool Success { get; private set; }
-        public int Factors { get; private set; }
-        public int Points { get; private set; }
-        public double DeviationBefore { get; private set; }
-        public double DeviationAfter { get; private set; }
+        public bool Success { get; }
+        public int Factors { get; }
+        public int Points { get; }
+        public double DeviationBefore { get; }
+        public double DeviationAfter { get; }
 
         public CalibrationResult(int factors, int points, double initialSumOfSquares, double expectedRmsError)
         {
-            this.Success = !(double.IsNaN(initialSumOfSquares) || double.IsNaN(expectedRmsError));
-            this.Factors = factors;
-            this.Points = points;
-            this.DeviationBefore = Math.Sqrt(initialSumOfSquares / Convert.ToDouble(Points));
-            this.DeviationAfter = expectedRmsError;
+            Success = !(double.IsNaN(initialSumOfSquares) || double.IsNaN(expectedRmsError));
+            Factors = factors;
+            Points = points;
+            DeviationBefore = Math.Sqrt(initialSumOfSquares / Convert.ToDouble(Points));
+            DeviationAfter = expectedRmsError;
 
         }
 
         public override string ToString()
         {
-            return String.Format("Calibrated {0} factors using {1} points, deviation before {2} after {3}", Factors, Points, DeviationBefore, DeviationAfter);
+            return
+                $"Calibrated {Factors} factors using {Points} points, deviation before {DeviationBefore} after {DeviationAfter}";
         }
     }
 }
